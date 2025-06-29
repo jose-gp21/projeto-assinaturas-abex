@@ -1,0 +1,128 @@
+{
+    "plans": {
+      "title": "Desbloqueie Todo o Potencial",
+      "subtitle": "Escolha o plano perfeito para acelerar seu crescimento. Todos os planos incluem acesso completo ao conteúdo premium, suporte prioritário e atualizações constantes.",
+      "choosePlan": "Escolha seu plano",
+      "loading": "Carregando planos...",
+      "accessDenied": "Acesso negado. Por favor, faça login.",
+      "noPlansAvailable": "Nenhum plano disponível",
+      "newPlansAvailable": "Novos planos serão disponibilizados em breve",
+      "billing": {
+        "monthly": "Mensal",
+        "annual": "Anual",
+        "saveUp": "Economize até 30%"
+      },
+      "badges": {
+        "mostPopular": "MAIS POPULAR",
+        "freeTrialDays": "dias grátis"
+      },
+      "pricing": {
+        "month": "mês",
+        "year": "ano",
+        "consultValues": "Consulte valores"
+      },
+      "benefits": {
+        "title": "Benefícios inclusos:",
+        "securePayment": "Pagamento 100% seguro",
+        "activeMembers": "+10.000 membros ativos",
+        "satisfaction": "98% de satisfação"
+      },
+      "actions": {
+        "chooseMonthlyPlan": "Escolher Plano Mensal",
+        "chooseAnnualPlan": "Escolher Plano Anual",
+        "cancelAnytime": "Cancele a qualquer momento durante o período de teste"
+      },
+      "whyChoose": {
+        "title": "Por que escolher nossos planos?",
+        "subtitle": "Todos os planos foram cuidadosamente desenvolvidos para oferecer o máximo valor e acelerar seus resultados",
+        "premiumContent": {
+          "title": "Conteúdo Premium",
+          "description": "Acesso exclusivo a materiais de alta qualidade criados por especialistas"
+        },
+        "vipCommunity": {
+          "title": "Comunidade VIP",
+          "description": "Conecte-se com outros membros e participe de discussões exclusivas"
+        },
+        "prioritySupport": {
+          "title": "Suporte Prioritário",
+          "description": "Atendimento especializado para tirar suas dúvidas rapidamente"
+        }
+      },
+      "faq": {
+        "title": "Ainda tem dúvidas?",
+        "subtitle": "Entre em contato conosco para esclarecimentos sobre nossos planos",
+        "talkToSupport": "Falar com Suporte",
+        "viewDemo": "Ver Demonstração"
+      },
+      "processing": {
+        "selectingPlan": "selecionado! Redirecionando para pagamento...",
+        "error": "Erro ao processar solicitação. Tente novamente."
+      }
+    },
+    "content": {
+      "title": "Conteúdo Exclusivo",
+      "subtitle": "Descubra materiais premium cuidadosamente selecionados para impulsionar seu crescimento",
+      "loading": "Carregando conteúdos...",
+      "accessDenied": "Acesso negado. Por favor, faça login.",
+      "unlockPremium": {
+        "title": "Desbloqueie Conteúdo Premium",
+        "subtitle": "Assine um plano para acessar todos os conteúdos exclusivos e acelerar seus resultados",
+        "viewPlans": "Ver Planos"
+      },
+      "activeSubscription": {
+        "title": "Assinatura Ativa!",
+        "subtitle": "Você tem acesso completo a todos os conteúdos premium"
+      },
+      "library": "Biblioteca de Conteúdo",
+      "search": "Buscar conteúdo...",
+      "allTypes": "Todos os tipos",
+      "viewModes": {
+        "grid": "Grade",
+        "list": "Lista"
+      },
+      "stats": {
+        "totalAvailable": "Total Disponível",
+        "premium": "Premium",
+        "free": "Gratuito",
+        "accessible": "Acessível"
+      },
+      "types": {
+        "article": "Artigo",
+        "video": "Vídeo", 
+        "event": "Evento",
+        "podcast": "Podcast",
+        "course": "Curso",
+        "webinar": "Webinar",
+        "other": "Outro"
+      },
+      "badges": {
+        "premium": "Premium",
+        "free": "Grátis"
+      },
+      "actions": {
+        "accessContent": "Acessar Conteúdo",
+        "subscribeToAccess": "Assine para Acessar",
+        "subscribe": "Assinar",
+        "access": "Acessar"
+      },
+      "noContent": {
+        "title": "Nenhum conteúdo disponível",
+        "titleNotFound": "Nenhum conteúdo encontrado",
+        "subtitle": "Novos conteúdos serão adicionados em breve",
+        "subtitleNotFound": "Tente ajustar os filtros de busca"
+      },
+      "rating": "avaliação",
+      "views": "visualizações"
+    },
+    "common": {
+      "loading": "Carregando...",
+      "error": "Erro",
+      "success": "Sucesso",
+      "accessDenied": "Acesso negado",
+      "loginRequired": "Por favor, faça login",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "close": "Fechar",
+      "back": "Voltar"
+    }
+  }

@@ -1,0 +1,128 @@
+{
+    "plans": {
+      "title": "Unlock Your Full Potential",
+      "subtitle": "Choose the perfect plan to accelerate your growth. All plans include full access to premium content, priority support, and constant updates.",
+      "choosePlan": "Choose your plan",
+      "loading": "Loading plans...",
+      "accessDenied": "Access denied. Please login.",
+      "noPlansAvailable": "No plans available",
+      "newPlansAvailable": "New plans will be available soon",
+      "billing": {
+        "monthly": "Monthly",
+        "annual": "Annual",
+        "saveUp": "Save up to 30%"
+      },
+      "badges": {
+        "mostPopular": "MOST POPULAR",
+        "freeTrialDays": "free days"
+      },
+      "pricing": {
+        "month": "month",
+        "year": "year",
+        "consultValues": "Contact for pricing"
+      },
+      "benefits": {
+        "title": "Benefits included:",
+        "securePayment": "100% secure payment",
+        "activeMembers": "+10,000 active members",
+        "satisfaction": "98% satisfaction"
+      },
+      "actions": {
+        "chooseMonthlyPlan": "Choose Monthly Plan",
+        "chooseAnnualPlan": "Choose Annual Plan",
+        "cancelAnytime": "Cancel anytime during trial period"
+      },
+      "whyChoose": {
+        "title": "Why choose our plans?",
+        "subtitle": "All plans have been carefully developed to offer maximum value and accelerate your results",
+        "premiumContent": {
+          "title": "Premium Content",
+          "description": "Exclusive access to high-quality materials created by experts"
+        },
+        "vipCommunity": {
+          "title": "VIP Community",
+          "description": "Connect with other members and participate in exclusive discussions"
+        },
+        "prioritySupport": {
+          "title": "Priority Support",
+          "description": "Specialized service to answer your questions quickly"
+        }
+      },
+      "faq": {
+        "title": "Still have questions?",
+        "subtitle": "Contact us for clarifications about our plans",
+        "talkToSupport": "Talk to Support",
+        "viewDemo": "View Demo"
+      },
+      "processing": {
+        "selectingPlan": "selected! Redirecting to payment...",
+        "error": "Error processing request. Please try again."
+      }
+    },
+    "content": {
+      "title": "Exclusive Content",
+      "subtitle": "Discover premium materials carefully selected to boost your growth",
+      "loading": "Loading content...",
+      "accessDenied": "Access denied. Please login.",
+      "unlockPremium": {
+        "title": "Unlock Premium Content",
+        "subtitle": "Subscribe to a plan to access all exclusive content and accelerate your results",
+        "viewPlans": "View Plans"
+      },
+      "activeSubscription": {
+        "title": "Active Subscription!",
+        "subtitle": "You have full access to all premium content"
+      },
+      "library": "Content Library",
+      "search": "Search content...",
+      "allTypes": "All types",
+      "viewModes": {
+        "grid": "Grid",
+        "list": "List"
+      },
+      "stats": {
+        "totalAvailable": "Total Available",
+        "premium": "Premium",
+        "free": "Free",
+        "accessible": "Accessible"
+      },
+      "types": {
+        "article": "Article",
+        "video": "Video",
+        "event": "Event",
+        "podcast": "Podcast",
+        "course": "Course",
+        "webinar": "Webinar",
+        "other": "Other"
+      },
+      "badges": {
+        "premium": "Premium",
+        "free": "Free"
+      },
+      "actions": {
+        "accessContent": "Access Content",
+        "subscribeToAccess": "Subscribe to Access",
+        "subscribe": "Subscribe",
+        "access": "Access"
+      },
+      "noContent": {
+        "title": "No content available",
+        "titleNotFound": "No content found",
+        "subtitle": "New content will be added soon",
+        "subtitleNotFound": "Try adjusting the search filters"
+      },
+      "rating": "rating",
+      "views": "views"
+    },
+    "common": {
+      "loading": "Loading...",
+      "error": "Error",
+      "success": "Success",
+      "accessDenied": "Access denied",
+      "loginRequired": "Please login",
+      "save": "Save",
+      "cancel": "Cancel",
+      "close": "Close",
+      "back": "Back"
+    }
+  }
