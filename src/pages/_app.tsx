@@ -1,15 +1,16 @@
 // src/pages/_app.tsx
-import '../styles/globals.css'; // Certifique-se de que seus estilos globais estão importados
+import '../styles/globals.css';
 import type { AppProps } from 'next/app';
-import { SessionProvider } from 'next-auth/react'; // <-- Importe o SessionProvider
+import { SessionProvider } from 'next-auth/react';
+import { appWithTranslation } from 'next-i18next';
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
-    // Envolve todo o aplicativo com SessionProvider
     <SessionProvider session={session}>
       <Component {...pageProps} />
     </SessionProvider>
   );
 }
 
-export default MyApp;
+// MUITO IMPORTANTE: Envolver com appWithTranslation
+export default appWithTranslation(MyApp);

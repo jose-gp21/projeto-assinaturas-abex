@@ -1,6 +1,10 @@
 // src/pages/index.tsx
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Layout from '@/components/Layout';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 import { 
   Crown, 
   Shield, 
@@ -46,10 +50,12 @@ import { useState, useEffect } from 'react';
 
 export default function HomePage() {
   const { data: session } = useSession();
+  const { t, i18n } = useTranslation(['home', 'common']);
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [activePlanPeriod, setActivePlanPeriod] = useState<'monthly' | 'annually'>('monthly'); // 'monthly' or 'annually'
+  const [activePlanPeriod, setActivePlanPeriod] = useState<'monthly' | 'annually'>('monthly');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,91 +66,121 @@ export default function HomePage() {
   }, []);
 
   const stats = [
-    { number: "10,000+", label: "Membros Ativos", icon: Users },
-    { number: "98%", label: "Satisfação", icon: Star },
-    { number: "500+", label: "Conteúdos Exclusivos", icon: FileText },
-    { number: "24/7", label: "Suporte Premium", icon: Shield }
+    { number: "10,000+", label: t('home:stats.activeMembers'), icon: Users },
+    { number: "98%", label: t('home:stats.satisfaction'), icon: Star },
+    { number: "500+", label: t('home:stats.exclusiveContent'), icon: FileText },
+    { number: "24/7", label: t('home:stats.premiumSupport'), icon: Shield }
   ];
 
   const features = [
     {
       icon: Crown,
-      title: "Conteúdo Exclusivo",
-      description: "Acesso a materiais premium desenvolvidos por especialistas reconhecidos no mercado",
+      title: t('home:features.exclusiveContent.title'),
+      description: t('home:features.exclusiveContent.description'),
       color: "from-purple-500 to-pink-500"
     },
     {
       icon: Shield,
-      title: "Segurança Total",
-      description: "Seus dados e conteúdos protegidos com criptografia de nível militar",
+      title: t('home:features.totalSecurity.title'),
+      description: t('home:features.totalSecurity.description'),
       color: "from-blue-500 to-cyan-500"
     },
     {
       icon: Users,
-      title: "Comunidade VIP",
-      description: "Conecte-se com outros membros premium em ambiente exclusivo e colaborativo",
+      title: t('home:features.vipCommunity.title'),
+      description: t('home:features.vipCommunity.description'),
       color: "from-green-500 to-emerald-500"
     },
     {
       icon: Zap,
-      title: "Acesso Instantâneo",
-      description: "Disponibilidade 24/7 em todos os seus dispositivos com sincronização automática",
+      title: t('home:features.instantAccess.title'),
+      description: t('home:features.instantAccess.description'),
       color: "from-orange-500 to-red-500"
     }
   ];
 
   const contentTypes = [
-    { icon: FileText, title: "Artigos Premium", description: "Análises profundas e insights exclusivos", color: "from-purple-500 to-pink-500" },
-    { icon: Video, title: "Vídeos Exclusivos", description: "Masterclasses com experts do setor", color: "from-blue-500 to-cyan-500" },
-    { icon: Calendar, title: "Eventos VIP", description: "Webinars e encontros exclusivos", color: "from-green-500 to-emerald-500" },
-    { icon: Headphones, title: "Podcasts", description: "Conversas reveladoras e estratégias secretas", color: "from-orange-500 to-red-500" },
-    { icon: BookOpen, title: "Cursos Avançados", description: "Formação completa em diversas áreas", color: "from-indigo-500 to-purple-500" },
-    { icon: Monitor, title: "Webinars", description: "Sessões interativas ao vivo", color: "from-teal-500 to-blue-500" }
+    { 
+      icon: FileText, 
+      title: t('home:contentTypes.premiumArticles.title'), 
+      description: t('home:contentTypes.premiumArticles.description'), 
+      color: "from-purple-500 to-pink-500" 
+    },
+    { 
+      icon: Video, 
+      title: t('home:contentTypes.exclusiveVideos.title'), 
+      description: t('home:contentTypes.exclusiveVideos.description'), 
+      color: "from-blue-500 to-cyan-500" 
+    },
+    { 
+      icon: Calendar, 
+      title: t('home:contentTypes.vipEvents.title'), 
+      description: t('home:contentTypes.vipEvents.description'), 
+      color: "from-green-500 to-emerald-500" 
+    },
+    { 
+      icon: Headphones, 
+      title: t('home:contentTypes.podcasts.title'), 
+      description: t('home:contentTypes.podcasts.description'), 
+      color: "from-orange-500 to-red-500" 
+    },
+    { 
+      icon: BookOpen, 
+      title: t('home:contentTypes.advancedCourses.title'), 
+      description: t('home:contentTypes.advancedCourses.description'), 
+      color: "from-indigo-500 to-purple-500" 
+    },
+    { 
+      icon: Monitor, 
+      title: t('home:contentTypes.webinars.title'), 
+      description: t('home:contentTypes.webinars.description'), 
+      color: "from-teal-500 to-blue-500" 
+    }
   ];
 
   const plans = [
     {
-      name: "Básico",
-      price: { monthly: "29", annually: "299" }, // Changed to object for monthly/annually
+      name: t('home:plans.basic.name'),
+      price: { monthly: "29", annually: "299" },
       originalPrice: { monthly: "39", annually: "399" },
-      description: "Ideal para iniciantes",
+      description: t('home:plans.basic.description'),
       features: [
-        "Acesso a 50+ conteúdos premium",
-        "Suporte via email",
-        "Comunidade básica",
-        "Downloads limitados"
+        t('home:plans.basic.features.0'),
+        t('home:plans.basic.features.1'),
+        t('home:plans.basic.features.2'),
+        t('home:plans.basic.features.3')
       ],
       popular: false,
       color: "from-slate-600 to-slate-700"
     },
     {
-      name: "Premium",
+      name: t('home:plans.premium.name'),
       price: { monthly: "79", annually: "799" },
       originalPrice: { monthly: "99", annually: "999" },
-      description: "Mais popular entre profissionais",
+      description: t('home:plans.premium.description'),
       features: [
-        "Acesso total aos conteúdos",
-        "Suporte prioritário 24/7",
-        "Eventos exclusivos",
-        "Downloads ilimitados",
-        "Acesso mobile premium",
-        "Certificados de conclusão"
+        t('home:plans.premium.features.0'),
+        t('home:plans.premium.features.1'),
+        t('home:plans.premium.features.2'),
+        t('home:plans.premium.features.3'),
+        t('home:plans.premium.features.4'),
+        t('home:plans.premium.features.5')
       ],
       popular: true,
       color: "from-purple-600 to-blue-600"
     },
     {
-      name: "VIP",
+      name: t('home:plans.vip.name'),
       price: { monthly: "149", annually: "1499" },
       originalPrice: { monthly: "199", annually: "1999" },
-      description: "Experiência completa e personalizada",
+      description: t('home:plans.vip.description'),
       features: [
-        "Tudo do Premium",
-        "Consultoria 1:1 mensal",
-        "Acesso antecipado a novos conteúdos",
-        "Sessões de mentoria",
-        "Networking exclusivo",
-        "Materiais personalizados"
+        t('home:plans.vip.features.0'),
+        t('home:plans.vip.features.1'),
+        t('home:plans.vip.features.2'),
+        t('home:plans.vip.features.3'),
+        t('home:plans.vip.features.4'),
+        t('home:plans.vip.features.5')
       ],
       popular: false,
       color: "from-yellow-500 to-orange-500"
@@ -153,33 +189,49 @@ export default function HomePage() {
 
   const testimonials = [
     {
-      name: "Maria Silva",
-      role: "Empresária",
-      content: "O Clubes Abex transformou completamente minha visão de negócios. O conteúdo é simplesmente excepcional!",
+      name: t('home:testimonials.0.name'),
+      role: t('home:testimonials.0.role'),
+      content: t('home:testimonials.0.content'),
       rating: 5,
       image: "MS"
     },
     {
-      name: "João Santos",
-      role: "Consultor",
-      content: "Depois de assinar o plano Premium, meus resultados triplicaram. Vale cada centavo investido!",
+      name: t('home:testimonials.1.name'),
+      role: t('home:testimonials.1.role'),
+      content: t('home:testimonials.1.content'),
       rating: 5,
       image: "JS"
     },
     {
-      name: "Ana Costa",
-      role: "Executiva",
-      content: "A comunidade VIP é incrível. Aprendo todos os dias com profissionais de alto nível.",
+      name: t('home:testimonials.2.name'),
+      role: t('home:testimonials.2.role'),
+      content: t('home:testimonials.2.content'),
       rating: 5,
       image: "AC"
     }
   ];
 
   const dashboardFeatures = [
-    { title: "Analytics Avançados", description: "Métricas detalhadas de engajamento", icon: BarChart3 },
-    { title: "Gestão de Membros", description: "Controle total da sua comunidade", icon: Users },
-    { title: "Criação de Conteúdo", description: "Editor intuitivo e poderoso", icon: Settings },
-    { title: "Monetização", description: "Diversas opções de receita", icon: TrendingUp }
+    { 
+      title: t('home:dashboard.analytics.title'), 
+      description: t('home:dashboard.analytics.description'), 
+      icon: BarChart3 
+    },
+    { 
+      title: t('home:dashboard.memberManagement.title'), 
+      description: t('home:dashboard.memberManagement.description'), 
+      icon: Users 
+    },
+    { 
+      title: t('home:dashboard.contentCreation.title'), 
+      description: t('home:dashboard.contentCreation.description'), 
+      icon: Settings 
+    },
+    { 
+      title: t('home:dashboard.monetization.title'), 
+      description: t('home:dashboard.monetization.description'), 
+      icon: TrendingUp 
+    }
   ];
 
   useEffect(() => {
@@ -189,8 +241,13 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [testimonials.length]);
 
+  // Função para trocar idioma
+  const changeLanguage = (locale: string) => {
+    router.push(router.pathname, router.asPath, { locale });
+  };
+
   return (
-    <Layout>
+    <Layout activeTab="home" >
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 overflow-hidden">
         
         {/* Floating Elements */}
@@ -199,7 +256,31 @@ export default function HomePage() {
           <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 blur-3xl animate-pulse delay-1000"></div>
         </div>
 
-
+        {/* Language Selector - Top Bar */}
+        <div className="absolute top-4 right-4 z-50">
+          <div className="flex items-center gap-2 bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2">
+            <button
+              onClick={() => changeLanguage('pt-BR')}
+              className={`px-2 py-1 rounded text-sm transition-colors ${
+                router.locale === 'pt-BR' 
+                  ? 'bg-purple-600 text-white' 
+                  : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              🇧🇷 PT
+            </button>
+            <button
+              onClick={() => changeLanguage('en-US')}
+              className={`px-2 py-1 rounded text-sm transition-colors ${
+                router.locale === 'en-US' 
+                  ? 'bg-purple-600 text-white' 
+                  : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              🇺🇸 EN
+            </button>
+          </div>
+        </div>
 
         {/* Hero Section */}
         <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8">
@@ -209,23 +290,23 @@ export default function HomePage() {
                 <div className="space-y-6">
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full border border-purple-500/30">
                     <Sparkles className="w-4 h-4 text-purple-400" />
-                    <span className="text-purple-300 text-sm font-medium">Plataforma Exclusiva</span>
+                    <span className="text-purple-300 text-sm font-medium">
+                      {t('home:hero.badge')}
+                    </span>
                   </div>
                   
                   <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
                     <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-                      Clubes Abex
+                      {t('home:hero.title.part1')}
                     </span>
                     <br />
                     <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                      Conteúdo Premium
+                      {t('home:hero.title.part2')}
                     </span>
                   </h1>
                   
                   <p className="text-xl text-slate-300 leading-relaxed max-w-2xl">
-                    Descubra a plataforma que transforma conhecimento em resultados. 
-                    Acesse conteúdos exclusivos, conecte-se com uma comunidade premium 
-                    e acelere seu crescimento profissional.
+                    {t('home:hero.subtitle')}
                   </p>
                 </div>
 
@@ -233,18 +314,18 @@ export default function HomePage() {
                   {session ? (
                     <a href="/membro/conteudo" className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/25">
                       <Crown className="w-5 h-5" />
-                      Acessar Conteúdo
+                      {t('home:hero.cta.accessContent')}
                     </a>
                   ) : (
                     <a href="/auth/signin" className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/25">
                       <Crown className="w-5 h-5" />
-                      Começar Agora
+                      {t('home:hero.cta.getStarted')}
                     </a>
                   )}
                   
                   <button className="inline-flex items-center justify-center gap-2 bg-slate-800/50 backdrop-blur-sm border border-slate-700 hover:bg-slate-700/50 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105">
                     <Play className="w-5 h-5" />
-                    Ver Demonstração
+                    {t('home:hero.cta.watchDemo')}
                   </button>
                 </div>
 
@@ -258,7 +339,9 @@ export default function HomePage() {
                         </div>
                       ))}
                     </div>
-                    <span className="text-slate-400 text-sm ml-2">+10k membros</span>
+                    <span className="text-slate-400 text-sm ml-2">
+                      {t('home:hero.trustIndicators.members')}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1">
                     {[1,2,3,4,5].map(i => (
@@ -287,8 +370,12 @@ export default function HomePage() {
                         <div className="flex items-center gap-3">
                           <Video className="w-6 h-6 text-purple-400" />
                           <div>
-                            <p className="text-white font-medium">Masterclass Exclusiva</p>
-                            <p className="text-slate-400 text-sm">Estratégias Avançadas</p>
+                            <p className="text-white font-medium">
+                              {t('home:hero.preview.masterclass')}
+                            </p>
+                            <p className="text-slate-400 text-sm">
+                              {t('home:hero.preview.strategies')}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -297,8 +384,12 @@ export default function HomePage() {
                         <div className="flex items-center gap-3">
                           <FileText className="w-6 h-6 text-green-400" />
                           <div>
-                            <p className="text-white font-medium">Relatório Premium</p>
-                            <p className="text-slate-400 text-sm">Insights Exclusivos</p>
+                            <p className="text-white font-medium">
+                              {t('home:hero.preview.report')}
+                            </p>
+                            <p className="text-slate-400 text-sm">
+                              {t('home:hero.preview.insights')}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -307,8 +398,12 @@ export default function HomePage() {
                         <div className="flex items-center gap-3">
                           <Users className="w-6 h-6 text-orange-400" />
                           <div>
-                            <p className="text-white font-medium">Comunidade VIP</p>
-                            <p className="text-slate-400 text-sm">Networking Premium</p>
+                            <p className="text-white font-medium">
+                              {t('home:hero.preview.community')}
+                            </p>
+                            <p className="text-slate-400 text-sm">
+                              {t('home:hero.preview.networking')}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -342,10 +437,13 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Por que escolher <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">Clubes Abex?</span>
+                {t('home:features.title.part1')} {' '}
+                <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                  {t('home:features.title.part2')}
+                </span>
               </h2>
               <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-                Uma plataforma completa desenvolvida para maximizar seu potencial e acelerar seus resultados
+                {t('home:features.subtitle')}
               </p>
             </div>
 
@@ -370,10 +468,13 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Tipos de <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">Conteúdo Disponível</span>
+                {t('home:contentTypes.title.part1')} {' '}
+                <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                  {t('home:contentTypes.title.part2')}
+                </span>
               </h2>
               <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-                Diversidade de formatos para atender todos os estilos de aprendizado
+                {t('home:contentTypes.subtitle')}
               </p>
             </div>
 
@@ -398,14 +499,19 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Escolha seu <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">Plano</span>
+                {t('home:plans.title.part1')} {' '}
+                <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                  {t('home:plans.title.part2')}
+                </span>
               </h2>
               <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-                Planos flexíveis para atender diferentes necessidades e orçamentos
+                {t('home:plans.subtitle')}
               </p>
               
               <div className="flex items-center justify-center gap-4 mt-8">
-                <span className={`text-slate-400 ${activePlanPeriod === 'monthly' ? 'text-white font-semibold' : ''}`}>Mensal</span>
+                <span className={`text-slate-400 ${activePlanPeriod === 'monthly' ? 'text-white font-semibold' : ''}`}>
+                  {t('home:plans.billing.monthly')}
+                </span>
                 <button
                   className="relative w-14 h-8 bg-slate-700 rounded-full border border-slate-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
                   onClick={() => setActivePlanPeriod(activePlanPeriod === 'monthly' ? 'annually' : 'monthly')}
@@ -414,9 +520,11 @@ export default function HomePage() {
                     activePlanPeriod === 'annually' ? 'translate-x-6' : ''
                   }`}></span>
                 </button>
-                <span className={`text-slate-400 ${activePlanPeriod === 'annually' ? 'text-white font-semibold' : ''}`}>Anual</span>
+                <span className={`text-slate-400 ${activePlanPeriod === 'annually' ? 'text-white font-semibold' : ''}`}>
+                  {t('home:plans.billing.annually')}
+                </span>
                 <div className="px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full text-white text-sm font-medium">
-                  -20% OFF
+                  {t('home:plans.billing.discount')}
                 </div>
               </div>
             </div>
@@ -426,7 +534,7 @@ export default function HomePage() {
                 <div key={index} className={`relative group ${plan.popular ? 'scale-105' : ''}`}>
                   {plan.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full text-white text-sm font-bold shadow-md">
-                      Mais Popular
+                      {t('home:plans.mostPopular')}
                     </div>
                   )}
                   
@@ -437,11 +545,17 @@ export default function HomePage() {
                       
                       <div className="space-y-2">
                         <div className="flex items-center justify-center gap-2">
-                          <span className="text-3xl font-bold text-slate-400 line-through">R$ {plan.originalPrice[activePlanPeriod]}</span>
+                          <span className="text-3xl font-bold text-slate-400 line-through">
+                            {router.locale === 'en-US' ? '$' : 'R$'} {plan.originalPrice[activePlanPeriod]}
+                          </span>
                         </div>
                         <div className="flex items-center justify-center gap-1">
-                          <span className="text-4xl font-bold text-white">R$ {plan.price[activePlanPeriod]}</span>
-                          <span className="text-slate-400">/{activePlanPeriod === 'monthly' ? 'mês' : 'ano'}</span>
+                          <span className="text-4xl font-bold text-white">
+                            {router.locale === 'en-US' ? '$' : 'R$'} {plan.price[activePlanPeriod]}
+                          </span>
+                          <span className="text-slate-400">
+                            /{activePlanPeriod === 'monthly' ? t('home:plans.billing.monthShort') : t('home:plans.billing.yearShort')}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -462,7 +576,7 @@ export default function HomePage() {
                         ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-purple-500/25'
                         : 'bg-slate-700 hover:bg-slate-600 text-white'
                     }`}>
-                      {session ? 'Fazer Upgrade' : 'Assinar Agora'}
+                      {session ? t('home:plans.cta.upgrade') : t('home:plans.cta.subscribe')}
                     </a>
                   </div>
                 </div>
@@ -478,11 +592,13 @@ export default function HomePage() {
               <div className="space-y-8">
                 <div>
                   <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                    Painel <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">Administrativo Avançado</span>
+                    {t('home:dashboard.title.part1')} {' '}
+                    <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                      {t('home:dashboard.title.part2')}
+                    </span>
                   </h2>
                   <p className="text-xl text-slate-400 leading-relaxed max-w-2xl">
-                    Gerencie sua plataforma com facilidade e tome decisões baseadas em dados. 
-                    Nosso painel intuitivo oferece todas as ferramentas que você precisa.
+                    {t('home:dashboard.subtitle')}
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -510,16 +626,16 @@ export default function HomePage() {
                     <div className="w-11/12 h-5/6 bg-slate-900 rounded-lg shadow-inner p-4 flex flex-col gap-2 relative">
                         <div className="absolute top-4 right-4 flex items-center gap-2 text-slate-400 text-xs">
                             <Settings className="w-3 h-3" />
-                            <span>Configurações</span>
+                            <span>{t('common:settings')}</span>
                         </div>
-                        <div className="h-6 bg-slate-800 rounded mb-4"></div> {/* Search bar */}
+                        <div className="h-6 bg-slate-800 rounded mb-4"></div>
                         <div className="grid grid-cols-3 gap-2">
-                            <div className="col-span-1 h-24 bg-gradient-to-br from-purple-700 to-blue-700 rounded-md"></div> {/* Small widget 1 */}
-                            <div className="col-span-2 h-24 bg-slate-700 rounded-md"></div> {/* Larger widget 2 */}
+                            <div className="col-span-1 h-24 bg-gradient-to-br from-purple-700 to-blue-700 rounded-md"></div>
+                            <div className="col-span-2 h-24 bg-slate-700 rounded-md"></div>
                         </div>
                         <div className="grid grid-cols-2 gap-2 mt-2">
-                            <div className="h-32 bg-slate-700 rounded-md"></div> {/* Chart 1 */}
-                            <div className="h-32 bg-slate-700 rounded-md"></div> {/* Chart 2 */}
+                            <div className="h-32 bg-slate-700 rounded-md"></div>
+                            <div className="h-32 bg-slate-700 rounded-md"></div>
                         </div>
                         <div className="flex justify-end gap-2 mt-auto">
                             <div className="w-16 h-6 bg-slate-700 rounded-md"></div>
@@ -537,79 +653,102 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Gestão de <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">Conteúdo Intuitiva</span>
+                {t('home:contentManagement.title.part1')} {' '}
+                <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                  {t('home:contentManagement.title.part2')}
+                </span>
               </h2>
               <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-                Crie, edite e organize seus conteúdos com uma interface simples e poderosa.
+                {t('home:contentManagement.subtitle')}
               </p>
             </div>
             <div className="relative p-6 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl animate-fade-in">
-              {/* Mockup de Gestão de Conteúdo */}
               <div className="w-full h-80 bg-slate-900 rounded-xl flex flex-col p-6 shadow-inner relative">
                 <div className="flex justify-between items-center mb-6">
                   <div className="flex gap-4">
-                    <div className="w-24 h-8 bg-slate-700 rounded-md"></div> {/* Filter 1 */}
-                    <div className="w-24 h-8 bg-slate-700 rounded-md"></div> {/* Filter 2 */}
+                    <div className="w-24 h-8 bg-slate-700 rounded-md"></div>
+                    <div className="w-24 h-8 bg-slate-700 rounded-md"></div>
                   </div>
                   <div className="flex items-center gap-2 bg-slate-700 rounded-md px-3 py-2">
                     <Search className="w-4 h-4 text-slate-400" />
-                    <input type="text" placeholder="Buscar conteúdo..." className="bg-transparent text-slate-300 outline-none w-40" />
+                    <input type="text" placeholder={t('common:search')} className="bg-transparent text-slate-300 outline-none w-40" />
                   </div>
                 </div>
                 <div className="flex-grow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {/* Card de Conteúdo 1 */}
                   <div className="bg-slate-800 rounded-xl p-4 flex flex-col justify-between border border-slate-700/50 hover:border-purple-500/50 transition-colors duration-300">
                     <div>
-                      <h4 className="text-lg font-semibold text-white mb-2">Artigo: Futuro da IA</h4>
-                      <p className="text-slate-400 text-sm mb-3 truncate">Um panorama completo sobre as tendências de inteligência artificial em 2025.</p>
+                      <h4 className="text-lg font-semibold text-white mb-2">
+                        {t('home:contentManagement.examples.article.title')}
+                      </h4>
+                      <p className="text-slate-400 text-sm mb-3 truncate">
+                        {t('home:contentManagement.examples.article.description')}
+                      </p>
                       <div className="flex items-center gap-2 text-slate-500 text-xs">
                         <FileText className="w-3 h-3" />
-                        <span>Publicado</span>
+                        <span>{t('home:contentManagement.status.published')}</span>
                         <div className="w-2 h-2 rounded-full bg-green-500 ml-auto"></div>
                       </div>
                     </div>
                     <div className="flex justify-end gap-2 mt-4">
-                      <button className="text-blue-400 hover:text-blue-500 text-sm">Editar</button>
-                      <button className="text-red-400 hover:text-red-500 text-sm">Excluir</button>
+                      <button className="text-blue-400 hover:text-blue-500 text-sm">
+                        {t('common:edit')}
+                      </button>
+                      <button className="text-red-400 hover:text-red-500 text-sm">
+                        {t('common:delete')}
+                      </button>
                     </div>
                   </div>
-                  {/* Card de Conteúdo 2 */}
                   <div className="bg-slate-800 rounded-xl p-4 flex flex-col justify-between border border-slate-700/50 hover:border-purple-500/50 transition-colors duration-300">
                     <div>
-                      <h4 className="text-lg font-semibold text-white mb-2">Vídeo: Blockchain Descomplicado</h4>
-                      <p className="text-slate-400 text-sm mb-3 truncate">Entenda a tecnologia blockchain e suas aplicações práticas.</p>
+                      <h4 className="text-lg font-semibold text-white mb-2">
+                        {t('home:contentManagement.examples.video.title')}
+                      </h4>
+                      <p className="text-slate-400 text-sm mb-3 truncate">
+                        {t('home:contentManagement.examples.video.description')}
+                      </p>
                       <div className="flex items-center gap-2 text-slate-500 text-xs">
                         <Video className="w-3 h-3" />
-                        <span>Rascunho</span>
+                        <span>{t('home:contentManagement.status.draft')}</span>
                         <div className="w-2 h-2 rounded-full bg-yellow-500 ml-auto"></div>
                       </div>
                     </div>
                     <div className="flex justify-end gap-2 mt-4">
-                      <button className="text-blue-400 hover:text-blue-500 text-sm">Editar</button>
-                      <button className="text-red-400 hover:text-red-500 text-sm">Excluir</button>
+                      <button className="text-blue-400 hover:text-blue-500 text-sm">
+                        {t('common:edit')}
+                      </button>
+                      <button className="text-red-400 hover:text-red-500 text-sm">
+                        {t('common:delete')}
+                      </button>
                     </div>
                   </div>
-                  {/* Card de Conteúdo 3 */}
                   <div className="bg-slate-800 rounded-xl p-4 flex flex-col justify-between border border-slate-700/50 hover:border-purple-500/50 transition-colors duration-300">
                     <div>
-                      <h4 className="text-lg font-semibold text-white mb-2">Podcast: Liderança no Século 21</h4>
-                      <p className="text-slate-400 text-sm mb-3 truncate">Entrevistas com líderes que estão moldando o futuro dos negócios.</p>
+                      <h4 className="text-lg font-semibold text-white mb-2">
+                        {t('home:contentManagement.examples.podcast.title')}
+                      </h4>
+                      <p className="text-slate-400 text-sm mb-3 truncate">
+                        {t('home:contentManagement.examples.podcast.description')}
+                      </p>
                       <div className="flex items-center gap-2 text-slate-500 text-xs">
                         <Headphones className="w-3 h-3" />
-                        <span>Agendado</span>
+                        <span>{t('home:contentManagement.status.scheduled')}</span>
                         <div className="w-2 h-2 rounded-full bg-orange-500 ml-auto"></div>
                       </div>
                     </div>
                     <div className="flex justify-end gap-2 mt-4">
-                      <button className="text-blue-400 hover:text-blue-500 text-sm">Editar</button>
-                      <button className="text-red-400 hover:text-red-500 text-sm">Excluir</button>
+                      <button className="text-blue-400 hover:text-blue-500 text-sm">
+                        {t('common:edit')}
+                      </button>
+                      <button className="text-red-400 hover:text-red-500 text-sm">
+                        {t('common:delete')}
+                      </button>
                     </div>
                   </div>
                 </div>
                 <div className="mt-6 flex justify-center">
                   <button className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105">
                     <Edit className="w-5 h-5" />
-                    Adicionar Novo Conteúdo
+                    {t('home:contentManagement.cta.addContent')}
                   </button>
                 </div>
               </div>
@@ -622,22 +761,27 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="relative p-6 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl animate-pulse-subtle">
-                {/* Mockup de Experiência do Membro */}
                 <div className="w-full h-80 bg-slate-900 rounded-xl flex flex-col shadow-inner relative">
                     <div className="w-full h-1/3 bg-gradient-to-r from-purple-700 to-blue-700 rounded-t-xl flex items-center justify-center">
                         <Crown className="w-16 h-16 text-white text-opacity-30" />
                     </div>
                     <div className="flex-grow p-4 space-y-4">
                         <div className="bg-slate-700 rounded-md p-3 flex items-center justify-between">
-                            <span className="text-white font-medium">Masterclass: Marketing Digital</span>
+                            <span className="text-white font-medium">
+                              {t('home:memberExperience.examples.masterclass')}
+                            </span>
                             <Play className="w-5 h-5 text-purple-400" />
                         </div>
                         <div className="bg-slate-700 rounded-md p-3 flex items-center justify-between">
-                            <span className="text-white font-medium">E-book: Finanças para Empreendedores</span>
+                            <span className="text-white font-medium">
+                              {t('home:memberExperience.examples.ebook')}
+                            </span>
                             <Lock className="w-5 h-5 text-red-400" />
                         </div>
                         <div className="bg-slate-700 rounded-md p-3 flex items-center justify-between">
-                            <span className="text-white font-medium">Webinar: Estratégias de Venda</span>
+                            <span className="text-white font-medium">
+                              {t('home:memberExperience.examples.webinar')}
+                            </span>
                             <Play className="w-5 h-5 text-purple-400" />
                         </div>
                     </div>
@@ -652,10 +796,13 @@ export default function HomePage() {
               <div className="space-y-8">
                 <div>
                   <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                    Experiência <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">Premium para Membros</span>
+                    {t('home:memberExperience.title.part1')} {' '}
+                    <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                      {t('home:memberExperience.title.part2')}
+                    </span>
                   </h2>
                   <p className="text-xl text-slate-400 leading-relaxed max-w-2xl">
-                    Navegue por um ambiente intuitivo e personalize sua jornada de aprendizado com acesso simplificado a todo o conteúdo.
+                    {t('home:memberExperience.subtitle')}
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -664,8 +811,12 @@ export default function HomePage() {
                       <Globe className="w-6 h-6 text-blue-400" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-white">Acesso Multi-Dispositivo</h3>
-                      <p className="text-slate-400 text-sm">Disponível em desktop, tablet e mobile.</p>
+                      <h3 className="text-lg font-semibold text-white">
+                        {t('home:memberExperience.features.multiDevice.title')}
+                      </h3>
+                      <p className="text-slate-400 text-sm">
+                        {t('home:memberExperience.features.multiDevice.description')}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
@@ -673,8 +824,12 @@ export default function HomePage() {
                       <Lock className="w-6 h-6 text-purple-400" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-white">Conteúdo Restrito</h3>
-                      <p className="text-slate-400 text-sm">Apenas para assinantes premium.</p>
+                      <h3 className="text-lg font-semibold text-white">
+                        {t('home:memberExperience.features.restrictedContent.title')}
+                      </h3>
+                      <p className="text-slate-400 text-sm">
+                        {t('home:memberExperience.features.restrictedContent.description')}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
@@ -682,8 +837,12 @@ export default function HomePage() {
                       <Eye className="w-6 h-6 text-green-400" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-white">Interface Clara</h3>
-                      <p className="text-slate-400 text-sm">Fácil de navegar e encontrar o que precisa.</p>
+                      <h3 className="text-lg font-semibold text-white">
+                        {t('home:memberExperience.features.clearInterface.title')}
+                      </h3>
+                      <p className="text-slate-400 text-sm">
+                        {t('home:memberExperience.features.clearInterface.description')}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -697,15 +856,18 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                O que nossos <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">Membros Dizem</span>
+                {t('home:testimonials.title.part1')} {' '}
+                <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                  {t('home:testimonials.title.part2')}
+                </span>
               </h2>
               <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-                Histórias de sucesso de quem já transformou sua carreira com Clubes Abex.
+                {t('home:testimonials.subtitle')}
               </p>
             </div>
 
             <div className="relative max-w-4xl mx-auto bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8 shadow-xl">
-              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/5 to-blue-500/5 rounded-2xl -z-10 animate-spin-slow"></div> {/* Subtle background animation */}
+              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/5 to-blue-500/5 rounded-2xl -z-10 animate-spin-slow"></div>
               <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
                 <div className="flex-shrink-0 w-24 h-24 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-3xl font-bold text-white shadow-lg">
                   {testimonials[currentTestimonial].image}
@@ -736,16 +898,6 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
-
-            {/* Optional: Logos de empresas */}
-            {/* <div className="mt-20 text-center">
-              <h3 className="text-xl font-semibold text-slate-400 mb-8">Confiado por:</h3>
-              <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8">
-                <img src="/logo-company-1.svg" alt="Company Logo 1" className="h-10 opacity-70 hover:opacity-100 transition-opacity" />
-                <img src="/logo-company-2.svg" alt="Company Logo 2" className="h-10 opacity-70 hover:opacity-100 transition-opacity" />
-                <img src="/logo-company-3.svg" alt="Company Logo 3" className="h-10 opacity-70 hover:opacity-100 transition-opacity" />
-              </div>
-            </div> */}
           </div>
         </section>
 
@@ -760,7 +912,7 @@ export default function HomePage() {
                 <span className="text-2xl font-bold text-white">Clubes Abex</span>
               </div>
               <p className="text-slate-400 leading-relaxed">
-                Sua jornada para o sucesso começa aqui. Conteúdo premium, comunidade exclusiva.
+                {t('home:footer.description')}
               </p>
               <div className="flex space-x-4 mt-6">
                 <a href="#" className="text-slate-400 hover:text-white transition-colors">
@@ -779,27 +931,49 @@ export default function HomePage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-white mb-6">Navegação</h3>
+              <h3 className="text-lg font-semibold text-white mb-6">
+                {t('home:footer.navigation.title')}
+              </h3>
               <ul className="space-y-3">
-                <li><a href="#features" className="hover:text-white transition-colors">Recursos</a></li>
-                <li><a href="#content" className="hover:text-white transition-colors">Conteúdo</a></li>
-                <li><a href="#plans" className="hover:text-white transition-colors">Planos</a></li>
-                <li><a href="#testimonials" className="hover:text-white transition-colors">Depoimentos</a></li>
+                <li><a href="#features" className="hover:text-white transition-colors">
+                  {t('home:footer.navigation.features')}
+                </a></li>
+                <li><a href="#content" className="hover:text-white transition-colors">
+                  {t('home:footer.navigation.content')}
+                </a></li>
+                <li><a href="#plans" className="hover:text-white transition-colors">
+                  {t('home:footer.navigation.plans')}
+                </a></li>
+                <li><a href="#testimonials" className="hover:text-white transition-colors">
+                  {t('home:footer.navigation.testimonials')}
+                </a></li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-white mb-6">Suporte</h3>
+              <h3 className="text-lg font-semibold text-white mb-6">
+                {t('home:footer.support.title')}
+              </h3>
               <ul className="space-y-3">
-                <li><a href="#" className="hover:text-white transition-colors">Central de Ajuda</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">FAQs</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contato</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Termos de Serviço</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">
+                  {t('home:footer.support.helpCenter')}
+                </a></li>
+                <li><a href="#" className="hover:text-white transition-colors">
+                  {t('home:footer.support.faqs')}
+                </a></li>
+                <li><a href="#" className="hover:text-white transition-colors">
+                  {t('home:footer.support.contact')}
+                </a></li>
+                <li><a href="#" className="hover:text-white transition-colors">
+                  {t('home:footer.support.terms')}
+                </a></li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-white mb-6">Contato</h3>
+              <h3 className="text-lg font-semibold text-white mb-6">
+                {t('home:footer.contact.title')}
+              </h3>
               <address className="not-italic space-y-3">
                 <p className="flex items-center gap-3">
                   <Mail className="w-5 h-5 text-purple-400" />
@@ -811,17 +985,30 @@ export default function HomePage() {
                 </p>
                 <p className="flex items-center gap-3">
                   <MapPin className="w-5 h-5 text-green-400" />
-                  <span>Av. Exclusiva, 123, São Paulo, Brasil</span>
+                  <span>{t('home:footer.contact.address')}</span>
                 </p>
               </address>
             </div>
           </div>
 
           <div className="border-t border-slate-700/50 mt-12 pt-8 text-center text-slate-500 text-sm">
-            &copy; {new Date().getFullYear()} Clubes Abex. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} Clubes Abex. {t('home:footer.copyright')}
           </div>
         </footer>
       </div>
     </Layout>
   );
 }
+
+// Esta função é executada no build time para gerar as traduções
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'pt-BR', [
+        'home',
+        'common',
+        'auth'
+      ])),
+    },
+  };
+};
