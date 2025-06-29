@@ -1,16 +1,20 @@
-'use client'
 // src/components/Layout.tsx
+// Remover 'use client' se estiver usando Pages Router
 import React from 'react';
 import Navbar from './NavBar';
+import { useTranslation } from 'next-i18next';
 
 interface LayoutProps {
   children: React.ReactNode;
+  activeTab?: string;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = ({ children, activeTab }) => {
+  const { t } = useTranslation('common'); // Adicionar hook de tradução
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 flex flex-col">
-      <Navbar />
+      <Navbar activeTab={activeTab} />
       
       {/* Main Content with animated entrance */}
       <main className="flex-grow relative">
@@ -20,7 +24,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </main>
       
-      {/* Modern Footer */}
+      {/* Modern Footer com traduções */}
       <footer className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
         {/* Decorative background elements */}
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-transparent to-blue-600/10" />
@@ -35,29 +39,33 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 Clubes Abex
               </h3>
               <p className="text-slate-300 text-sm leading-relaxed">
-                Sua plataforma exclusiva para conteúdo premium e experiências únicas.
+                {t('footer.description') || 'Sua plataforma exclusiva para conteúdo premium e experiências únicas.'}
               </p>
             </div>
             
             {/* Quick Links */}
             <div className="text-center">
-              <h4 className="font-semibold text-white mb-3">Links Rápidos</h4>
+              <h4 className="font-semibold text-white mb-3">
+                {t('footer.quickLinks') || 'Links Rápidos'}
+              </h4>
               <div className="space-y-2 text-sm">
                 <a href="/sobre" className="block text-slate-300 hover:text-purple-400 transition-colors duration-200">
-                  Sobre Nós
+                  {t('footer.about') || 'Sobre Nós'}
                 </a>
                 <a href="/contato" className="block text-slate-300 hover:text-purple-400 transition-colors duration-200">
-                  Contato
+                  {t('footer.contact') || 'Contato'}
                 </a>
                 <a href="/suporte" className="block text-slate-300 hover:text-purple-400 transition-colors duration-200">
-                  Suporte
+                  {t('footer.support') || 'Suporte'}
                 </a>
               </div>
             </div>
             
             {/* Contact Info */}
             <div className="text-center md:text-right">
-              <h4 className="font-semibold text-white mb-3">Contato</h4>
+              <h4 className="font-semibold text-white mb-3">
+                {t('footer.contactInfo') || 'Contato'}
+              </h4>
               <div className="space-y-2 text-sm text-slate-300">
                 <p>contato@clubesabex.com</p>
                 <p>+55 (11) 9999-9999</p>
@@ -69,14 +77,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="pt-6 border-t border-slate-700/50">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
               <p className="text-slate-400 text-sm">
-                &copy; {new Date().getFullYear()} Clubes Abex. Todos os direitos reservados.
+                &copy; {new Date().getFullYear()} Clubes Abex. {t('footer.allRightsReserved') || 'Todos os direitos reservados.'}
               </p>
               <div className="flex space-x-6 text-sm">
                 <a href="/privacidade" className="text-slate-400 hover:text-purple-400 transition-colors duration-200">
-                  Privacidade
+                  {t('footer.privacy') || 'Privacidade'}
                 </a>
                 <a href="/termos" className="text-slate-400 hover:text-purple-400 transition-colors duration-200">
-                  Termos de Uso
+                  {t('footer.terms') || 'Termos de Uso'}
                 </a>
               </div>
             </div>
