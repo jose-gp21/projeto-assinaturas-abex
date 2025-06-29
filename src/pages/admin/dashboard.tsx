@@ -33,9 +33,9 @@ import {
 interface DashboardData {
   totalUsers: number;
   activeSubscriptions: number;
-  totalPlanos: number;
-  totalConteudo: number;
-  restrictedConteudo: number;
+  totalPlans: number;
+  totalContent: number;
+  restrictedContent: number;
   monthlyGrowth?: {
     users: number;
     subscriptions: number;
@@ -48,7 +48,7 @@ interface DashboardData {
   };
   topContent?: Array<{
     _id: string;
-    titulo: string;
+    title: string;
     views: number;
     engagement: number;
   }>;
@@ -78,7 +78,7 @@ function AdminDashboardPage() {
     setError(null);
     
     try {
-      const res = await fetch(`/api/admin/relatorios?period=${timeFilter}`);
+      const res = await fetch(`/api/admin/reports?period=${timeFilter}`);
       const result = await res.json();
       if (result.success) {
         setData(result.data);
@@ -86,7 +86,7 @@ function AdminDashboardPage() {
         setError(result.message);
       }
     } catch (err: any) {
-      setError(err.message || 'Erro ao carregar dados do dashboard.');
+      setError(err.message || 'Error loading dashboard data.');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -157,11 +157,11 @@ function AdminDashboardPage() {
 
   if (loading) {
     return (
-      <Layout>
+      <Layout activeTab='dashboard'>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-slate-300 text-lg">Carregando Dashboard...</p>
+            <p className="text-slate-300 text-lg">Loading Dashboard...</p>
           </div>
         </div>
       </Layout>
@@ -174,13 +174,13 @@ function AdminDashboardPage() {
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center bg-red-500/10 border border-red-500/20 rounded-2xl p-8">
             <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-            <p className="text-red-400 text-lg mb-4">Erro ao carregar dados</p>
+            <p className="text-red-400 text-lg mb-4">Error loading data</p>
             <p className="text-slate-400 mb-6">{error}</p>
             <button
               onClick={() => fetchDashboardData()}
               className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors"
             >
-              Tentar Novamente
+              Try Again
             </button>
           </div>
         </div>
@@ -189,16 +189,16 @@ function AdminDashboardPage() {
   }
 
   return (
-    <Layout>
+    <Layout activeTab='dashboard'>
       <div className="container mx-auto p-4 lg:p-6 max-w-7xl space-y-8">
         
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
-              Dashboard Administrativo
+              Admin Dashboard
             </h1>
-            <p className="text-slate-400">Visão geral da plataforma e métricas em tempo real</p>
+            <p className="text-slate-400">Platform overview and real-time metrics</p>
           </div>
           
           <div className="flex items-center gap-3">
@@ -208,10 +208,10 @@ function AdminDashboardPage() {
               onChange={(e) => setTimeFilter(e.target.value)}
               className="bg-slate-800 border border-slate-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              <option value="7d">Últimos 7 dias</option>
-              <option value="30d">Últimos 30 dias</option>
-              <option value="90d">Últimos 90 dias</option>
-              <option value="1y">Último ano</option>
+              <option value="7d">Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+              <option value="90d">Last 90 days</option>
+              <option value="1y">Last year</option>
             </select>
             
             {/* Refresh Button */}
@@ -226,7 +226,7 @@ function AdminDashboardPage() {
             {/* Export Button */}
             <button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:scale-105 flex items-center gap-2">
               <Download className="w-4 h-4" />
-              Exportar
+              Export
             </button>
           </div>
         </div>
@@ -234,43 +234,43 @@ function AdminDashboardPage() {
         {/* Main Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard
-            title="Total de Usuários"
+            title="Total Users"
             value={data?.totalUsers || 0}
             icon={Users}
             trend="up"
             trendValue={`+${data?.monthlyGrowth?.users || 0}%`}
             color="from-blue-500 to-blue-600"
-            subtitle="Crescimento mensal"
+            subtitle="Monthly growth"
           />
           
           <StatCard
-            title="Assinaturas Ativas"
+            title="Active Subscriptions"
             value={data?.activeSubscriptions || 0}
             icon={Crown}
             trend="up"
             trendValue={`+${data?.monthlyGrowth?.subscriptions || 0}%`}
             color="from-purple-500 to-purple-600"
-            subtitle="Membros premium"
+            subtitle="Premium members"
           />
           
           <StatCard
-            title="Planos Ativos"
-            value={data?.totalPlanos || 0}
+            title="Active Plans"
+            value={data?.totalPlans || 0}
             icon={Target}
             trend="neutral"
-            trendValue="estável"
+            trendValue="stable"
             color="from-green-500 to-green-600"
-            subtitle="Ofertas disponíveis"
+            subtitle="Available offers"
           />
           
           <StatCard
-            title="Conteúdo Total"
-            value={data?.totalConteudo || 0}
+            title="Total Content"
+            value={data?.totalContent || 0}
             icon={FileText}
             trend="up"
             trendValue={`+${data?.monthlyGrowth?.content || 0}%`}
             color="from-orange-500 to-orange-600"
-            subtitle="Materiais publicados"
+            subtitle="Published materials"
           />
         </div>
 
@@ -278,7 +278,7 @@ function AdminDashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-white">Performance Geral</h2>
+              <h2 className="text-xl font-bold text-white">Overall Performance</h2>
               <BarChart3 className="w-6 h-6 text-purple-400" />
             </div>
             
@@ -286,25 +286,25 @@ function AdminDashboardPage() {
               <div className="bg-slate-900/50 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <DollarSign className="w-5 h-5 text-green-400" />
-                  <span className="text-green-400 font-medium">Receita Mensal</span>
+                  <span className="text-green-400 font-medium">Monthly Revenue</span>
                 </div>
                 <p className="text-2xl font-bold text-white">
-                  R$ {(data?.revenueData?.monthly || 0).toLocaleString()}
+                  ${(data?.revenueData?.monthly || 0).toLocaleString()}
                 </p>
                 <p className="text-sm text-slate-400">
-                  +{data?.revenueData?.growth || 0}% vs mês anterior
+                  +{data?.revenueData?.growth || 0}% vs last month
                 </p>
               </div>
               
               <div className="bg-slate-900/50 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <UserCheck className="w-5 h-5 text-blue-400" />
-                  <span className="text-blue-400 font-medium">Taxa de Conversão</span>
+                  <span className="text-blue-400 font-medium">Conversion Rate</span>
                 </div>
                 <p className="text-2xl font-bold text-white">
                   {((data?.activeSubscriptions || 0) / (data?.totalUsers || 1) * 100).toFixed(1)}%
                 </p>
-                <p className="text-sm text-slate-400">Usuários para premium</p>
+                <p className="text-sm text-slate-400">Users to premium</p>
               </div>
             </div>
             
@@ -312,8 +312,8 @@ function AdminDashboardPage() {
             <div className="h-48 bg-slate-900/30 rounded-xl flex items-center justify-center">
               <div className="text-center text-slate-400">
                 <BarChart3 className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p>Gráfico de Performance</p>
-                <p className="text-sm">(Integração com biblioteca de gráficos)</p>
+                <p>Performance Chart</p>
+                <p className="text-sm">(Chart library integration)</p>
               </div>
             </div>
           </div>
@@ -322,31 +322,31 @@ function AdminDashboardPage() {
           <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
               <Zap className="w-6 h-6 text-yellow-400" />
-              Ações Rápidas
+              Quick Actions
             </h2>
             
             <div className="space-y-3">
               <QuickAction
                 icon={Users}
-                label="Gerenciar Usuários"
+                label="Manage Users"
                 onClick={() => {}}
                 color="from-blue-500 to-blue-600"
               />
               <QuickAction
                 icon={Crown}
-                label="Criar Plano"
+                label="Create Plan"
                 onClick={() => {}}
                 color="from-purple-500 to-purple-600"
               />
               <QuickAction
                 icon={FileText}
-                label="Novo Conteúdo"
+                label="New Content"
                 onClick={() => {}}
                 color="from-green-500 to-green-600"
               />
               <QuickAction
                 icon={Shield}
-                label="Configurações"
+                label="Settings"
                 onClick={() => {}}
                 color="from-orange-500 to-orange-600"
               />
@@ -354,7 +354,7 @@ function AdminDashboardPage() {
             
             {/* System Status */}
             <div className="mt-6 pt-6 border-t border-slate-700">
-              <h3 className="text-sm font-medium text-slate-400 mb-3">Status do Sistema</h3>
+              <h3 className="text-sm font-medium text-slate-400 mb-3">System Status</h3>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-300">API Status</span>
@@ -367,14 +367,14 @@ function AdminDashboardPage() {
                   <span className="text-sm text-slate-300">Database</span>
                   <div className="flex items-center gap-1">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-xs text-green-400">Conectado</span>
+                    <span className="text-xs text-green-400">Connected</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-300">CDN</span>
                   <div className="flex items-center gap-1">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-xs text-green-400">Ativo</span>
+                    <span className="text-xs text-green-400">Active</span>
                   </div>
                 </div>
               </div>
@@ -389,7 +389,7 @@ function AdminDashboardPage() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
                 <Eye className="w-6 h-6 text-green-400" />
-                Conteúdo Popular
+                Popular Content
               </h2>
               <button className="text-slate-400 hover:text-white transition-colors">
                 <MoreHorizontal className="w-5 h-5" />
@@ -404,10 +404,10 @@ function AdminDashboardPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-white font-medium truncate">
-                      Título do Conteúdo {item}
+                      Content Title {item}
                     </h3>
                     <p className="text-slate-400 text-sm">
-                      {Math.floor(Math.random() * 1000) + 100} visualizações
+                      {Math.floor(Math.random() * 1000) + 100} views
                     </p>
                   </div>
                   <div className="text-green-400 text-sm font-medium">
@@ -423,7 +423,7 @@ function AdminDashboardPage() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
                 <Clock className="w-6 h-6 text-blue-400" />
-                Atividade Recente
+                Recent Activity
               </h2>
               <button className="text-slate-400 hover:text-white transition-colors">
                 <MoreHorizontal className="w-5 h-5" />
@@ -432,10 +432,10 @@ function AdminDashboardPage() {
             
             <div className="space-y-4">
               {[
-                { action: "Nova assinatura", user: "João Silva", time: "2 min atrás", type: "subscription" },
-                { action: "Conteúdo visualizado", user: "Maria Santos", time: "5 min atrás", type: "view" },
-                { action: "Novo usuário", user: "Pedro Costa", time: "12 min atrás", type: "user" },
-                { action: "Plano atualizado", user: "Ana Oliveira", time: "20 min atrás", type: "plan" }
+                { action: "New subscription", user: "John Smith", time: "2 min ago", type: "subscription" },
+                { action: "Content viewed", user: "Mary Johnson", time: "5 min ago", type: "view" },
+                { action: "New user", user: "Peter Brown", time: "12 min ago", type: "user" },
+                { action: "Plan updated", user: "Sarah Wilson", time: "20 min ago", type: "plan" }
               ].map((activity, index) => (
                 <div key={index} className="flex items-center gap-3 p-3 bg-slate-900/30 rounded-xl">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -466,9 +466,9 @@ function AdminDashboardPage() {
             <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Lock className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-1">{data?.restrictedConteudo || 0}</h3>
-            <p className="text-slate-400 text-sm">Conteúdo Restrito</p>
-            <p className="text-red-400 text-xs mt-2">Apenas para membros premium</p>
+            <h3 className="text-2xl font-bold text-white mb-1">{data?.restrictedContent || 0}</h3>
+            <p className="text-slate-400 text-sm">Restricted Content</p>
+            <p className="text-red-400 text-xs mt-2">Premium members only</p>
           </div>
           
           <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 text-center">
@@ -478,8 +478,8 @@ function AdminDashboardPage() {
             <h3 className="text-2xl font-bold text-white mb-1">
               {Math.round(((data?.activeSubscriptions || 0) / (data?.totalUsers || 1)) * 100)}%
             </h3>
-            <p className="text-slate-400 text-sm">Taxa de Engajamento</p>
-            <p className="text-indigo-400 text-xs mt-2">Usuários ativos hoje</p>
+            <p className="text-slate-400 text-sm">Engagement Rate</p>
+            <p className="text-indigo-400 text-xs mt-2">Active users today</p>
           </div>
           
           <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 text-center">
@@ -487,8 +487,8 @@ function AdminDashboardPage() {
               <Award className="w-6 h-6 text-white" />
             </div>
             <h3 className="text-2xl font-bold text-white mb-1">98.5%</h3>
-            <p className="text-slate-400 text-sm">Satisfação</p>
-            <p className="text-teal-400 text-xs mt-2">Rating médio dos usuários</p>
+            <p className="text-slate-400 text-sm">Satisfaction</p>
+            <p className="text-teal-400 text-xs mt-2">Average user rating</p>
           </div>
         </div>
       </div>
