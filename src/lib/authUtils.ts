@@ -1,7 +1,7 @@
 // src/lib/authUtils.ts
 import bcrypt from 'bcryptjs';
 
-const SALT_ROUNDS = 10; // Número de "rounds" para o hashing, um valor comum e seguro
+const SALT_ROUNDS = 10; // Number of rounds for hashing, a common and secure value
 
 export const hashPassword = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, SALT_ROUNDS);
