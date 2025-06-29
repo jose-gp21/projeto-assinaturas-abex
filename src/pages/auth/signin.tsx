@@ -2,8 +2,6 @@
 import { getProviders, signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { GetServerSidePropsContext } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useTranslation } from 'next-i18next';
 import Layout from '@/components/Layout';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -27,7 +25,6 @@ interface SignInPageProps {
 
 function SignIn({ providers }: SignInPageProps) {
   const router = useRouter();
-  const { t } = useTranslation(['auth', 'common']);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
@@ -35,7 +32,7 @@ function SignIn({ providers }: SignInPageProps) {
     try {
       await signIn('google', { callbackUrl: '/' });
     } catch (error) {
-      console.error('Erro no login:', error);
+      console.error('Login error:', error);
       setIsLoading(false);
     }
   };
@@ -43,18 +40,18 @@ function SignIn({ providers }: SignInPageProps) {
   const features = [
     {
       icon: <Crown className="w-5 h-5" />,
-      title: t('auth:features.exclusiveContent.title') || "Conteúdo Exclusivo",
-      description: t('auth:features.exclusiveContent.description') || "Acesse materiais premium e experiências únicas"
+      title: "Exclusive Content",
+      description: "Access premium materials and unique experiences"
     },
     {
       icon: <Users className="w-5 h-5" />,
-      title: t('auth:features.vipCommunity.title') || "Comunidade VIP",
-      description: t('auth:features.vipCommunity.description') || "Conecte-se com membros exclusivos da nossa comunidade"
+      title: "VIP Community",
+      description: "Connect with exclusive members of our community"
     },
     {
       icon: <Shield className="w-5 h-5" />,
-      title: t('auth:features.totalSecurity.title') || "Segurança Total",
-      description: t('auth:features.totalSecurity.description') || "Seus dados protegidos com criptografia de ponta"
+      title: "Total Security",
+      description: "Your data protected with cutting-edge encryption"
     }
   ];
 
@@ -78,11 +75,11 @@ function SignIn({ providers }: SignInPageProps) {
                     <Crown className="w-8 h-8 text-white" />
                   </div>
                   <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                    Clubes Abex
+                    Abex Clubs
                   </h1>
                 </div>
                 <p className="text-xl text-slate-300 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-                  {t('auth:subtitle') || 'Sua plataforma exclusiva para conteúdo premium e experiências únicas'}
+                  Your exclusive platform for premium content and unique experiences
                 </p>
               </div>
 
@@ -114,7 +111,7 @@ function SignIn({ providers }: SignInPageProps) {
                   ))}
                 </div>
                 <span className="text-sm">
-                  {t('auth:socialProof') || 'Mais de 10.000 membros ativos'}
+                  Over 10,000 active members
                 </span>
               </div>
             </div>
@@ -131,13 +128,13 @@ function SignIn({ providers }: SignInPageProps) {
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/20 rounded-full text-purple-300 text-sm font-medium mb-4">
                       <Sparkles className="w-4 h-4" />
-                      {t('auth:exclusiveAccess') || 'Acesso Exclusivo'}
+                      Exclusive Access
                     </div>
                     <h2 className="text-3xl font-bold text-white mb-3">
-                      {t('auth:welcomeBack') || 'Bem-vindo de volta!'}
+                      Welcome back!
                     </h2>
                     <p className="text-slate-400">
-                      {t('auth:loginDescription') || 'Entre para acessar seu conteúdo exclusivo'}
+                      Sign in to access your exclusive content
                     </p>
                   </div>
 
@@ -162,8 +159,8 @@ function SignIn({ providers }: SignInPageProps) {
                             )}
                             <span className="text-lg">
                               {isLoading 
-                                ? (t('auth:signingIn') || 'Entrando...') 
-                                : (t('auth:continueWithGoogle') || 'Continuar com Google')
+                                ? 'Signing in...' 
+                                : 'Continue with Google'
                               }
                             </span>
                             {!isLoading && (
@@ -175,15 +172,15 @@ function SignIn({ providers }: SignInPageProps) {
                           <div className="space-y-3">
                             <div className="flex items-center gap-3 text-slate-300 text-sm">
                               <CheckCircle className="w-4 h-4 text-green-400" />
-                              {t('auth:benefits.secureLogin') || 'Login seguro e rápido'}
+                              Secure and fast login
                             </div>
                             <div className="flex items-center gap-3 text-slate-300 text-sm">
                               <CheckCircle className="w-4 h-4 text-green-400" />
-                              {t('auth:benefits.instantAccess') || 'Acesso instantâneo ao conteúdo'}
+                              Instant access to content
                             </div>
                             <div className="flex items-center gap-3 text-slate-300 text-sm">
                               <CheckCircle className="w-4 h-4 text-green-400" />
-                              {t('auth:benefits.sync') || 'Sincronização em todos os dispositivos'}
+                              Sync across all devices
                             </div>
                           </div>
                         </div>
@@ -196,27 +193,27 @@ function SignIn({ providers }: SignInPageProps) {
                   <div className="my-8 flex items-center">
                     <div className="flex-1 border-t border-slate-600"></div>
                     <span className="px-4 text-slate-500 text-sm">
-                      {t('auth:secure') || '100% Seguro'}
+                      100% Secure
                     </span>
                     <div className="flex-1 border-t border-slate-600"></div>
                   </div>
 
-                  {/* Security note - CORRIGIR LINKS */}
+                  {/* Security note */}
                   <div className="text-center">
                     <p className="text-xs text-slate-500 leading-relaxed">
-                      {t('auth:agreement.text') || 'Ao continuar, você concorda com nossos'}{' '}
+                      By continuing, you agree to our{' '}
                       <Link 
-                        href="/termos" 
+                        href="/terms" 
                         className="text-purple-400 hover:text-purple-300 underline"
                       >
-                        {t('auth:agreement.terms') || 'Termos de Serviço'}
+                        Terms of Service
                       </Link>{' '}
-                      {t('auth:agreement.and') || 'e'}{' '}
+                      and{' '}
                       <Link 
-                        href="/privacidade" 
+                        href="/privacy" 
                         className="text-purple-400 hover:text-purple-300 underline"
                       >
-                        {t('auth:agreement.privacy') || 'Política de Privacidade'}
+                        Privacy Policy
                       </Link>
                     </p>
                   </div>
@@ -226,9 +223,9 @@ function SignIn({ providers }: SignInPageProps) {
               {/* Additional CTA */}
               <div className="mt-6 text-center">
                 <p className="text-slate-400 text-sm">
-                  {t('auth:newHere') || 'Novo por aqui?'}{' '}
+                  New here?{' '}
                   <span className="text-purple-400 font-medium">
-                    {t('auth:autoAccount') || 'O login com Google já cria sua conta automaticamente!'}
+                    Google sign-in automatically creates your account!
                   </span>
                 </p>
               </div>
@@ -256,11 +253,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: { 
       providers,
-      // Adicionar traduções
-      ...(await serverSideTranslations(context.locale ?? 'pt-BR', [
-        'auth',
-        'common'
-      ])),
     },
   };
 }

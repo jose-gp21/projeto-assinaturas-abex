@@ -12,5 +12,4 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   );
 }
 
-// MUITO IMPORTANTE: Envolver com appWithTranslation
 export default appWithTranslation(MyApp);
