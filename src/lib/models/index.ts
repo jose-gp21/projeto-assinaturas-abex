@@ -1,12 +1,13 @@
 // src/lib/models/index.ts
-// Este arquivo serve para garantir que todos os seus modelos Mongoose
-// sejam carregados e seus Schemas registrados quando este arquivo for importado.
+// This file ensures that all your Mongoose models are loaded
+// and their Schemas are registered when this file is imported.
 
-import './User';       // Importa o modelo User
-import './Administrador'; // Importa o modelo Administrador
-import './Plano';       // Importa o modelo Plano
-import './Assinatura';  // Importa o modelo Assinatura
-import './Conteudo';    // Importa o modelo Conteudo
+import './User';       // Imports the User model
+import './Admin';      // Imports the Admin model
+import './Plan';       // Imports the Plan model
+import './Subscription';  // Imports the Subscription model
+import './Content';    // Imports the Content model
 
-// Você não precisa exportar nada daqui, apenas a importação já força o carregamento dos arquivos
-// e o registro dos Schemas pelo Mongoose (devido às linhas 'mongoose.models.X || mongoose.model<I...>(...)')
+// You don't need to export anything from here, just importing the files
+// forces their loading and the registration of Schemas by Mongoose
+// (due to the lines 'mongoose.models.X || mongoose.model<I...>(...)')

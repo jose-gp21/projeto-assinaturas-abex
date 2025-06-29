@@ -1,51 +1,51 @@
 // src/lib/models/User.ts
 import mongoose from 'mongoose';
 
-// Define a interface para tipagem (opcional, mas recomendado com TypeScript)
+// Define an interface for typing (optional, but recommended with TypeScript)
 export interface IUser extends mongoose.Document {
-  nome: string;
+  name: string;
   email: string;
-  senha: string;
-  statusAssinatura: string; // Ex: 'Ativa', 'Inativa', 'Pendente' 
-  dataCadastro: Date;
-  ultimoAcesso: Date;
+  password: string;
+  subscriptionStatus: string; // Ex: 'Active', 'Inactive', 'Pending'
+  registrationDate: Date;
+  lastAccess: Date;
 }
 
-// Define o Schema do Mongoose
+// Define the Mongoose Schema
 const UserSchema = new mongoose.Schema<IUser>({
-  nome: {
+  name: {
     type: String,
-    required: [true, 'Por favor, forneça um nome.'],
-    maxlength: [60, 'Nome não pode ter mais de 60 caracteres.'],
+    required: [true, 'Please provide a name.'],
+    maxlength: [60, 'Name cannot exceed 60 characters.'],
   },
   email: {
     type: String,
-    required: [true, 'Por favor, forneça um e-mail.'],
-    unique: true, // Garante que e-mails sejam únicos
-    match: [/.+@.+\..+/, 'Por favor, forneça um e-mail válido.'],
+    required: [true, 'Please provide an email.'],
+    unique: true, // Ensures emails are unique
+    match: [/.+@.+\..+/, 'Please provide a valid email.'],
   },
-  senha: {
+  password: {
     type: String,
-    required: [true, 'Por favor, forneça uma senha.'],
-    minlength: [6, 'A senha deve ter pelo menos 6 caracteres.'],
-    // Em um projeto real, você NÃO armazenaria a senha em texto puro.
-    // Ela seria hashed (ex: com bcrypt) antes de ser salva.
-    // Para 1 dia, podemos deixar assim, mas lembre-se disso para produção.
+    required: [true, 'Please provide a password.'],
+    minlength: [6, 'Password must be at least 6 characters long.'],
+    // In a real project, you should NOT store the password in plain text.
+    // It should be hashed (e.g., with bcrypt) before being saved.
+    // For now, we can leave it like this, but remember this for production.
   },
-  statusAssinatura: {
+  subscriptionStatus: {
     type: String,
-    enum: ['Ativa', 'Cancelada', 'Suspensa', 'Pendente', 'Inativa'], // Enum de possíveis status 
-    default: 'Inativa',
+    enum: ['Active', 'Canceled', 'Suspended', 'Pending', 'Inactive'], // Enum of possible statuses
+    default: 'Inactive',
   },
-  dataCadastro: {
+  registrationDate: {
     type: Date,
-    default: Date.now, // Data de criação automática
+    default: Date.now, // Automatically set creation date
   },
-  ultimoAcesso: {
+  lastAccess: {
     type: Date,
-    default: Date.now, // Atualizado no login
+    default: Date.now, // Updated on login
   },
 });
 
-// Verifica se o modelo já foi compilado para evitar recompilação em hot-reload
+// Check if the model has already been compiled to avoid recompilation during hot-reload
 export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
