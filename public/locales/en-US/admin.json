@@ -1,0 +1,15 @@
+{
+    "title": "Administration",
+    "users": "Users",
+    "usersDescription": "Manage system users",
+    "members": "Members",
+    "membersDescription": "Manage ABEX members",
+    "reports": "Reports",
+    "reportsDescription": "View reports and statistics",
+    "configurations": "Configurations",
+    "configurationsDescription": "Configure the system",
+    "permissions": "Permissions",
+    "roles": "Roles",
+    "audit": "Audit"
+  }
+  

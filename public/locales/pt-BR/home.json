@@ -1,0 +1,261 @@
+{
+    "hero": {
+      "badge": "Plataforma Exclusiva",
+      "title": {
+        "part1": "Clubes Abex",
+        "part2": "Conteúdo Premium"
+      },
+      "subtitle": "Descubra a plataforma que transforma conhecimento em resultados. Acesse conteúdos exclusivos, conecte-se com uma comunidade premium e acelere seu crescimento profissional.",
+      "cta": {
+        "accessContent": "Acessar Conteúdo",
+        "getStarted": "Começar Agora",
+        "watchDemo": "Ver Demonstração"
+      },
+      "trustIndicators": {
+        "members": "+10k membros"
+      },
+      "preview": {
+        "masterclass": "Masterclass Exclusiva",
+        "strategies": "Estratégias Avançadas",
+        "report": "Relatório Premium",
+        "insights": "Insights Exclusivos",
+        "community": "Comunidade VIP",
+        "networking": "Networking Premium"
+      }
+    },
+    "stats": {
+      "activeMembers": "Membros Ativos",
+      "satisfaction": "Satisfação",
+      "exclusiveContent": "Conteúdos Exclusivos",
+      "premiumSupport": "Suporte Premium"
+    },
+    "features": {
+      "title": {
+        "part1": "Por que escolher",
+        "part2": "Clubes Abex?"
+      },
+      "subtitle": "Uma plataforma completa desenvolvida para maximizar seu potencial e acelerar seus resultados",
+      "exclusiveContent": {
+        "title": "Conteúdo Exclusivo",
+        "description": "Acesso a materiais premium desenvolvidos por especialistas reconhecidos no mercado"
+      },
+      "totalSecurity": {
+        "title": "Segurança Total",
+        "description": "Seus dados e conteúdos protegidos com criptografia de nível militar"
+      },
+      "vipCommunity": {
+        "title": "Comunidade VIP",
+        "description": "Conecte-se com outros membros premium em ambiente exclusivo e colaborativo"
+      },
+      "instantAccess": {
+        "title": "Acesso Instantâneo",
+        "description": "Disponibilidade 24/7 em todos os seus dispositivos com sincronização automática"
+      }
+    },
+    "contentTypes": {
+      "title": {
+        "part1": "Tipos de",
+        "part2": "Conteúdo Disponível"
+      },
+      "subtitle": "Diversidade de formatos para atender todos os estilos de aprendizado",
+      "premiumArticles": {
+        "title": "Artigos Premium",
+        "description": "Análises profundas e insights exclusivos"
+      },
+      "exclusiveVideos": {
+        "title": "Vídeos Exclusivos",
+        "description": "Masterclasses com experts do setor"
+      },
+      "vipEvents": {
+        "title": "Eventos VIP",
+        "description": "Webinars e encontros exclusivos"
+      },
+      "podcasts": {
+        "title": "Podcasts",
+        "description": "Conversas reveladoras e estratégias secretas"
+      },
+      "advancedCourses": {
+        "title": "Cursos Avançados",
+        "description": "Formação completa em diversas áreas"
+      },
+      "webinars": {
+        "title": "Webinars",
+        "description": "Sessões interativas ao vivo"
+      }
+    },
+    "plans": {
+      "title": {
+        "part1": "Escolha seu",
+        "part2": "Plano"
+      },
+      "subtitle": "Planos flexíveis para atender diferentes necessidades e orçamentos",
+      "mostPopular": "Mais Popular",
+      "billing": {
+        "monthly": "Mensal",
+        "annually": "Anual",
+        "discount": "-20% OFF",
+        "monthShort": "mês",
+        "yearShort": "ano"
+      },
+      "basic": {
+        "name": "Básico",
+        "description": "Ideal para iniciantes",
+        "features": [
+          "Acesso a 50+ conteúdos premium",
+          "Suporte via email",
+          "Comunidade básica",
+          "Downloads limitados"
+        ]
+      },
+      "premium": {
+        "name": "Premium",
+        "description": "Mais popular entre profissionais",
+        "features": [
+          "Acesso total aos conteúdos",
+          "Suporte prioritário 24/7",
+          "Eventos exclusivos",
+          "Downloads ilimitados",
+          "Acesso mobile premium",
+          "Certificados de conclusão"
+        ]
+      },
+      "vip": {
+        "name": "VIP",
+        "description": "Experiência completa e personalizada",
+        "features": [
+          "Tudo do Premium",
+          "Consultoria 1:1 mensal",
+          "Acesso antecipado a novos conteúdos",
+          "Sessões de mentoria",
+          "Networking exclusivo",
+          "Materiais personalizados"
+        ]
+      },
+      "cta": {
+        "upgrade": "Fazer Upgrade",
+        "subscribe": "Assinar Agora"
+      }
+    },
+    "dashboard": {
+      "title": {
+        "part1": "Painel",
+        "part2": "Administrativo Avançado"
+      },
+      "subtitle": "Gerencie sua plataforma com facilidade e tome decisões baseadas em dados. Nosso painel intuitivo oferece todas as ferramentas que você precisa.",
+      "analytics": {
+        "title": "Analytics Avançados",
+        "description": "Métricas detalhadas de engajamento"
+      },
+      "memberManagement": {
+        "title": "Gestão de Membros",
+        "description": "Controle total da sua comunidade"
+      },
+      "contentCreation": {
+        "title": "Criação de Conteúdo",
+        "description": "Editor intuitivo e poderoso"
+      },
+      "monetization": {
+        "title": "Monetização",
+        "description": "Diversas opções de receita"
+      }
+    },
+    "contentManagement": {
+      "title": {
+        "part1": "Gestão de",
+        "part2": "Conteúdo Intuitiva"
+      },
+      "subtitle": "Crie, edite e organize seus conteúdos com uma interface simples e poderosa.",
+      "examples": {
+        "article": {
+          "title": "Artigo: Futuro da IA",
+          "description": "Um panorama completo sobre as tendências de inteligência artificial em 2025."
+        },
+        "video": {
+          "title": "Vídeo: Blockchain Descomplicado",
+          "description": "Entenda a tecnologia blockchain e suas aplicações práticas."
+        },
+        "podcast": {
+          "title": "Podcast: Liderança no Século 21",
+          "description": "Entrevistas com líderes que estão moldando o futuro dos negócios."
+        }
+      },
+      "status": {
+        "published": "Publicado",
+        "draft": "Rascunho",
+        "scheduled": "Agendado"
+      },
+      "cta": {
+        "addContent": "Adicionar Novo Conteúdo"
+      }
+    },
+    "memberExperience": {
+      "title": {
+        "part1": "Experiência",
+        "part2": "Premium para Membros"
+      },
+      "subtitle": "Navegue por um ambiente intuitivo e personalize sua jornada de aprendizado com acesso simplificado a todo o conteúdo.",
+      "examples": {
+        "masterclass": "Masterclass: Marketing Digital",
+        "ebook": "E-book: Finanças para Empreendedores",
+        "webinar": "Webinar: Estratégias de Venda"
+      },
+      "features": {
+        "multiDevice": {
+          "title": "Acesso Multi-Dispositivo",
+          "description": "Disponível em desktop, tablet e mobile."
+        },
+        "restrictedContent": {
+          "title": "Conteúdo Restrito",
+          "description": "Apenas para assinantes premium."
+        },
+        "clearInterface": {
+          "title": "Interface Clara",
+          "description": "Fácil de navegar e encontrar o que precisa."
+        }
+      }
+    },
+    "testimonials": {
+      "title": {
+        "part1": "O que nossos",
+        "part2": "Membros Dizem"
+      },
+      "subtitle": "Histórias de sucesso de quem já transformou sua carreira com Clubes Abex.",
+      "0": {
+        "name": "Maria Silva",
+        "role": "Empresária",
+        "content": "O Clubes Abex transformou completamente minha visão de negócios. O conteúdo é simplesmente excepcional!"
+      },
+      "1": {
+        "name": "João Santos",
+        "role": "Consultor",
+        "content": "Depois de assinar o plano Premium, meus resultados triplicaram. Vale cada centavo investido!"
+      },
+      "2": {
+        "name": "Ana Costa",
+        "role": "Executiva",
+        "content": "A comunidade VIP é incrível. Aprendo todos os dias com profissionais de alto nível."
+      }
+    },
+    "footer": {
+      "description": "Sua jornada para o sucesso começa aqui. Conteúdo premium, comunidade exclusiva.",
+      "navigation": {
+        "title": "Navegação",
+        "features": "Recursos",
+        "content": "Conteúdo",
+        "plans": "Planos",
+        "testimonials": "Depoimentos"
+      },
+      "support": {
+        "title": "Suporte",
+        "helpCenter": "Central de Ajuda",
+        "faqs": "FAQs",
+        "contact": "Contato",
+        "terms": "Termos de Serviço"
+      },
+      "contact": {
+        "title": "Contato",
+        "address": "Av. Exclusiva, 123, São Paulo, Brasil"
+      },
+      "copyright": "Todos os direitos reservados."
+    }
+  }
