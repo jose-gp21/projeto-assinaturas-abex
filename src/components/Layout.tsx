@@ -1,8 +1,7 @@
 // src/components/Layout.tsx
-// Remover 'use client' se estiver usando Pages Router
+// Remove 'use client' if using Pages Router
 import React from 'react';
 import Navbar from './NavBar';
-import { useTranslation } from 'next-i18next';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,8 +9,6 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, activeTab }) => {
-  const { t } = useTranslation('common'); // Adicionar hook de tradução
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 flex flex-col">
       <Navbar activeTab={activeTab} />
@@ -24,7 +21,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab }) => {
         </div>
       </main>
       
-      {/* Modern Footer com traduções */}
+      {/* Modern Footer */}
       <footer className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
         {/* Decorative background elements */}
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-transparent to-blue-600/10" />
@@ -36,27 +33,27 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab }) => {
             {/* Brand Section */}
             <div className="text-center md:text-left">
               <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-3">
-                Clubes Abex
+                Abex Clubs
               </h3>
               <p className="text-slate-300 text-sm leading-relaxed">
-                {t('footer.description') || 'Sua plataforma exclusiva para conteúdo premium e experiências únicas.'}
+                Your exclusive platform for premium content and unique experiences.
               </p>
             </div>
             
             {/* Quick Links */}
             <div className="text-center">
               <h4 className="font-semibold text-white mb-3">
-                {t('footer.quickLinks') || 'Links Rápidos'}
+                Quick Links
               </h4>
               <div className="space-y-2 text-sm">
-                <a href="/sobre" className="block text-slate-300 hover:text-purple-400 transition-colors duration-200">
-                  {t('footer.about') || 'Sobre Nós'}
+                <a href="/about" className="block text-slate-300 hover:text-purple-400 transition-colors duration-200">
+                  About Us
                 </a>
-                <a href="/contato" className="block text-slate-300 hover:text-purple-400 transition-colors duration-200">
-                  {t('footer.contact') || 'Contato'}
+                <a href="/contact" className="block text-slate-300 hover:text-purple-400 transition-colors duration-200">
+                  Contact
                 </a>
-                <a href="/suporte" className="block text-slate-300 hover:text-purple-400 transition-colors duration-200">
-                  {t('footer.support') || 'Suporte'}
+                <a href="/support" className="block text-slate-300 hover:text-purple-400 transition-colors duration-200">
+                  Support
                 </a>
               </div>
             </div>
@@ -64,11 +61,11 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab }) => {
             {/* Contact Info */}
             <div className="text-center md:text-right">
               <h4 className="font-semibold text-white mb-3">
-                {t('footer.contactInfo') || 'Contato'}
+                Contact
               </h4>
               <div className="space-y-2 text-sm text-slate-300">
-                <p>contato@clubesabex.com</p>
-                <p>+55 (11) 9999-9999</p>
+                <p>contact@abexclubs.com</p>
+                <p>+1 (555) 123-4567</p>
               </div>
             </div>
           </div>
@@ -77,14 +74,14 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab }) => {
           <div className="pt-6 border-t border-slate-700/50">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
               <p className="text-slate-400 text-sm">
-                &copy; {new Date().getFullYear()} Clubes Abex. {t('footer.allRightsReserved') || 'Todos os direitos reservados.'}
+                &copy; {new Date().getFullYear()} Abex Clubs. All rights reserved.
               </p>
               <div className="flex space-x-6 text-sm">
-                <a href="/privacidade" className="text-slate-400 hover:text-purple-400 transition-colors duration-200">
-                  {t('footer.privacy') || 'Privacidade'}
+                <a href="/privacy" className="text-slate-400 hover:text-purple-400 transition-colors duration-200">
+                  Privacy Policy
                 </a>
-                <a href="/termos" className="text-slate-400 hover:text-purple-400 transition-colors duration-200">
-                  {t('footer.terms') || 'Termos de Uso'}
+                <a href="/terms" className="text-slate-400 hover:text-purple-400 transition-colors duration-200">
+                  Terms of Service
                 </a>
               </div>
             </div>

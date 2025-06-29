@@ -1,10 +1,9 @@
 // src/components/Navbar.tsx
-// VERSÃO FINAL - SEM NENHUMA TAG <a>
+// FINAL VERSION - WITHOUT ANY <a> TAGS
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { 
   Menu, 
@@ -16,8 +15,7 @@ import {
   Home,
   FileText,
   Shield,
-  ChevronDown,
-  Globe
+  ChevronDown
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -26,19 +24,10 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
   const { data: session, status } = useSession();
-  const { t } = useTranslation(['common']);
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
-  const languages = [
-    { code: 'pt-BR', name: 'Português', flag: '🇧🇷' },
-    { code: 'en-US', name: 'English', flag: '🇺🇸' },
-  ];
-
-  const currentLanguage = languages.find(lang => lang.code === router.locale);
 
   const isActiveTab = (tabName: string, path?: string) => {
     if (activeTab) {
@@ -80,11 +69,6 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
     }
   };
 
-  const changeLanguage = (locale: string) => {
-    router.push(router.pathname, router.asPath, { locale });
-    setIsLanguageOpen(false);
-  };
-
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -97,13 +81,12 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
     const handleClickOutside = () => {
       setIsOpen(false);
       setIsProfileOpen(false);
-      setIsLanguageOpen(false);
     };
-    if (isOpen || isProfileOpen || isLanguageOpen) {
+    if (isOpen || isProfileOpen) {
       document.addEventListener('click', handleClickOutside);
       return () => document.removeEventListener('click', handleClickOutside);
     }
-  }, [isOpen, isProfileOpen, isLanguageOpen]);
+  }, [isOpen, isProfileOpen]);
 
   const handleSignOut = () => {
     signOut({ callbackUrl: '/' });
@@ -117,7 +100,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
         <div className={`${size} relative ${showBorder ? 'ring-2 ring-purple-500/30' : ''} rounded-full overflow-hidden`}>
           <img 
             src={userImage} 
-            alt={session?.user?.name || t('profile')}
+            alt={session?.user?.name || 'Profile'}
             className="w-full h-full object-cover"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
@@ -149,7 +132,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 lg:h-20">
           
-          {/* Logo - SEM tag <a> */}
+          {/* Logo */}
           <Link 
             href="/" 
             className={`text-2xl lg:text-3xl font-bold transition-all duration-300 hover:scale-105 flex items-center gap-2 ${
@@ -159,17 +142,17 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
             }`}
           >
             <Crown className="w-6 h-6 lg:w-8 lg:h-8" />
-            Clubes Abex
+            Abex Clubs
           </Link>
 
-          {/* Desktop Navigation - TODOS SEM tags <a> */}
+          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-6">
             <Link 
               href="/"
               className={getLinkClasses('home', '/')}
             >
               <Home className="w-4 h-4" />
-              {t('home')}
+              Home
             </Link>
 
             {status === 'authenticated' && (
@@ -181,39 +164,39 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                       className={getLinkClasses('admin-dashboard', '/admin/dashboard')}
                     >
                       <Shield className="w-4 h-4" />
-                      {t('dashboard')}
+                      Dashboard
                     </Link>
                     <Link 
-                      href="/admin/planos"
-                      className={getLinkClasses('admin-plans', '/admin/planos')}
+                      href="/admin/plans"
+                      className={getLinkClasses('admin-plans', '/admin/plans')}
                     >
                       <Settings className="w-4 h-4" />
-                      {t('plans') || 'Planos'}
+                      Plans
                     </Link>
                     <Link 
-                      href="/admin/conteudo"
-                      className={getLinkClasses('admin-content', '/admin/conteudo')}
+                      href="/admin/content"
+                      className={getLinkClasses('admin-content', '/admin/content')}
                     >
                       <FileText className="w-4 h-4" />
-                      {t('content') || 'Conteúdo'}
+                      Content
                     </Link>
                   </div>
                 )}
 
                 <Link 
-                  href="/membro/planos"
-                  className={getLinkClasses('member-plans', '/membro/planos')}
+                  href="/member/plans"
+                  className={getLinkClasses('member-plans', '/member/plans')}
                 >
                   <Crown className="w-4 h-4" />
-                  {t('myPlans') || 'Meus Planos'}
+                  My Plans
                 </Link>
 
                 <Link 
-                  href="/membro/conteudo"
-                  className={getLinkClasses('member-content', '/membro/conteudo')}
+                  href="/member/content"
+                  className={getLinkClasses('member-content', '/member/content')}
                 >
                   <FileText className="w-4 h-4" />
-                  {t('exclusiveContent') || 'Conteúdo Exclusivo'}
+                  Exclusive Content
                 </Link>
 
                 {/* User Profile Dropdown */}
@@ -243,7 +226,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                           <UserAvatar size="w-10 h-10" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-white truncate">
-                              {session.user?.name || t('user') || 'Usuário'}
+                              {session.user?.name || 'User'}
                             </p>
                             <p className="text-xs text-slate-400 truncate">
                               {session.user?.email}
@@ -252,7 +235,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                         </div>
                         {session.user?.role === 'admin' && (
                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                            {t('administrator') || 'Administrador'}
+                            Administrator
                           </span>
                         )}
                       </div>
@@ -262,7 +245,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                         className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-red-900/20 hover:text-red-300 transition-colors duration-200"
                       >
                         <LogOut className="w-4 h-4" />
-                        {t('logout')}
+                        Sign Out
                       </button>
                     </div>
                   )}
@@ -270,50 +253,12 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
               </>
             )}
 
-            {/* Language Selector */}
-            <div className="relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsLanguageOpen(!isLanguageOpen);
-                }}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 hover:scale-105 ${
-                  scrolled 
-                    ? 'text-slate-300 hover:bg-purple-900/20' 
-                    : 'text-slate-300 hover:bg-white/10'
-                }`}
-              >
-                <Globe className="w-4 h-4" />
-                <span className="hidden xl:block">{currentLanguage?.flag}</span>
-                <ChevronDown className="w-3 h-3" />
-              </button>
-
-              {isLanguageOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-slate-800 rounded-xl shadow-2xl border border-slate-700 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                  {languages.map((language) => (
-                    <button
-                      key={language.code}
-                      onClick={() => changeLanguage(language.code)}
-                      className={`w-full flex items-center gap-3 px-4 py-2 text-sm transition-colors duration-200 hover:bg-slate-700/50 ${
-                        router.locale === language.code 
-                          ? 'text-purple-400 bg-purple-900/20' 
-                          : 'text-slate-300'
-                      }`}
-                    >
-                      <span className="text-lg">{language.flag}</span>
-                      <span>{language.name}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {status !== 'authenticated' && (
               <Link 
                 href="/auth/signin"
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 hover:scale-105 hover:shadow-lg"
               >
-                {t('signIn') || 'Entrar'}
+                Sign In
               </Link>
             )}
           </div>
@@ -334,7 +279,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
           </button>
         </div>
 
-        {/* Mobile Navigation - TODOS SEM tags <a> */}
+        {/* Mobile Navigation */}
         {isOpen && (
           <div className="lg:hidden py-4 border-t border-slate-700/50 animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="space-y-2">
@@ -344,7 +289,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                 onClick={() => setIsOpen(false)}
               >
                 <Home className="w-5 h-5" />
-                {t('home')}
+                Home
               </Link>
 
               {status === 'authenticated' ? (
@@ -357,73 +302,44 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                         onClick={() => setIsOpen(false)}
                       >
                         <Shield className="w-5 h-5" />
-                        {t('dashboard')}
+                        Dashboard
                       </Link>
                       <Link 
-                        href="/admin/planos"
-                        className={getMobileLinkClasses('admin-plans', '/admin/planos')}
+                        href="/admin/plans"
+                        className={getMobileLinkClasses('admin-plans', '/admin/plans')}
                         onClick={() => setIsOpen(false)}
                       >
                         <Settings className="w-5 h-5" />
-                        {t('managePlans') || 'Gerenciar Planos'}
+                        Manage Plans
                       </Link>
                       <Link 
-                        href="/admin/conteudo"
-                        className={getMobileLinkClasses('admin-content', '/admin/conteudo')}
+                        href="/admin/content"
+                        className={getMobileLinkClasses('admin-content', '/admin/content')}
                         onClick={() => setIsOpen(false)}
                       >
                         <FileText className="w-5 h-5" />
-                        {t('manageContent') || 'Gerenciar Conteúdo'}
+                        Manage Content
                       </Link>
                     </>
                   )}
 
                   <Link 
-                    href="/membro/planos"
-                    className={getMobileLinkClasses('member-plans', '/membro/planos')}
+                    href="/member/plans"
+                    className={getMobileLinkClasses('member-plans', '/member/plans')}
                     onClick={() => setIsOpen(false)}
                   >
                     <Crown className="w-5 h-5" />
-                    {t('myPlans') || 'Meus Planos'}
+                    My Plans
                   </Link>
 
                   <Link 
-                    href="/membro/conteudo"
-                    className={getMobileLinkClasses('member-content', '/membro/conteudo')}
+                    href="/member/content"
+                    className={getMobileLinkClasses('member-content', '/member/content')}
                     onClick={() => setIsOpen(false)}
                   >
                     <FileText className="w-5 h-5" />
-                    {t('exclusiveContent') || 'Conteúdo Exclusivo'}
+                    Exclusive Content
                   </Link>
-
-                  {/* Language Selector - Mobile */}
-                  <div className={`px-4 py-3 rounded-lg ${
-                    scrolled ? 'bg-purple-900/20' : 'bg-white/10'
-                  }`}>
-                    <p className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
-                      <Globe className="w-4 h-4" />
-                      {t('language') || 'Idioma'}
-                    </p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {languages.map((language) => (
-                        <button
-                          key={language.code}
-                          onClick={() => {
-                            changeLanguage(language.code);
-                            setIsOpen(false);
-                          }}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
-                            router.locale === language.code 
-                              ? 'bg-purple-600 text-white' 
-                              : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
-                          }`}
-                        >
-                          <span>{language.flag}</span>
-                          <span>{language.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
 
                   {/* User info mobile */}
                   <div className={`px-4 py-3 rounded-lg ${
@@ -442,7 +358,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                     </div>
                     {session.user?.role === 'admin' && (
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                        {t('administrator') || 'Administrador'}
+                        Administrator
                       </span>
                     )}
                   </div>
@@ -452,7 +368,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-900/20 hover:text-red-300 transition-colors duration-200"
                   >
                     <LogOut className="w-5 h-5" />
-                    {t('logout')}
+                    Sign Out
                   </button>
                 </>
               ) : (
@@ -461,7 +377,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                   className="block w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white text-center px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:from-purple-700 hover:to-blue-700"
                   onClick={() => setIsOpen(false)}
                 >
-                  {t('signIn') || 'Entrar'}
+                  Sign In
                 </Link>
               )}
             </div>
