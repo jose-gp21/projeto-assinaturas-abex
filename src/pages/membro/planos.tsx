@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { GetServerSideProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withAuth from "@/components/withAuth";
 import Layout from "@/components/Layout";
 import {
@@ -25,7 +28,6 @@ import {
   ArrowRight,
   Loader2,
 } from "lucide-react";
-import { log } from "console";
 
 interface Plano {
   _id: string;
@@ -40,6 +42,7 @@ interface Plano {
 }
 
 function MembroPlanosPage() {
+  const { t } = useTranslation(['member', 'common']);
   const { data: session, status } = useSession();
   const router = useRouter();
   const [planos, setPlanos] = useState<Plano[]>([]);
@@ -70,7 +73,7 @@ function MembroPlanosPage() {
         setError(data.message);
       }
     } catch (err: any) {
-      setError(err.message || "Erro ao carregar planos.");
+      setError(err.message || t('common:error'));
     } finally {
       setLoading(false);
     }
@@ -90,13 +93,13 @@ function MembroPlanosPage() {
       // Por exemplo: Stripe, PayPal, PagSeguro, etc.
 
       alert(
-        `Plano ${plano.nome} (${billing}) selecionado! Redirecionando para pagamento...`
+        `${t('plans.processing.selectingPlan', { planName: plano.nome, billing })}`
       );
 
       // Redirecionar para checkout ou processar pagamento
       // router.push(`/checkout?plano=${plano._id}&billing=${billing}`);
     } catch (err: any) {
-      setError("Erro ao processar solicitação. Tente novamente.");
+      setError(t('plans.processing.error'));
     } finally {
       setProcessingPlan(null);
     }
@@ -135,7 +138,7 @@ function MembroPlanosPage() {
           <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
             <div className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
               <Star className="w-4 h-4 fill-current" />
-              MAIS POPULAR
+              {t('plans.badges.mostPopular')}
             </div>
           </div>
         )}
@@ -145,7 +148,7 @@ function MembroPlanosPage() {
           <div className="absolute -top-4 right-4">
             <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1">
               <Gift className="w-3 h-3" />
-              {plano.diasTeste} dias grátis
+              {plano.diasTeste} {t('plans.badges.freeTrialDays')}
             </div>
           </div>
         )}
@@ -176,12 +179,12 @@ function MembroPlanosPage() {
                   R$ {currentPrice.toFixed(2)}
                 </span>
                 <span className="text-slate-400">
-                  /{selectedBilling === "anual" ? "ano" : "mês"}
+                  /{selectedBilling === "anual" ? t('plans.pricing.year') : t('plans.pricing.month')}
                 </span>
               </div>
             ) : (
               <div className="text-2xl font-bold text-white mb-2">
-                Consulte valores
+                {t('plans.pricing.consultValues')}
               </div>
             )}
 
@@ -204,7 +207,7 @@ function MembroPlanosPage() {
         <div className="mb-8">
           <h4 className="text-sm font-semibold text-slate-300 mb-4 flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-green-400" />
-            Benefícios inclusos:
+            {t('plans.benefits.title')}
           </h4>
           <ul className="space-y-3">
             {plano.beneficios.map((beneficio, index) => (
@@ -233,7 +236,7 @@ function MembroPlanosPage() {
               ) : (
                 <>
                   <CreditCard className="w-5 h-5" />
-                  Escolher Plano Mensal
+                  {t('plans.actions.chooseMonthlyPlan')}
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -251,7 +254,7 @@ function MembroPlanosPage() {
               ) : (
                 <>
                   <Calendar className="w-4 h-4" />
-                  Escolher Plano Anual
+                  {t('plans.actions.chooseAnnualPlan')}
                   {discountPercent > 0 && (
                     <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-bold">
                       -{discountPercent}%
@@ -267,7 +270,7 @@ function MembroPlanosPage() {
         {plano.diasTeste && (
           <div className="mt-4 text-center">
             <p className="text-xs text-slate-500">
-              Cancele a qualquer momento durante o período de teste
+              {t('plans.actions.cancelAnytime')}
             </p>
           </div>
         )}
@@ -277,11 +280,11 @@ function MembroPlanosPage() {
 
   if (status === "loading" || loading) {
     return (
-      <Layout>
+      <Layout activeTab="member-plans">
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-slate-300 text-lg">Carregando planos...</p>
+            <p className="text-slate-300 text-lg">{t('plans.loading')}</p>
           </div>
         </div>
       </Layout>
@@ -290,13 +293,11 @@ function MembroPlanosPage() {
 
   if (status === "unauthenticated" || !session) {
     return (
-      <Layout>
+      <Layout activeTab="member-plans">
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center bg-red-500/10 border border-red-500/20 rounded-2xl p-8">
             <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-            <p className="text-red-400 text-lg">
-              Acesso negado. Por favor, faça login.
-            </p>
+            <p className="text-red-400 text-lg">{t('plans.accessDenied')}</p>
           </div>
         </div>
       </Layout>
@@ -304,21 +305,19 @@ function MembroPlanosPage() {
   }
 
   return (
-    <Layout>
+    <Layout activeTab="member-plans">
       <div className="container mx-auto p-4 lg:p-6 max-w-7xl space-y-12">
         {/* Hero Section */}
         <div className="text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/20 rounded-full text-purple-300 text-sm font-medium mb-6">
             <Sparkles className="w-4 h-4" />
-            Escolha seu plano
+            {t('plans.choosePlan')}
           </div>
           <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-6">
-            Desbloqueie Todo o Potencial
+            {t('plans.title')}
           </h1>
           <p className="text-slate-400 text-lg max-w-3xl mx-auto leading-relaxed">
-            Escolha o plano perfeito para acelerar seu crescimento. Todos os
-            planos incluem acesso completo ao conteúdo premium, suporte
-            prioritário e atualizações constantes.
+            {t('plans.subtitle')}
           </p>
         </div>
 
@@ -334,7 +333,7 @@ function MembroPlanosPage() {
               }`}
             >
               <Clock className="w-4 h-4" />
-              Mensal
+              {t('plans.billing.monthly')}
             </button>
             <button
               onClick={() => setSelectedBilling("anual")}
@@ -345,9 +344,9 @@ function MembroPlanosPage() {
               }`}
             >
               <Calendar className="w-4 h-4" />
-              Anual
+              {t('plans.billing.annual')}
               <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-bold">
-                Economize até 30%
+                {t('plans.billing.saveUp')}
               </span>
             </button>
           </div>
@@ -366,24 +365,21 @@ function MembroPlanosPage() {
           <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-12 text-center">
             <Crown className="w-16 h-16 text-slate-600 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-slate-400 mb-2">
-              Nenhum plano disponível
+              {t('plans.noPlansAvailable')}
             </h3>
             <p className="text-slate-500">
-              Novos planos serão disponibilizados em breve
+              {t('plans.newPlansAvailable')}
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {planos.map((plano, index) => {
-              console.log(plano);
-              return (
-                <PlanCard
-                  key={plano._id}
-                  plano={plano}
-                  featured={plano.popular || index === 1}
-                />
-              );
-            })}
+            {planos.map((plano, index) => (
+              <PlanCard
+                key={plano._id}
+                plano={plano}
+                featured={plano.popular || index === 1}
+              />
+            ))}
           </div>
         )}
 
@@ -391,11 +387,10 @@ function MembroPlanosPage() {
         <div className="bg-slate-800/30 border border-slate-700/50 rounded-3xl p-8 lg:p-12">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white mb-4">
-              Por que escolher nossos planos?
+              {t('plans.whyChoose.title')}
             </h2>
             <p className="text-slate-400 max-w-2xl mx-auto">
-              Todos os planos foram cuidadosamente desenvolvidos para oferecer o
-              máximo valor e acelerar seus resultados
+              {t('plans.whyChoose.subtitle')}
             </p>
           </div>
 
@@ -405,11 +400,10 @@ function MembroPlanosPage() {
                 <Shield className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">
-                Conteúdo Premium
+                {t('plans.whyChoose.premiumContent.title')}
               </h3>
               <p className="text-slate-400 text-sm">
-                Acesso exclusivo a materiais de alta qualidade criados por
-                especialistas
+                {t('plans.whyChoose.premiumContent.description')}
               </p>
             </div>
 
@@ -418,11 +412,10 @@ function MembroPlanosPage() {
                 <Users className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">
-                Comunidade VIP
+                {t('plans.whyChoose.vipCommunity.title')}
               </h3>
               <p className="text-slate-400 text-sm">
-                Conecte-se com outros membros e participe de discussões
-                exclusivas
+                {t('plans.whyChoose.vipCommunity.description')}
               </p>
             </div>
 
@@ -431,10 +424,10 @@ function MembroPlanosPage() {
                 <Zap className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">
-                Suporte Prioritário
+                {t('plans.whyChoose.prioritySupport.title')}
               </h3>
               <p className="text-slate-400 text-sm">
-                Atendimento especializado para tirar suas dúvidas rapidamente
+                {t('plans.whyChoose.prioritySupport.description')}
               </p>
             </div>
           </div>
@@ -443,19 +436,19 @@ function MembroPlanosPage() {
         {/* FAQ Section */}
         <div className="text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
-            Ainda tem dúvidas?
+            {t('plans.faq.title')}
           </h2>
           <p className="text-slate-400 mb-8">
-            Entre em contato conosco para esclarecimentos sobre nossos planos
+            {t('plans.faq.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2">
               <Heart className="w-4 h-4" />
-              Falar com Suporte
+              {t('plans.faq.talkToSupport')}
             </button>
             <button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
               <Award className="w-4 h-4" />
-              Ver Demonstração
+              {t('plans.faq.viewDemo')}
             </button>
           </div>
         </div>
@@ -465,15 +458,15 @@ function MembroPlanosPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-slate-500 text-sm">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4" />
-              Pagamento 100% seguro
+              {t('plans.benefits.securePayment')}
             </div>
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4" />
-              +10.000 membros ativos
+              {t('plans.benefits.activeMembers')}
             </div>
             <div className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
-              98% de satisfação
+              {t('plans.benefits.satisfaction')}
             </div>
           </div>
         </div>
@@ -483,3 +476,11 @@ function MembroPlanosPage() {
 }
 
 export default withAuth(MembroPlanosPage);
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'pt-BR', ['member', 'common'])),
+    },
+  };
+};

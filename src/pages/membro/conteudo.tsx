@@ -2,6 +2,9 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withAuth from '@/components/withAuth';
 import Layout from '@/components/Layout';
 import Link from 'next/link';
@@ -52,17 +55,8 @@ interface Conteudo {
   rating?: number;
 }
 
-const contentTypes = [
-  { value: 'Artigo', label: 'Artigo', icon: FileText, color: 'blue' },
-  { value: 'Video', label: 'Vídeo', icon: Video, color: 'red' },
-  { value: 'Evento', label: 'Evento', icon: Calendar, color: 'purple' },
-  { value: 'Podcast', label: 'Podcast', icon: Headphones, color: 'green' },
-  { value: 'Curso', label: 'Curso', icon: BookOpen, color: 'orange' },
-  { value: 'Webinar', label: 'Webinar', icon: Monitor, color: 'indigo' },
-  { value: 'Outro', label: 'Outro', icon: Archive, color: 'gray' },
-];
-
 function MembroConteudoPage() {
+  const { t } = useTranslation(['member', 'common']);
   const { data: session, status } = useSession();
   const router = useRouter();
   const [conteudos, setConteudos] = useState<Conteudo[]>([]);
@@ -73,6 +67,16 @@ function MembroConteudoPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  const contentTypes = [
+    { value: 'Artigo', label: t('content.types.article'), icon: FileText, color: 'blue' },
+    { value: 'Video', label: t('content.types.video'), icon: Video, color: 'red' },
+    { value: 'Evento', label: t('content.types.event'), icon: Calendar, color: 'purple' },
+    { value: 'Podcast', label: t('content.types.podcast'), icon: Headphones, color: 'green' },
+    { value: 'Curso', label: t('content.types.course'), icon: BookOpen, color: 'orange' },
+    { value: 'Webinar', label: t('content.types.webinar'), icon: Monitor, color: 'indigo' },
+    { value: 'Outro', label: t('content.types.other'), icon: Archive, color: 'gray' },
+  ];
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -117,7 +121,7 @@ function MembroConteudoPage() {
         setError(data.message);
       }
     } catch (err: any) {
-      setError(err.message || 'Erro ao carregar conteúdos.');
+      setError(err.message || t('common:error'));
       console.error("Erro no fetchConteudos:", err);
     } finally {
       setLoadingContent(false);
@@ -182,12 +186,12 @@ function MembroConteudoPage() {
             {conteudo.restrito ? (
               <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-purple-500/20 text-purple-300">
                 <Crown className="w-3 h-3" />
-                Premium
+                {t('content.badges.premium')}
               </div>
             ) : (
               <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300">
                 <Unlock className="w-3 h-3" />
-                Grátis
+                {t('content.badges.free')}
               </div>
             )}
           </div>
@@ -248,12 +252,12 @@ function MembroConteudoPage() {
             {!canAccess ? (
               <>
                 <Lock className="w-4 h-4" />
-                Assine para Acessar
+                {t('content.actions.subscribeToAccess')}
               </>
             ) : (
               <>
                 <Play className="w-4 h-4" />
-                Acessar Conteúdo
+                {t('content.actions.accessContent')}
                 {conteudo.url && <ExternalLink className="w-4 h-4" />}
               </>
             )}
@@ -294,12 +298,12 @@ function MembroConteudoPage() {
                 {conteudo.restrito ? (
                   <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-purple-500/20 text-purple-300">
                     <Crown className="w-3 h-3" />
-                    Premium
+                    {t('content.badges.premium')}
                   </div>
                 ) : (
                   <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300">
                     <Unlock className="w-3 h-3" />
-                    Grátis
+                    {t('content.badges.free')}
                   </div>
                 )}
               </div>
@@ -334,12 +338,12 @@ function MembroConteudoPage() {
                 {!canAccess ? (
                   <>
                     <Lock className="w-4 h-4" />
-                    Assinar
+                    {t('content.actions.subscribe')}
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4" />
-                    Acessar
+                    {t('content.actions.access')}
                   </>
                 )}
               </button>
@@ -352,11 +356,11 @@ function MembroConteudoPage() {
 
   if (status === 'loading' || loadingContent) {
     return (
-      <Layout>
+      <Layout activeTab='member-content'>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-slate-300 text-lg">Carregando conteúdos...</p>
+            <p className="text-slate-300 text-lg">{t('content.loading')}</p>
           </div>
         </div>
       </Layout>
@@ -365,11 +369,11 @@ function MembroConteudoPage() {
 
   if (status === 'unauthenticated' || !session) {
     return (
-      <Layout>
+      <Layout activeTab='member-content'>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center bg-red-500/10 border border-red-500/20 rounded-2xl p-8">
             <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-            <p className="text-red-400 text-lg">Acesso negado. Por favor, faça login.</p>
+            <p className="text-red-400 text-lg">{t('content.accessDenied')}</p>
           </div>
         </div>
       </Layout>
@@ -377,16 +381,16 @@ function MembroConteudoPage() {
   }
 
   return (
-    <Layout>
+    <Layout activeTab='member-content'>
       <div className="container mx-auto p-4 lg:p-6 max-w-7xl space-y-8">
         
         {/* Header */}
         <div className="text-center">
           <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-4">
-            Conteúdo Exclusivo
+            {t('content.title')}
           </h1>
           <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Descubra materiais premium cuidadosamente selecionados para impulsionar seu crescimento
+            {t('content.subtitle')}
           </p>
         </div>
 
@@ -398,16 +402,16 @@ function MembroConteudoPage() {
                 <Crown className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-orange-300 mb-1">Desbloqueie Conteúdo Premium</h3>
+                <h3 className="text-lg font-semibold text-orange-300 mb-1">{t('content.unlockPremium.title')}</h3>
                 <p className="text-orange-200 text-sm mb-3">
-                  Assine um plano para acessar todos os conteúdos exclusivos e acelerar seus resultados
+                  {t('content.unlockPremium.subtitle')}
                 </p>
                 <Link 
                   href="/membro/planos"
                   className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:scale-105"
                 >
                   <Crown className="w-4 h-4" />
-                  Ver Planos
+                  {t('content.unlockPremium.viewPlans')}
                 </Link>
               </div>
             </div>
@@ -419,9 +423,9 @@ function MembroConteudoPage() {
                 <CheckCircle className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-green-300 mb-1">Assinatura Ativa!</h3>
+                <h3 className="text-lg font-semibold text-green-300 mb-1">{t('content.activeSubscription.title')}</h3>
                 <p className="text-green-200 text-sm">
-                  Você tem acesso completo a todos os conteúdos premium
+                  {t('content.activeSubscription.subtitle')}
                 </p>
               </div>
             </div>
@@ -443,7 +447,7 @@ function MembroConteudoPage() {
               <FileText className="w-6 h-6 text-white" />
             </div>
             <p className="text-2xl font-bold text-white">{conteudos.length}</p>
-            <p className="text-slate-400 text-sm">Total Disponível</p>
+            <p className="text-slate-400 text-sm">{t('content.stats.totalAvailable')}</p>
           </div>
           
           <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 text-center">
@@ -453,7 +457,7 @@ function MembroConteudoPage() {
             <p className="text-2xl font-bold text-white">
               {conteudos.filter(c => c.restrito).length}
             </p>
-            <p className="text-slate-400 text-sm">Premium</p>
+            <p className="text-slate-400 text-sm">{t('content.stats.premium')}</p>
           </div>
           
           <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 text-center">
@@ -463,7 +467,7 @@ function MembroConteudoPage() {
             <p className="text-2xl font-bold text-white">
               {conteudos.filter(c => !c.restrito).length}
             </p>
-            <p className="text-slate-400 text-sm">Gratuito</p>
+            <p className="text-slate-400 text-sm">{t('content.stats.free')}</p>
           </div>
           
           <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 text-center">
@@ -473,7 +477,7 @@ function MembroConteudoPage() {
             <p className="text-2xl font-bold text-white">
               {userStatusAssinatura === 'Ativa' ? conteudos.length : conteudos.filter(c => !c.restrito).length}
             </p>
-            <p className="text-slate-400 text-sm">Acessível</p>
+            <p className="text-slate-400 text-sm">{t('content.stats.accessible')}</p>
           </div>
         </div>
 
@@ -485,7 +489,7 @@ function MembroConteudoPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Buscar conteúdo..."
+                  placeholder={t('content.search')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full bg-slate-900/50 border border-slate-600 text-white pl-12 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -498,7 +502,7 @@ function MembroConteudoPage() {
               onChange={(e) => setFilterType(e.target.value)}
               className="bg-slate-900/50 border border-slate-600 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              <option value="">Todos os tipos</option>
+              <option value="">{t('content.allTypes')}</option>
               {contentTypes.map(type => (
                 <option key={type.value} value={type.value}>{type.label}</option>
               ))}
@@ -533,19 +537,19 @@ function MembroConteudoPage() {
         <div>
           <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
             <Sparkles className="w-6 h-6 text-purple-400" />
-            Biblioteca de Conteúdo ({filteredConteudos.length})
+            {t('content.library')} ({filteredConteudos.length})
           </h2>
           
           {filteredConteudos.length === 0 ? (
             <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-12 text-center">
               <FileText className="w-16 h-16 text-slate-600 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-slate-400 mb-2">
-                {conteudos.length === 0 ? 'Nenhum conteúdo disponível' : 'Nenhum conteúdo encontrado'}
+                {conteudos.length === 0 ? t('content.noContent.title') : t('content.noContent.titleNotFound')}
               </h3>
               <p className="text-slate-500">
                 {conteudos.length === 0 
-                  ? 'Novos conteúdos serão adicionados em breve'
-                  : 'Tente ajustar os filtros de busca'
+                  ? t('content.noContent.subtitle')
+                  : t('content.noContent.subtitleNotFound')
                 }
               </p>
             </div>
@@ -571,3 +575,11 @@ function MembroConteudoPage() {
 }
 
 export default withAuth(MembroConteudoPage);
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'pt-BR', ['member', 'common'])),
+    },
+  };
+};

@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withAuth from '@/components/withAuth';
 import Layout from '@/components/Layout';
 import { 
@@ -67,17 +70,8 @@ interface Plano {
   nome: string;
 }
 
-const contentTypes = [
-  { value: 'Artigo', label: 'Artigo', icon: FileText, color: 'blue' },
-  { value: 'Video', label: 'Vídeo', icon: Video, color: 'red' },
-  { value: 'Evento', label: 'Evento', icon: Calendar, color: 'purple' },
-  { value: 'Podcast', label: 'Podcast', icon: Headphones, color: 'green' },
-  { value: 'Curso', label: 'Curso', icon: BookOpen, color: 'orange' },
-  { value: 'Webinar', label: 'Webinar', icon: Monitor, color: 'indigo' },
-  { value: 'Outro', label: 'Outro', icon: Archive, color: 'gray' },
-];
-
 function GerenciarConteudoPage() {
+  const { t } = useTranslation(['admin', 'common']);
   const { data: session, status } = useSession();
   const router = useRouter();
   const [conteudos, setConteudos] = useState<Conteudo[]>([]);
@@ -90,6 +84,16 @@ function GerenciarConteudoPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('');
   const [filterRestricted, setFilterRestricted] = useState('');
+  
+  const contentTypes = [
+    { value: 'Artigo', label: t('content.types.article'), icon: FileText, color: 'blue' },
+    { value: 'Video', label: t('content.types.video'), icon: Video, color: 'red' },
+    { value: 'Evento', label: t('content.types.event'), icon: Calendar, color: 'purple' },
+    { value: 'Podcast', label: t('content.types.podcast'), icon: Headphones, color: 'green' },
+    { value: 'Curso', label: t('content.types.course'), icon: BookOpen, color: 'orange' },
+    { value: 'Webinar', label: t('content.types.webinar'), icon: Monitor, color: 'indigo' },
+    { value: 'Outro', label: t('content.types.other'), icon: Archive, color: 'gray' },
+  ];
   
   const [form, setForm] = useState<Partial<Conteudo>>({
     titulo: '',
@@ -164,7 +168,7 @@ function GerenciarConteudoPage() {
         setError(dataPlanos.message);
       }
     } catch (err: any) {
-      setError(err.message || 'Erro ao carregar dados.');
+      setError(err.message || t('common:error'));
     } finally {
       setLoading(false);
     }
@@ -205,7 +209,7 @@ function GerenciarConteudoPage() {
         setError(data.message);
       }
     } catch (err: any) {
-      setError(err.message || 'Erro ao salvar conteúdo.');
+      setError(err.message || t('common:error'));
     } finally {
       setFormLoading(false);
     }
@@ -242,7 +246,7 @@ function GerenciarConteudoPage() {
   };
 
   const handleDelete = async (id: string, titulo: string) => {
-    if (!confirm(`Tem certeza que deseja excluir "${titulo}"?`)) return;
+    if (!confirm(`${t('content.deleteConfirm')} "${titulo}"?`)) return;
 
     try {
       const res = await fetch(`/api/admin/conteudo?id=${id}`, { method: 'DELETE' });
@@ -253,7 +257,7 @@ function GerenciarConteudoPage() {
         setError(data.message);
       }
     } catch (err: any) {
-      setError(err.message || 'Erro ao excluir conteúdo.');
+      setError(err.message || t('common:error'));
     }
   };
 
@@ -271,7 +275,7 @@ function GerenciarConteudoPage() {
         setError(data.message);
       }
     } catch (err: any) {
-      setError(err.message || 'Erro ao atualizar status.');
+      setError(err.message || t('common:error'));
     }
   };
 
@@ -311,14 +315,14 @@ function GerenciarConteudoPage() {
               }`}
             >
               {conteudo.ativo !== false ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-              {conteudo.ativo !== false ? 'Ativo' : 'Inativo'}
+              {conteudo.ativo !== false ? t('content.actions.active') : t('content.actions.inactive')}
             </button>
 
             {/* Restricted Badge */}
             {conteudo.restrito && (
               <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400">
                 <Lock className="w-3 h-3" />
-                Restrito
+                {t('content.badges.restricted')}
               </div>
             )}
           </div>
@@ -343,7 +347,7 @@ function GerenciarConteudoPage() {
             {conteudo.url && (
               <span className="flex items-center gap-1">
                 <Link className="w-3 h-3" />
-                URL externa
+                {t('content.badges.external')}
               </span>
             )}
           </div>
@@ -373,7 +377,7 @@ function GerenciarConteudoPage() {
             className="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
           >
             <Edit3 className="w-4 h-4" />
-            Editar
+            {t('content.actions.edit')}
           </button>
           {conteudo.url && (
             <button
@@ -396,11 +400,11 @@ function GerenciarConteudoPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <Layout>
+      <Layout activeTab="admin-content">
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-slate-300 text-lg">Carregando conteúdo...</p>
+            <p className="text-slate-300 text-lg">{t('content.loading')}</p>
           </div>
         </div>
       </Layout>
@@ -409,11 +413,11 @@ function GerenciarConteudoPage() {
 
   if (!session) {
     return (
-      <Layout>
+      <Layout activeTab="admin-content">
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center bg-red-500/10 border border-red-500/20 rounded-2xl p-8">
             <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-            <p className="text-red-400 text-lg">Acesso negado. Faça login como administrador.</p>
+            <p className="text-red-400 text-lg">{t('common.accessDenied')}</p>
           </div>
         </div>
       </Layout>
@@ -421,22 +425,22 @@ function GerenciarConteudoPage() {
   }
 
   return (
-    <Layout>
+    <Layout activeTab="admin-content">
       <div className="container mx-auto p-4 lg:p-6 max-w-7xl space-y-8">
         
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
-              Gerenciar Conteúdo
+              {t('content.title')}
             </h1>
-            <p className="text-slate-400">Crie e gerencie o conteúdo exclusivo da sua plataforma</p>
+            <p className="text-slate-400">{t('content.subtitle')}</p>
           </div>
           
           <div className="flex items-center gap-3">
             <button className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
               <Download className="w-4 h-4" />
-              Exportar
+              {t('content.export')}
             </button>
             <button
               onClick={() => {
@@ -446,7 +450,7 @@ function GerenciarConteudoPage() {
               className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2 shadow-lg"
             >
               <Plus className="w-5 h-5" />
-              Novo Conteúdo
+              {t('content.newContent')}
             </button>
           </div>
         </div>
@@ -474,7 +478,7 @@ function GerenciarConteudoPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-white">{conteudos.length}</p>
-                <p className="text-slate-400 text-sm">Total</p>
+                <p className="text-slate-400 text-sm">{t('content.stats.total')}</p>
               </div>
             </div>
           </div>
@@ -488,7 +492,7 @@ function GerenciarConteudoPage() {
                 <p className="text-2xl font-bold text-white">
                   {conteudos.filter(c => c.ativo !== false).length}
                 </p>
-                <p className="text-slate-400 text-sm">Ativos</p>
+                <p className="text-slate-400 text-sm">{t('content.stats.active')}</p>
               </div>
             </div>
           </div>
@@ -502,7 +506,7 @@ function GerenciarConteudoPage() {
                 <p className="text-2xl font-bold text-white">
                   {conteudos.filter(c => c.restrito).length}
                 </p>
-                <p className="text-slate-400 text-sm">Restritos</p>
+                <p className="text-slate-400 text-sm">{t('content.stats.restricted')}</p>
               </div>
             </div>
           </div>
@@ -516,7 +520,7 @@ function GerenciarConteudoPage() {
                 <p className="text-2xl font-bold text-white">
                   {Math.round(conteudos.reduce((acc, c) => acc + (c.engagement || 0), 0) / conteudos.length) || 0}%
                 </p>
-                <p className="text-slate-400 text-sm">Engajamento</p>
+                <p className="text-slate-400 text-sm">{t('content.stats.engagement')}</p>
               </div>
             </div>
           </div>
@@ -530,7 +534,7 @@ function GerenciarConteudoPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Buscar conteúdo..."
+                  placeholder={t('content.search')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full bg-slate-900/50 border border-slate-600 text-white pl-12 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -543,7 +547,7 @@ function GerenciarConteudoPage() {
               onChange={(e) => setFilterType(e.target.value)}
               className="bg-slate-900/50 border border-slate-600 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              <option value="">Todos os tipos</option>
+              <option value="">{t('content.allTypes')}</option>
               {contentTypes.map(type => (
                 <option key={type.value} value={type.value}>{type.label}</option>
               ))}
@@ -554,9 +558,9 @@ function GerenciarConteudoPage() {
               onChange={(e) => setFilterRestricted(e.target.value)}
               className="bg-slate-900/50 border border-slate-600 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              <option value="">Todos</option>
-              <option value="true">Apenas restritos</option>
-              <option value="false">Apenas públicos</option>
+              <option value="">{t('content.all')}</option>
+              <option value="true">{t('content.onlyRestricted')}</option>
+              <option value="false">{t('content.onlyPublic')}</option>
             </select>
           </div>
         </div>
@@ -565,19 +569,19 @@ function GerenciarConteudoPage() {
         <div>
           <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
             <FileText className="w-6 h-6 text-purple-400" />
-            Conteúdo Cadastrado ({filteredConteudos.length})
+            {t('content.contentCadastrado')} ({filteredConteudos.length})
           </h2>
           
           {filteredConteudos.length === 0 ? (
             <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-12 text-center">
               <FileText className="w-16 h-16 text-slate-600 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-slate-400 mb-2">
-                {conteudos.length === 0 ? 'Nenhum conteúdo cadastrado' : 'Nenhum conteúdo encontrado'}
+                {conteudos.length === 0 ? t('content.noContentCadastrado') : t('content.noContentFound')}
               </h3>
               <p className="text-slate-500 mb-6">
                 {conteudos.length === 0 
-                  ? 'Comece criando seu primeiro conteúdo exclusivo'
-                  : 'Tente ajustar os filtros de busca'
+                  ? t('content.startCreating')
+                  : t('content.adjustFilters')
                 }
               </p>
               {conteudos.length === 0 && (
@@ -589,7 +593,7 @@ function GerenciarConteudoPage() {
                   className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2 mx-auto"
                 >
                   <Plus className="w-5 h-5" />
-                  Criar Primeiro Conteúdo
+                  {t('content.createFirstContent')}
                 </button>
               )}
             </div>
@@ -609,7 +613,7 @@ function GerenciarConteudoPage() {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                   {isEditing ? <Edit3 className="w-6 h-6 text-blue-400" /> : <Plus className="w-6 h-6 text-purple-400" />}
-                  {isEditing ? 'Editar Conteúdo' : 'Criar Novo Conteúdo'}
+                  {isEditing ? t('content.editContent') : t('content.createContent')}
                 </h2>
                 <button
                   onClick={() => setShowForm(false)}
@@ -623,7 +627,7 @@ function GerenciarConteudoPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-slate-300 text-sm font-medium mb-2">
-                      Título *
+                      {t('content.form.title')} *
                     </label>
                     <input
                       type="text"
@@ -631,14 +635,14 @@ function GerenciarConteudoPage() {
                       value={form.titulo || ''}
                       onChange={handleChange}
                       className="w-full bg-slate-900/50 border border-slate-600 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      placeholder="Título do conteúdo"
+                      placeholder={t('content.form.titlePlaceholder')}
                       required
                     />
                   </div>
 
                   <div>
                     <label className="block text-slate-300 text-sm font-medium mb-2">
-                      Tipo *
+                      {t('content.form.type')} *
                     </label>
                     <select
                       name="tipo"
@@ -656,7 +660,7 @@ function GerenciarConteudoPage() {
 
                 <div>
                   <label className="block text-slate-300 text-sm font-medium mb-2">
-                    Descrição *
+                    {t('content.form.description')} *
                   </label>
                   <textarea
                     name="descricao"
@@ -664,7 +668,7 @@ function GerenciarConteudoPage() {
                     onChange={handleChange}
                     rows={4}
                     className="w-full bg-slate-900/50 border border-slate-600 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="Descreva o conteúdo..."
+                    placeholder={t('content.form.descriptionPlaceholder')}
                     required
                   />
                 </div>
@@ -672,7 +676,7 @@ function GerenciarConteudoPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-slate-300 text-sm font-medium mb-2">
-                      URL Externa (opcional)
+                      {t('content.form.externalUrl')}
                     </label>
                     <div className="relative">
                       <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -682,14 +686,14 @@ function GerenciarConteudoPage() {
                         value={form.url || ''}
                         onChange={handleChange}
                         className="w-full bg-slate-900/50 border border-slate-600 text-white pl-12 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="https://exemplo.com"
+                        placeholder={t('content.form.urlPlaceholder')}
                       />
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-slate-300 text-sm font-medium mb-2">
-                      Associar ao Plano
+                      {t('content.form.associatePlan')}
                     </label>
                     <div className="relative">
                       <Crown className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -699,7 +703,7 @@ function GerenciarConteudoPage() {
                         onChange={handleChange}
                         className="w-full bg-slate-900/50 border border-slate-600 text-white pl-12 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
                       >
-                        <option value="">Público ou Todos os Assinantes</option>
+                        <option value="">{t('content.form.publicOrAllSubscribers')}</option>
                         {planosDisponiveis.map((plano) => (
                           <option key={plano._id} value={plano._id}>
                             {plano.nome}
@@ -722,7 +726,7 @@ function GerenciarConteudoPage() {
                     />
                     <span className="text-slate-300 flex items-center gap-2">
                       <Lock className="w-4 h-4" />
-                      Conteúdo restrito (apenas assinantes)
+                      {t('content.form.restrictedContent')}
                     </span>
                   </label>
 
@@ -736,7 +740,7 @@ function GerenciarConteudoPage() {
                     />
                     <span className="text-slate-300 flex items-center gap-2">
                       <Eye className="w-4 h-4" />
-                      Conteúdo ativo
+                      {t('content.form.activeContent')}
                     </span>
                   </label>
                 </div>
@@ -748,7 +752,7 @@ function GerenciarConteudoPage() {
                     onClick={() => setShowForm(false)}
                     className="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-xl font-medium transition-colors"
                   >
-                    Cancelar
+                    {t('content.form.cancel')}
                   </button>
                   <button
                     type="submit"
@@ -760,7 +764,7 @@ function GerenciarConteudoPage() {
                     ) : (
                       <Save className="w-5 h-5" />
                     )}
-                    {formLoading ? 'Salvando...' : isEditing ? 'Salvar Alterações' : 'Criar Conteúdo'}
+                    {formLoading ? t('content.form.saving') : isEditing ? t('content.form.save') : t('content.form.create')}
                   </button>
                 </div>
               </form>
@@ -773,3 +777,11 @@ function GerenciarConteudoPage() {
 }
 
 export default withAuth(GerenciarConteudoPage, { requiresAdmin: true });
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'pt-BR', ['admin', 'common'])),
+    },
+  };
+};

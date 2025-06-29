@@ -170,7 +170,7 @@ function AdminDashboardPage() {
 
   if (error) {
     return (
-      <Layout>
+      <Layout activeTab='dashboard'>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center bg-red-500/10 border border-red-500/20 rounded-2xl p-8">
             <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />

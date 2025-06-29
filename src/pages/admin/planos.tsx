@@ -3,6 +3,9 @@
 import Layout from '@/components/Layout';
 import withAuth from '@/components/withAuth';
 import { useState, useEffect } from 'react';
+import { GetServerSideProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { 
   Crown, 
   Plus, 
@@ -39,6 +42,7 @@ interface Plano {
 }
 
 function GerenciarPlanosPage() {
+  const { t } = useTranslation(['admin', 'common']);
   const [planos, setPlanos] = useState<Plano[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +75,7 @@ function GerenciarPlanosPage() {
         setError(data.message);
       }
     } catch (err: any) {
-      setError(err.message || 'Erro ao carregar planos.');
+      setError(err.message || t('common:error'));
     } finally {
       setLoading(false);
     }
@@ -119,7 +123,7 @@ function GerenciarPlanosPage() {
         setError(data.message);
       }
     } catch (err: any) {
-      setError(err.message || 'Erro ao salvar plano.');
+      setError(err.message || t('common:error'));
     } finally {
       setFormLoading(false);
     }
@@ -158,7 +162,7 @@ function GerenciarPlanosPage() {
   };
 
   const handleDelete = async (id: string, nome: string) => {
-    if (!confirm(`Tem certeza que deseja excluir o plano "${nome}"?`)) return;
+    if (!confirm(`${t('plans.deleteConfirm')} "${nome}"?`)) return;
 
     try {
       const res = await fetch(`/api/admin/planos?id=${id}`, {
@@ -171,7 +175,7 @@ function GerenciarPlanosPage() {
         setError(data.message);
       }
     } catch (err: any) {
-      setError(err.message || 'Erro ao excluir plano.');
+      setError(err.message || t('common:error'));
     }
   };
 
@@ -191,7 +195,7 @@ function GerenciarPlanosPage() {
         setError(data.message);
       }
     } catch (err: any) {
-      setError(err.message || 'Erro ao atualizar status.');
+      setError(err.message || t('common:error'));
     }
   };
 
@@ -205,7 +209,7 @@ function GerenciarPlanosPage() {
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
           <div className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-1 rounded-full text-xs font-bold flex items-center gap-1">
             <Star className="w-3 h-3 fill-current" />
-            POPULAR
+            {t('plans.popular')}
           </div>
         </div>
       )}
@@ -221,7 +225,7 @@ function GerenciarPlanosPage() {
           }`}
         >
           {plano.ativo !== false ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-          {plano.ativo !== false ? 'Ativo' : 'Inativo'}
+          {plano.ativo !== false ? t('plans.actions.active') : t('plans.actions.inactive')}
         </button>
       </div>
 
@@ -258,7 +262,7 @@ function GerenciarPlanosPage() {
             <span className="text-slate-400 text-sm">/ano</span>
             {plano.valorMensal && (
               <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">
-                {Math.round((1 - (plano.valorAnual / (plano.valorMensal * 12))) * 100)}% OFF
+                {Math.round((1 - (plano.valorAnual / (plano.valorMensal * 12))) * 100)}% {t('plans.discount')}
               </span>
             )}
           </div>
@@ -273,7 +277,7 @@ function GerenciarPlanosPage() {
 
       {/* Benefits */}
       <div className="mb-6">
-        <h4 className="text-sm font-medium text-slate-300 mb-3">Benefícios:</h4>
+        <h4 className="text-sm font-medium text-slate-300 mb-3">{t('plans.benefitsIncluded')}</h4>
         <div className="space-y-2">
           {plano.beneficios.slice(0, 3).map((beneficio, index) => (
             <div key={index} className="flex items-center gap-2 text-sm text-slate-400">
@@ -283,7 +287,7 @@ function GerenciarPlanosPage() {
           ))}
           {plano.beneficios.length > 3 && (
             <div className="text-xs text-slate-500">
-              +{plano.beneficios.length - 3} benefícios adicionais
+              +{plano.beneficios.length - 3} {t('plans.additionalBenefits')}
             </div>
           )}
         </div>
@@ -296,7 +300,7 @@ function GerenciarPlanosPage() {
           className="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
         >
           <Edit3 className="w-4 h-4" />
-          Editar
+          {t('plans.actions.edit')}
         </button>
         <button
           onClick={() => handleDelete(plano._id, plano.nome)}
@@ -310,11 +314,11 @@ function GerenciarPlanosPage() {
 
   if (loading) {
     return (
-      <Layout>
+      <Layout activeTab='admin-plans'>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-slate-300 text-lg">Carregando planos...</p>
+            <p className="text-slate-300 text-lg">{t('plans.loading')}</p>
           </div>
         </div>
       </Layout>
@@ -322,16 +326,16 @@ function GerenciarPlanosPage() {
   }
 
   return (
-    <Layout>
+    <Layout activeTab="admin-plans">
       <div className="container mx-auto p-4 lg:p-6 max-w-7xl space-y-8">
         
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
-              Gerenciar Planos
+              {t('plans.title')}
             </h1>
-            <p className="text-slate-400">Crie e gerencie os planos de assinatura da sua plataforma</p>
+            <p className="text-slate-400">{t('plans.subtitle')}</p>
           </div>
           
           <button
@@ -342,7 +346,7 @@ function GerenciarPlanosPage() {
             className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2 shadow-lg"
           >
             <Plus className="w-5 h-5" />
-            Novo Plano
+            {t('plans.newPlan')}
           </button>
         </div>
 
@@ -369,7 +373,7 @@ function GerenciarPlanosPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-white">{planos.length}</p>
-                <p className="text-slate-400 text-sm">Total de Planos</p>
+                <p className="text-slate-400 text-sm">{t('plans.totalPlans')}</p>
               </div>
             </div>
           </div>
@@ -383,7 +387,7 @@ function GerenciarPlanosPage() {
                 <p className="text-2xl font-bold text-white">
                   {planos.filter(p => p.ativo !== false).length}
                 </p>
-                <p className="text-slate-400 text-sm">Planos Ativos</p>
+                <p className="text-slate-400 text-sm">{t('plans.activePlans')}</p>
               </div>
             </div>
           </div>
@@ -397,7 +401,7 @@ function GerenciarPlanosPage() {
                 <p className="text-2xl font-bold text-white">
                   {planos.filter(p => p.popular).length}
                 </p>
-                <p className="text-slate-400 text-sm">Planos Populares</p>
+                <p className="text-slate-400 text-sm">{t('plans.popularPlans')}</p>
               </div>
             </div>
           </div>
@@ -407,14 +411,14 @@ function GerenciarPlanosPage() {
         <div>
           <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
             <Crown className="w-6 h-6 text-purple-400" />
-            Planos Cadastrados
+            {t('plans.plansCadastrados')}
           </h2>
           
           {planos.length === 0 ? (
             <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-12 text-center">
               <Crown className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-400 mb-2">Nenhum plano cadastrado</h3>
-              <p className="text-slate-500 mb-6">Comece criando seu primeiro plano de assinatura</p>
+              <h3 className="text-xl font-semibold text-slate-400 mb-2">{t('plans.noPlansCadastrados')}</h3>
+              <p className="text-slate-500 mb-6">{t('plans.startCreating')}</p>
               <button
                 onClick={() => {
                   resetForm();
@@ -423,7 +427,7 @@ function GerenciarPlanosPage() {
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2 mx-auto"
               >
                 <Plus className="w-5 h-5" />
-                Criar Primeiro Plano
+                {t('plans.createFirstPlan')}
               </button>
             </div>
           ) : (
@@ -442,7 +446,7 @@ function GerenciarPlanosPage() {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                   {isEditing ? <Edit3 className="w-6 h-6 text-blue-400" /> : <Plus className="w-6 h-6 text-purple-400" />}
-                  {isEditing ? 'Editar Plano' : 'Criar Novo Plano'}
+                  {isEditing ? t('plans.editPlan') : t('plans.createPlan')}
                 </h2>
                 <button
                   onClick={() => setShowForm(false)}
@@ -456,7 +460,7 @@ function GerenciarPlanosPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-slate-300 text-sm font-medium mb-2">
-                      Nome do Plano *
+                      {t('plans.form.planName')} *
                     </label>
                     <input
                       type="text"
@@ -464,14 +468,14 @@ function GerenciarPlanosPage() {
                       value={form.nome || ''}
                       onChange={handleChange}
                       className="w-full bg-slate-900/50 border border-slate-600 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      placeholder="Ex: Plano Premium"
+                      placeholder={t('plans.form.planNamePlaceholder')}
                       required
                     />
                   </div>
 
                   <div>
                     <label className="block text-slate-300 text-sm font-medium mb-2">
-                      Valor Mensal
+                      {t('plans.form.monthlyValue')}
                     </label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -489,7 +493,7 @@ function GerenciarPlanosPage() {
 
                   <div>
                     <label className="block text-slate-300 text-sm font-medium mb-2">
-                      Valor Anual
+                      {t('plans.form.annualValue')}
                     </label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -507,7 +511,7 @@ function GerenciarPlanosPage() {
 
                   <div>
                     <label className="block text-slate-300 text-sm font-medium mb-2">
-                      Dias de Teste Grátis
+                      {t('plans.form.freeTrialDays')}
                     </label>
                     <div className="relative">
                       <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -526,7 +530,7 @@ function GerenciarPlanosPage() {
 
                 <div>
                   <label className="block text-slate-300 text-sm font-medium mb-2">
-                    Descrição *
+                    {t('plans.form.description')} *
                   </label>
                   <textarea
                     name="descricao"
@@ -534,14 +538,14 @@ function GerenciarPlanosPage() {
                     onChange={handleChange}
                     rows={3}
                     className="w-full bg-slate-900/50 border border-slate-600 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="Descreva os principais benefícios deste plano..."
+                    placeholder={t('plans.form.descriptionPlaceholder')}
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-slate-300 text-sm font-medium mb-2">
-                    Benefícios (separados por vírgula)
+                    {t('plans.form.benefits')}
                   </label>
                   <textarea
                     name="beneficios"
@@ -549,7 +553,7 @@ function GerenciarPlanosPage() {
                     onChange={handleBeneficiosChange}
                     rows={3}
                     className="w-full bg-slate-900/50 border border-slate-600 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="Acesso ilimitado, Suporte prioritário, Conteúdo exclusivo..."
+                    placeholder={t('plans.form.benefitsPlaceholder')}
                   />
                 </div>
 
@@ -564,7 +568,7 @@ function GerenciarPlanosPage() {
                     />
                     <span className="text-slate-300 flex items-center gap-2">
                       <Star className="w-4 h-4" />
-                      Marcar como popular
+                      {t('plans.form.markAsPopular')}
                     </span>
                   </label>
 
@@ -578,7 +582,7 @@ function GerenciarPlanosPage() {
                     />
                     <span className="text-slate-300 flex items-center gap-2">
                       <Eye className="w-4 h-4" />
-                      Plano ativo
+                      {t('plans.form.activePlan')}
                     </span>
                   </label>
                 </div>
@@ -589,7 +593,7 @@ function GerenciarPlanosPage() {
                     onClick={() => setShowForm(false)}
                     className="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-xl font-medium transition-colors"
                   >
-                    Cancelar
+                    {t('plans.form.cancel')}
                   </button>
                   <button
                     type="submit"
@@ -601,7 +605,7 @@ function GerenciarPlanosPage() {
                     ) : (
                       <Save className="w-5 h-5" />
                     )}
-                    {formLoading ? 'Salvando...' : isEditing ? 'Salvar Alterações' : 'Criar Plano'}
+                    {formLoading ? t('plans.form.saving') : isEditing ? t('plans.form.save') : t('plans.form.create')}
                   </button>
                 </div>
               </form>
@@ -614,3 +618,11 @@ function GerenciarPlanosPage() {
 }
 
 export default withAuth(GerenciarPlanosPage, { requiresAdmin: true });
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'pt-BR', ['admin', 'common'])),
+    },
+  };
+};
