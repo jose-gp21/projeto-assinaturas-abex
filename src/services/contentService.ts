@@ -1,96 +1,96 @@
-// src/services/conteudoService.ts
-import Conteudo from '@/lib/models/Content'; // Seu modelo Conteudo
-import Plano from '@/lib/models/Plan';     // Seu modelo Plano
+// src/services/contentService.ts
+import Content from '@/lib/models/Content'; // Your Content model
+import Plan from '@/lib/models/Plan';     // Your Plan model
 import { connectMongoose } from '@/lib/mongodb';
 
-// Função para criar conteúdo
-export async function createNewContent(data: { titulo: string; descricao: string; tipo: string; url?: string | null; restrito?: boolean; planoId?: string | null }) {
-  await connectMongoose(); // Garante a conexão
+// Function to create content
+export async function createNewContent(data: { title: string; description: string; type: string; url?: string | null; restricted?: boolean; planId?: string | null }) {
+  await connectMongoose(); // Ensure connection
 
-  const { titulo, descricao, tipo, url, restrito, planoId } = data;
+  const { title, description, type, url, restricted, planId } = data;
 
-  // Validação de inputs (agora dentro do serviço)
-  if (!titulo || !descricao || !tipo) {
-    throw new Error('Título, descrição e tipo são obrigatórios para o conteúdo.');
+  // Input validation (now inside the service)
+  if (!title || !description || !type) {
+    throw new Error('Title, description, and type are required for the content.');
   }
 
-  if (planoId) {
-    const planoExistente = await Plano.findById(planoId);
-    if (!planoExistente) {
-      throw new Error('ID do plano fornecido não existe.');
+  if (planId) {
+    const existingPlan = await Plan.findById(planId);
+    if (!existingPlan) {
+      throw new Error('The provided plan ID does not exist.');
     }
   }
 
-  const newConteudo = await Conteudo.create({
-    titulo,
-    descricao,
-    dataPublicacao: new Date(),
-    tipo,
+  const newContent = await Content.create({
+    title,
+    description,
+    publicationDate: new Date(),
+    type,
     url: url || null,
-    restrito: typeof restrito === 'boolean' ? restrito : true,
-    planoId: planoId || null,
+    restricted: typeof restricted === 'boolean' ? restricted : true,
+    planId: planId || null,
   });
 
-  return newConteudo;
+  return newContent;
 }
 
-// Função para obter conteúdo(s)
+// Function to get content(s)
 export async function getContents(id?: string) {
-  await connectMongoose(); // Garante a conexão
+  await connectMongoose(); // Ensure connection
 
   if (id) {
-    const conteudo = await Conteudo.findById(id).populate('planoId', 'nome');
-    if (!conteudo) {
-      throw new Error('Conteúdo não encontrado.');
+    const content = await Content.findById(id).populate('planId', 'name');
+    if (!content) {
+      throw new Error('Content not found.');
     }
-    return conteudo;
+    return content;
   } else {
-    const conteudos = await Conteudo.find({}).populate('planoId', 'nome');
-    return conteudos;
+    const contents = await Content.find({}).populate('planId', 'name');
+    return contents;
   }
 }
 
-// Função para atualizar conteúdo
+// Function to update content
 export async function updateContent(id: string, data: any) {
-  await connectMongoose(); // Garante a conexão
+  await connectMongoose(); // Ensure connection
 
   if (!id) {
-    throw new Error('ID do conteúdo é obrigatório para atualização.');
+    throw new Error('Content ID is required for updating.');
   }
 
-  if (data.planoId) {
-    const planoExistente = await Plano.findById(data.planoId);
-    if (!planoExistente) {
-      throw new Error('ID do plano fornecido não existe.');
+  if (data.planId) {
+    const existingPlan = await Plan.findById(data.planId);
+    if (!existingPlan) {
+      throw new Error('The provided plan ID does not exist.');
     }
   }
 
-  const updatedConteudo = await Conteudo.findByIdAndUpdate(
+  const updatedContent = await Content.findByIdAndUpdate(
     id,
-    data, // Passamos o objeto de dados diretamente
+    data, // Pass the data object directly
     { new: true, runValidators: true }
   );
 
-  if (!updatedConteudo) {
-    throw new Error('Conteúdo não encontrado.');
+  if (!updatedContent) {
+    throw new Error('Content not found.');
   }
 
-  return updatedConteudo;
+  return updatedContent;
 }
 
-// Função para deletar conteúdo
+// Function to delete content
 export async function deleteContent(id: string) {
-  await connectMongoose(); // Garante a conexão
+  await connectMongoose(); // Ensure connection
 
   if (!id) {
-    throw new Error('ID do conteúdo é obrigatório para exclusão.');
+    throw new Error('Content ID is required for deletion.');
   }
 
-  const deletedConteudo = await Conteudo.findByIdAndDelete(id);
+  const deletedContent = await Content.findByIdAndDelete(id);
 
-  if (!deletedConteudo) {
-    throw new Error('Conteúdo não encontrado.');
+  if (!deletedContent) {
+    throw new Error('Content not found.');
   }
 
-  return deletedConteudo;
+  return deletedContent;
 }

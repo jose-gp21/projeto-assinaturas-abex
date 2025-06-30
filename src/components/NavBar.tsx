@@ -1,5 +1,5 @@
 // src/components/Navbar.tsx
-// FINAL VERSION - WITHOUT ANY <a> TAGS
+// FINAL VERSION - WITH LOGIN LOADER
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -28,6 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
 
   const isActiveTab = (tabName: string, path?: string) => {
     if (activeTab) {
@@ -69,6 +70,18 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
     }
   };
 
+  const handleLoginClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsLoginLoading(true);
+    setIsOpen(false); // Fechar menu mobile se estiver aberto
+    
+    // Navegar para página de login
+    router.push('/auth/signin').finally(() => {
+      // Reset loader após navegação completar
+      setTimeout(() => setIsLoginLoading(false), 500);
+    });
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -87,6 +100,13 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
       return () => document.removeEventListener('click', handleClickOutside);
     }
   }, [isOpen, isProfileOpen]);
+
+  // Reset login loading when status changes
+  useEffect(() => {
+    if (status === 'authenticated' || status === 'unauthenticated') {
+      setIsLoginLoading(false);
+    }
+  }, [status]);
 
   const handleSignOut = () => {
     signOut({ callbackUrl: '/' });
@@ -107,7 +127,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
               e.currentTarget.nextElementSibling?.classList.remove('hidden');
             }}
           />
-          <div className="hidden w-full h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+          <div className="hidden w-full h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full items-center justify-center">
             <User className="w-4 h-4 text-white" />
           </div>
         </div>
@@ -118,6 +138,29 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
       <div className={`${size} bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center ${showBorder ? 'ring-2 ring-purple-500/30' : ''}`}>
         <User className="w-4 h-4 text-white" />
       </div>
+    );
+  };
+
+  const LoginButton = ({ isMobile = false }) => {
+    const baseClasses = isMobile 
+      ? "block w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white text-center px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:from-purple-700 hover:to-blue-700"
+      : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 hover:scale-105 hover:shadow-lg";
+    
+    return (
+      <button
+        onClick={handleLoginClick}
+        disabled={isLoginLoading}
+        className={`${baseClasses} ${isLoginLoading ? 'opacity-80 cursor-not-allowed' : ''} flex items-center justify-center gap-2`}
+      >
+        {isLoginLoading ? (
+          <>
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            Loading...
+          </>
+        ) : (
+          'Sign In'
+        )}
+      </button>
     );
   };
 
@@ -253,14 +296,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
               </>
             )}
 
-            {status !== 'authenticated' && (
-              <Link 
-                href="/auth/signin"
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 hover:scale-105 hover:shadow-lg"
-              >
-                Sign In
-              </Link>
-            )}
+            {status !== 'authenticated' && <LoginButton />}
           </div>
 
           {/* Mobile menu button */}
@@ -372,13 +408,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                   </button>
                 </>
               ) : (
-                <Link 
-                  href="/auth/signin"
-                  className="block w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white text-center px-4 py-3 rounded-lg font-semibold transition-all duration-200 hover:from-purple-700 hover:to-blue-700"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Sign In
-                </Link>
+                <LoginButton isMobile={true} />
               )}
             </div>
           </div>
