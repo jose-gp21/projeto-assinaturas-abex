@@ -1,4 +1,4 @@
-// src/pages/api/member/plans.ts
+// src/pages/api/member/plans.ts - VERSÃO CORRIGIDA
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { connectMongoose } from '@/lib/mongodb';
 import Plan from '@/lib/models/Plan';
@@ -17,7 +17,7 @@ export default async function handler(
     return res.status(401).json({ success: false, message: 'Unauthorized. Please log in.' });
   }
 
-  await connectMongoose(); // ✅ centralized connection
+  await connectMongoose();
 
   switch (req.method) {
     case 'GET':
@@ -32,7 +32,7 @@ export default async function handler(
 
     case 'POST':
       try {
-        const { planId } = req.body;
+        const { planId, billing } = req.body; // ✅ Aceitar billing do frontend
         const memberId = session.user.id;
 
         if (!planId) {
@@ -44,12 +44,47 @@ export default async function handler(
           return res.status(404).json({ success: false, message: 'Plan not found.' });
         }
 
+        // ✅ CANCELAR SUBSCRIPTIONS ATIVAS ANTERIORES
+        await Subscription.updateMany(
+          { 
+            memberId, 
+            status: 'Active' 
+          },
+          { 
+            status: 'Cancelled',
+            cancellationDate: new Date()
+          }
+        );
+
         const startDate = new Date();
         const endDate = new Date();
-        endDate.setFullYear(endDate.getFullYear() + 1);
 
+        // ✅ DETERMINAR TIPO CORRETO BASEADO NO PLANO E BILLING
+        let subscriptionType: string;
+        
+        if (billing === 'annual' || plan.annualPrice) {
+          subscriptionType = 'Annual';
+          endDate.setFullYear(endDate.getFullYear() + 1);
+        } else if (billing === 'monthly' || plan.monthlyPrice) {
+          subscriptionType = 'Monthly';
+          endDate.setMonth(endDate.getMonth() + 1);
+        } else {
+          // ✅ FALLBACK para planos sem preço definido
+          subscriptionType = 'Monthly';
+          endDate.setMonth(endDate.getMonth() + 1);
+        }
+
+        console.log('🔧 Creating subscription:', {
+          planId,
+          billing,
+          subscriptionType,
+          hasAnnualPrice: !!plan.annualPrice,
+          hasMonthlyPrice: !!plan.monthlyPrice
+        });
+
+        // ✅ CRIAR NOVA SUBSCRIPTION COM TIPO VÁLIDO
         const newSubscription = await Subscription.create({
-          type: plan.annualValue ? 'Annual' : (plan.monthlyValue ? 'Monthly' : 'Other'),
+          type: subscriptionType, // ✅ Só 'Annual' ou 'Monthly'
           startDate,
           endDate,
           status: 'Active',
@@ -58,16 +93,32 @@ export default async function handler(
           planId,
         });
 
-        await User.findByIdAndUpdate(memberId, { subscriptionStatus: 'Active' });
+        // ✅ ATUALIZAR STATUS DO USUÁRIO
+        await User.findByIdAndUpdate(memberId, { 
+          subscriptionStatus: 'Active',
+          updatedAt: new Date()
+        });
+
+        console.log('🎉 Subscription created successfully:', {
+          userId: memberId,
+          planId,
+          subscriptionId: newSubscription._id,
+          type: newSubscription.type,
+          status: newSubscription.status
+        });
 
         res.status(201).json({
           success: true,
-          message: `You have successfully subscribed to the plan "${plan.name}" (simulated)!`,
-          data: newSubscription,
+          message: `You have successfully subscribed to the plan "${plan.name}"! 🎉`,
+          data: {
+            subscription: newSubscription,
+            plan: plan,
+            accessGranted: true
+          },
         });
 
       } catch (error) {
-        console.error('Error selecting plan:', error);
+        console.error('❌ Error selecting plan:', error);
         res.status(500).json({ success: false, message: 'Internal server error while selecting plan.' });
       }
       break;

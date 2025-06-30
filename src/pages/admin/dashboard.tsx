@@ -78,15 +78,65 @@ function AdminDashboardPage() {
     setError(null);
     
     try {
-      const res = await fetch(`/api/admin/reports?period=${timeFilter}`);
+      const res = await fetch(`/api/admin/reports?period=${timeFilter}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          // Adicione headers de autenticação se necessário
+          // 'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      // Verificar se a resposta é ok
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      // Verificar se o content-type é JSON
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await res.text();
+        console.error('Response is not JSON:', text);
+        throw new Error('Server returned non-JSON response');
+      }
+
       const result = await res.json();
+      
       if (result.success) {
         setData(result.data);
       } else {
-        setError(result.message);
+        setError(result.message || 'Unknown error occurred');
       }
     } catch (err: any) {
-      setError(err.message || 'Error loading dashboard data.');
+      console.error('Dashboard fetch error:', err);
+      
+      // Tratamento mais específico de erros
+      if (err.name === 'SyntaxError') {
+        setError('Invalid server response format. Please check the API endpoint.');
+      } else if (err.message.includes('fetch')) {
+        setError('Network error. Please check your connection.');
+      } else {
+        setError(err.message || 'Error loading dashboard data.');
+      }
+      
+      // Fallback para dados mock em caso de erro (opcional)
+      setData({
+        totalUsers: 0,
+        activeSubscriptions: 0,
+        totalPlans: 0,
+        totalContent: 0,
+        restrictedContent: 0,
+        monthlyGrowth: {
+          users: 0,
+          subscriptions: 0,
+          content: 0
+        },
+        revenueData: {
+          total: 0,
+          monthly: 0,
+          growth: 0
+        }
+      });
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -168,20 +218,28 @@ function AdminDashboardPage() {
     );
   }
 
-  if (error) {
+  if (error && !data) {
     return (
       <Layout activeTab='dashboard'>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center bg-red-500/10 border border-red-500/20 rounded-2xl p-8">
+          <div className="text-center bg-red-500/10 border border-red-500/20 rounded-2xl p-8 max-w-md">
             <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-            <p className="text-red-400 text-lg mb-4">Error loading data</p>
+            <h2 className="text-red-400 text-xl font-bold mb-2">Error loading data</h2>
             <p className="text-slate-400 mb-6">{error}</p>
-            <button
-              onClick={() => fetchDashboardData()}
-              className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors"
-            >
-              Try Again
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={() => fetchDashboardData()}
+                className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors w-full"
+              >
+                Try Again
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-slate-600 hover:bg-slate-700 text-white px-6 py-2 rounded-lg transition-colors w-full"
+              >
+                Reload Page
+              </button>
+            </div>
           </div>
         </div>
       </Layout>
@@ -191,6 +249,25 @@ function AdminDashboardPage() {
   return (
     <Layout activeTab='dashboard'>
       <div className="container mx-auto p-4 lg:p-6 max-w-7xl space-y-8">
+        
+        {/* Error Alert (if data exists but there was an error) */}
+        {error && data && (
+          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-6">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-yellow-400" />
+              <div>
+                <p className="text-yellow-400 font-medium">Warning</p>
+                <p className="text-slate-300 text-sm">{error}</p>
+              </div>
+              <button 
+                onClick={handleRefresh}
+                className="ml-auto bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 px-3 py-1 rounded text-sm transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        )}
         
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -486,9 +563,7 @@ function AdminDashboardPage() {
             <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Award className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-1">98.5%</h3>
-            <p className="text-slate-400 text-sm">Satisfaction</p>
-            <p className="text-teal-400 text-xs mt-2">Average user rating</p>
+ 
           </div>
         </div>
       </div>

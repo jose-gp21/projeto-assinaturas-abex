@@ -1,14 +1,14 @@
-'use client'
+"use client";
 // src/pages/member/content.tsx
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
-import withAuth from '@/components/withAuth';
-import Layout from '@/components/Layout';
-import { 
-  FileText, 
-  Video, 
-  Calendar, 
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import withAuth from "@/components/withAuth";
+import Layout from "@/components/Layout";
+import {
+  FileText,
+  Video,
+  Calendar,
   Search,
   Filter,
   Heart,
@@ -30,8 +30,9 @@ import {
   Download,
   Share,
   Bookmark,
-  BookmarkCheck
-} from 'lucide-react';
+  BookmarkCheck,
+  RotateCcw,
+} from "lucide-react";
 
 interface Content {
   _id: string;
@@ -57,29 +58,29 @@ function MyContentPage() {
   const [filteredContents, setFilteredContents] = useState<Content[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('');
-  const [filterAccess, setFilterAccess] = useState('');
-  const [sortBy, setSortBy] = useState('newest');
-  const [currentTab, setCurrentTab] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("");
+  const [filterAccess, setFilterAccess] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
+  const [currentTab, setCurrentTab] = useState("all");
 
   const contentTypes = [
-    { value: 'Article', label: 'Article', icon: FileText, action: 'Read' },
-    { value: 'Video', label: 'Video', icon: Video, action: 'Watch' },
-    { value: 'Event', label: 'Event', icon: Calendar, action: 'Join' },
-    { value: 'Podcast', label: 'Podcast', icon: Headphones, action: 'Listen' },
-    { value: 'Course', label: 'Course', icon: BookOpen, action: 'Start' },
-    { value: 'Webinar', label: 'Webinar', icon: Monitor, action: 'Watch' },
-    { value: 'Other', label: 'Other', icon: Archive, action: 'View More' },
+    { value: "Article", label: "Article", icon: FileText, action: "Read" },
+    { value: "Video", label: "Video", icon: Video, action: "Watch" },
+    { value: "Event", label: "Event", icon: Calendar, action: "Join" },
+    { value: "Podcast", label: "Podcast", icon: Headphones, action: "Listen" },
+    { value: "Course", label: "Course", icon: BookOpen, action: "Start" },
+    { value: "Webinar", label: "Webinar", icon: Monitor, action: "Watch" },
+    { value: "Other", label: "Other", icon: Archive, action: "View More" },
   ];
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/signin');
-    } else if (status === 'authenticated') {
+    if (status === "unauthenticated") {
+      router.push("/auth/signin");
+    } else if (status === "authenticated") {
       fetchContents();
     }
-  }, [status]);
+  }, [status, router.query]);
 
   useEffect(() => {
     filterAndSortContent();
@@ -88,67 +89,96 @@ function MyContentPage() {
   const fetchContents = async () => {
     setLoading(true);
     setError(null);
+    
     try {
-      const res = await fetch('/api/member/content');
+      const timestamp = new Date().getTime();
+      const res = await fetch(`/api/member/content?t=${timestamp}`, {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      
       const data = await res.json();
+      
       if (data.success) {
+        console.log('📋 Content loaded:', {
+          total: data.data.length,
+          accessible: data.data.filter((c: any) => c.hasAccess).length
+        });
+        
         setContents(data.data);
       } else {
         setError(data.message);
       }
     } catch (err: any) {
+      console.error('❌ Error loading content:', err);
       setError(err.message || 'Error loading content');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleRefreshContent = async () => {
+    setLoading(true);
+    await fetchContents();
+  };
+
   const filterAndSortContent = () => {
     let filtered = contents;
 
     // Filter by tab
-    if (currentTab === 'favorites') {
-      filtered = filtered.filter(content => content.isFavorite);
-    } else if (currentTab === 'accessible') {
-      filtered = filtered.filter(content => content.hasAccess);
-    } else if (currentTab === 'recent') {
+    if (currentTab === "favorites") {
+      filtered = filtered.filter((content) => content.isFavorite);
+    } else if (currentTab === "accessible") {
+      filtered = filtered.filter((content) => content.hasAccess);
+    } else if (currentTab === "recent") {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      filtered = filtered.filter(content => new Date(content.publishDate) >= oneWeekAgo);
+      filtered = filtered.filter(
+        (content) => new Date(content.publishDate) >= oneWeekAgo
+      );
     }
 
     // Filter by search term
     if (searchTerm) {
-      filtered = filtered.filter(content => 
-        content.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        content.description.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (content) =>
+          content.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          content.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Filter by type
     if (filterType) {
-      filtered = filtered.filter(content => content.type === filterType);
+      filtered = filtered.filter((content) => content.type === filterType);
     }
 
     // Filter by access
-    if (filterAccess === 'accessible') {
-      filtered = filtered.filter(content => content.hasAccess);
-    } else if (filterAccess === 'restricted') {
-      filtered = filtered.filter(content => !content.hasAccess);
+    if (filterAccess === "accessible") {
+      filtered = filtered.filter((content) => content.hasAccess);
+    } else if (filterAccess === "restricted") {
+      filtered = filtered.filter((content) => !content.hasAccess);
     }
 
     // Sort content
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'oldest':
-          return new Date(a.publishDate).getTime() - new Date(b.publishDate).getTime();
-        case 'popular':
+        case "oldest":
+          return (
+            new Date(a.publishDate).getTime() -
+            new Date(b.publishDate).getTime()
+          );
+        case "popular":
           return (b.views || 0) - (a.views || 0);
-        case 'title':
+        case "title":
           return a.title.localeCompare(b.title);
-        case 'newest':
+        case "newest":
         default:
-          return new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime();
+          return (
+            new Date(b.publishDate).getTime() -
+            new Date(a.publishDate).getTime()
+          );
       }
     });
 
@@ -157,42 +187,44 @@ function MyContentPage() {
 
   const toggleFavorite = async (contentId: string) => {
     try {
-      const res = await fetch('/api/member/favorite', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/member/favorite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contentId }),
       });
       const data = await res.json();
       if (data.success) {
-        setContents(contents.map(c => 
-          c._id === contentId ? { ...c, isFavorite: !c.isFavorite } : c
-        ));
+        setContents(
+          contents.map((c) =>
+            c._id === contentId ? { ...c, isFavorite: !c.isFavorite } : c
+          )
+        );
       }
     } catch (err) {
-      console.error('Error toggling favorite:', err);
+      console.error("Error toggling favorite:", err);
     }
   };
 
   const handleContentClick = (content: Content) => {
     if (!content.hasAccess) {
-      router.push('/member/plans');
+      router.push("/member/plans");
       return;
     }
 
     if (content.url) {
-      window.open(content.url, '_blank');
+      window.open(content.url, "_blank");
     }
-    
+
     // Track view
-    fetch('/api/member/view-content', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    fetch("/api/member/view-content", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ contentId: content._id }),
     }).catch(console.error);
   };
 
   const getTypeConfig = (type: string) => {
-    return contentTypes.find(t => t.value === type) || contentTypes[0];
+    return contentTypes.find((t) => t.value === type) || contentTypes[0];
   };
 
   const ContentCard = ({ content }: { content: Content }) => {
@@ -200,27 +232,36 @@ function MyContentPage() {
     const IconComponent = typeConfig.icon;
 
     return (
-      <div className={`bg-slate-800/50 backdrop-blur-sm border ${
-        !content.hasAccess ? 'border-red-500/30' : 'border-slate-700/50'
-      } rounded-2xl p-6 hover:bg-slate-800/70 transition-all duration-300 hover:scale-[1.02] group cursor-pointer`}
-      onClick={() => handleContentClick(content)}>
-        
+      <div
+        className={`bg-slate-800/50 backdrop-blur-sm border ${
+          !content.hasAccess ? "border-red-500/30" : "border-slate-700/50"
+        } rounded-2xl p-6 hover:bg-slate-800/70 transition-all duration-300 hover:scale-[1.02] group cursor-pointer`}
+        onClick={() => handleContentClick(content)}
+      >
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
-          <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${
-            content.hasAccess 
-              ? typeConfig.value === 'Article' ? 'from-blue-500 to-blue-600' :
-                typeConfig.value === 'Video' ? 'from-red-500 to-red-600' :
-                typeConfig.value === 'Event' ? 'from-purple-500 to-purple-600' :
-                typeConfig.value === 'Podcast' ? 'from-green-500 to-green-600' :
-                typeConfig.value === 'Course' ? 'from-orange-500 to-orange-600' :
-                typeConfig.value === 'Webinar' ? 'from-indigo-500 to-indigo-600' :
-                'from-gray-500 to-gray-600'
-              : 'from-gray-600 to-gray-700'
-          } flex items-center justify-center shadow-lg`}>
+          <div
+            className={`w-12 h-12 rounded-xl bg-gradient-to-r ${
+              content.hasAccess
+                ? typeConfig.value === "Article"
+                  ? "from-blue-500 to-blue-600"
+                  : typeConfig.value === "Video"
+                  ? "from-red-500 to-red-600"
+                  : typeConfig.value === "Event"
+                  ? "from-purple-500 to-purple-600"
+                  : typeConfig.value === "Podcast"
+                  ? "from-green-500 to-green-600"
+                  : typeConfig.value === "Course"
+                  ? "from-orange-500 to-orange-600"
+                  : typeConfig.value === "Webinar"
+                  ? "from-indigo-500 to-indigo-600"
+                  : "from-gray-500 to-gray-600"
+                : "from-gray-600 to-gray-700"
+            } flex items-center justify-center shadow-lg`}
+          >
             <IconComponent className="w-6 h-6 text-white" />
           </div>
-          
+
           <div className="flex items-center gap-2">
             {/* Favorite Button */}
             <button
@@ -229,12 +270,16 @@ function MyContentPage() {
                 toggleFavorite(content._id);
               }}
               className={`p-2 rounded-full transition-colors ${
-                content.isFavorite 
-                  ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' 
-                  : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700'
+                content.isFavorite
+                  ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                  : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
               }`}
             >
-              {content.isFavorite ? <Heart className="w-4 h-4 fill-current" /> : <Heart className="w-4 h-4" />}
+              {content.isFavorite ? (
+                <Heart className="w-4 h-4 fill-current" />
+              ) : (
+                <Heart className="w-4 h-4" />
+              )}
             </button>
 
             {/* Access Status */}
@@ -259,17 +304,21 @@ function MyContentPage() {
 
         {/* Content */}
         <div className="mb-4">
-          <h3 className={`text-lg font-bold mb-2 line-clamp-2 ${
-            content.hasAccess ? 'text-white' : 'text-slate-400'
-          }`}>
+          <h3
+            className={`text-lg font-bold mb-2 line-clamp-2 ${
+              content.hasAccess ? "text-white" : "text-slate-400"
+            }`}
+          >
             {content.title}
           </h3>
-          <p className="text-slate-400 text-sm line-clamp-3 mb-3">{content.description}</p>
-          
+          <p className="text-slate-400 text-sm line-clamp-3 mb-3">
+            {content.description}
+          </p>
+
           <div className="flex items-center gap-4 text-xs text-slate-500">
             <span className="flex items-center gap-1">
               <Calendar className="w-3 h-3" />
-              {new Date(content.publishDate).toLocaleDateString('en-US')}
+              {new Date(content.publishDate).toLocaleDateString("en-US")}
             </span>
             <span className="flex items-center gap-1">
               <Eye className="w-3 h-3" />
@@ -288,7 +337,9 @@ function MyContentPage() {
         <div className="pt-4 border-t border-slate-700">
           {!content.hasAccess ? (
             <div className="text-center">
-              <p className="text-red-400 text-sm mb-2">Upgrade required to access</p>
+              <p className="text-red-400 text-sm mb-2">
+                Upgrade required to access
+              </p>
               <button className="w-full bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
                 <Crown className="w-4 h-4" />
                 Upgrade Plan
@@ -305,7 +356,7 @@ function MyContentPage() {
     );
   };
 
-  if (status === 'loading' || loading) {
+  if (status === "loading" || loading) {
     return (
       <Layout activeTab="member-content">
         <div className="min-h-screen flex items-center justify-center">
@@ -334,13 +385,27 @@ function MyContentPage() {
   return (
     <Layout activeTab="member-content">
       <div className="container mx-auto p-4 lg:p-6 max-w-7xl space-y-8">
-        
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
-            My Content
-          </h1>
-          <p className="text-slate-400">Explore and access your exclusive content</p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="text-center flex-1">
+            <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
+              My Content
+            </h1>
+            <p className="text-slate-400">
+              Explore and access your exclusive content
+            </p>
+          </div>
+
+          {/* BOTÃO DE REFRESH */}
+          <button
+            onClick={handleRefreshContent}
+            disabled={loading}
+            className="bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            title="Refresh content"
+          >
+            <RotateCcw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </button>
         </div>
 
         {/* Error Alert */}
@@ -348,7 +413,7 @@ function MyContentPage() {
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-400" />
             <p className="text-red-400">{error}</p>
-            <button 
+            <button
               onClick={() => setError(null)}
               className="ml-auto text-red-400 hover:text-red-300"
             >
@@ -360,18 +425,18 @@ function MyContentPage() {
         {/* Content Tabs */}
         <div className="flex flex-wrap gap-2 mb-6">
           {[
-            { key: 'all', label: 'All Content', icon: Book },
-            { key: 'accessible', label: 'Accessible', icon: Eye },
-            { key: 'favorites', label: 'Favorites', icon: Heart },
-            { key: 'recent', label: 'Recent', icon: Clock }
+            { key: "all", label: "All Content", icon: Book },
+            { key: "accessible", label: "Accessible", icon: Eye },
+            { key: "favorites", label: "Favorites", icon: Heart },
+            { key: "recent", label: "Recent", icon: Clock },
           ].map((tab) => (
             <button
               key={tab.key}
               onClick={() => setCurrentTab(tab.key)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
                 currentTab === tab.key
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
+                  ? "bg-purple-600 text-white"
+                  : "bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700"
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -393,18 +458,20 @@ function MyContentPage() {
                 className="w-full bg-slate-900/50 border border-slate-600 text-white pl-12 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
-            
+
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
               className="bg-slate-900/50 border border-slate-600 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="">All types</option>
-              {contentTypes.map(type => (
-                <option key={type.value} value={type.value}>{type.label}</option>
+              {contentTypes.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
               ))}
             </select>
-            
+
             <select
               value={filterAccess}
               onChange={(e) => setFilterAccess(e.target.value)}
@@ -436,12 +503,14 @@ function MyContentPage() {
                 <Book className="w-6 h-6 text-white" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">{contents.length}</p>
+                <p className="text-2xl font-bold text-white">
+                  {contents.length}
+                </p>
                 <p className="text-slate-400 text-sm">Total</p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
@@ -449,13 +518,13 @@ function MyContentPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-white">
-                  {contents.filter(c => c.hasAccess).length}
+                  {contents.filter((c) => c.hasAccess).length}
                 </p>
                 <p className="text-slate-400 text-sm">Accessible</p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center">
@@ -463,13 +532,13 @@ function MyContentPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-white">
-                  {contents.filter(c => c.isFavorite).length}
+                  {contents.filter((c) => c.isFavorite).length}
                 </p>
                 <p className="text-slate-400 text-sm">Favorites</p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
@@ -477,7 +546,10 @@ function MyContentPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-white">
-                  {Math.round(contents.reduce((acc, c) => acc + (c.views || 0), 0) / contents.length) || 0}
+                  {Math.round(
+                    contents.reduce((acc, c) => acc + (c.views || 0), 0) /
+                      contents.length
+                  ) || 0}
                 </p>
                 <p className="text-slate-400 text-sm">Avg Views</p>
               </div>
@@ -489,28 +561,36 @@ function MyContentPage() {
         <div>
           <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
             <FileText className="w-6 h-6 text-purple-400" />
-            {currentTab === 'all' ? 'All Content' :
-             currentTab === 'favorites' ? 'Favorites' :
-             currentTab === 'accessible' ? 'Accessible' :
-             'Recent'} ({filteredContents.length})
+            {currentTab === "all"
+              ? "All Content"
+              : currentTab === "favorites"
+              ? "Favorites"
+              : currentTab === "accessible"
+              ? "Accessible"
+              : "Recent"}{" "}
+            ({filteredContents.length})
           </h2>
-          
+
           {filteredContents.length === 0 ? (
             <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-12 text-center">
               <FileText className="w-16 h-16 text-slate-600 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-slate-400 mb-2">
-                {currentTab === 'favorites' ? 'No favorites yet' :
-                 currentTab === 'accessible' ? 'No accessible content' :
-                 'No content found'}
+                {currentTab === "favorites"
+                  ? "No favorites yet"
+                  : currentTab === "accessible"
+                  ? "No accessible content"
+                  : "No content found"}
               </h3>
               <p className="text-slate-500 mb-6">
-                {currentTab === 'favorites' ? 'Start favoriting content you like' :
-                 currentTab === 'accessible' ? 'Upgrade your plan to access more content' :
-                 'Try adjusting your search filters'}
+                {currentTab === "favorites"
+                  ? "Start favoriting content you like"
+                  : currentTab === "accessible"
+                  ? "Upgrade your plan to access more content"
+                  : "Try adjusting your search filters"}
               </p>
-              {(currentTab === 'accessible' || currentTab === 'all') && (
+              {(currentTab === "accessible" || currentTab === "all") && (
                 <button
-                  onClick={() => router.push('/member/plans')}
+                  onClick={() => router.push("/member/plans")}
                   className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2 mx-auto"
                 >
                   <Crown className="w-5 h-5" />

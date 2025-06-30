@@ -29,8 +29,8 @@ import {
 interface Plan {
   _id: string;
   name: string;
-  monthlyValue?: number;
-  annualValue?: number;
+  monthlyPrice?: number;
+  annualPrice?: number; 
   description: string;
   benefits: string[];
   trialDays?: number;
@@ -98,31 +98,58 @@ function MyPlansPage() {
     }
   };
 
-  const handleSubscribe = async (planId: string, billing: 'monthly' | 'annual') => {
-    const plan = plans.find(p => p._id === planId);
-    if (!plan) return;
+ // Melhorar também o handler de subscribe no frontend:
 
-    if (!confirm(`Do you want to subscribe to "${plan.name}"?`)) return;
+ const handleSubscribe = async (planId: string, billing: 'monthly' | 'annual') => {
+  const plan = plans.find(p => p._id === planId);
+  if (!plan) {
+    setError('Plan not found');
+    return;
+  }
 
-    setActionLoading(planId);
-    try {
-      const res = await fetch('/api/member/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ planId, billing }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        fetchData();
-      } else {
-        setError(data.message);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Error subscribing to plan');
-    } finally {
-      setActionLoading(null);
+  if (!confirm(`Do you want to subscribe to "${plan.name}" (${billing})?`)) return;
+
+  setActionLoading(planId);
+  setError(null);
+
+  try {
+    const res = await fetch('/api/member/plans', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ 
+        planId, 
+        billing // ✅ PASSAR O BILLING PARA A API
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
     }
-  };
+
+    const data = await res.json();
+    
+    if (data.success) {
+      alert(`🎉 ${data.message}\n\nRedirecting to content...`);
+      await fetchData();
+      
+      setTimeout(() => {
+        router.push('/member/content');
+      }, 1500);
+      
+    } else {
+      setError(data.message || 'Subscription failed');
+    }
+
+  } catch (err: any) {
+    console.error('Subscribe error:', err);
+    setError(err.message || 'Error subscribing to plan');
+  } finally {
+    setActionLoading(null);
+  }
+};
 
   const handleCancelSubscription = async () => {
     if (!mySubscription) return;
@@ -251,23 +278,23 @@ function MyPlansPage() {
 
       {/* Pricing */}
       <div className="mb-6">
-        {plan.monthlyValue && (
+        {plan.monthlyPrice && (
           <div className="flex items-baseline gap-2 mb-2">
             <span className="text-2xl font-bold text-white">
-              ${plan.monthlyValue.toFixed(2)}
+              ${plan.monthlyPrice.toFixed(2)}
             </span>
             <span className="text-slate-400 text-sm">/month</span>
           </div>
         )}
-        {plan.annualValue && (
+        {plan.annualPrice && (
           <div className="flex items-baseline gap-2 mb-2">
             <span className="text-lg font-semibold text-purple-400">
-              ${plan.annualValue.toFixed(2)}
+              ${plan.annualPrice.toFixed(2)}
             </span>
             <span className="text-slate-400 text-sm">/year</span>
-            {plan.monthlyValue && (
+            {plan.monthlyPrice && (
               <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">
-                {Math.round((1 - (plan.annualValue / (plan.monthlyValue * 12))) * 100)}% off
+                {Math.round((1 - (plan.annualPrice / (plan.monthlyPrice * 12))) * 100)}% off
               </span>
             )}
           </div>
@@ -297,7 +324,7 @@ function MyPlansPage() {
       <div className="space-y-3">
         {!isCurrentPlan && plan.active && (
           <>
-            {plan.monthlyValue && (
+            {plan.monthlyPrice && (
               <button
                 onClick={() => handleSubscribe(plan._id, 'monthly')}
                 disabled={actionLoading === plan._id}
@@ -311,7 +338,7 @@ function MyPlansPage() {
                 Subscribe - Monthly
               </button>
             )}
-            {plan.annualValue && (
+            {plan.annualPrice && (
               <button
                 onClick={() => handleSubscribe(plan._id, 'annual')}
                 disabled={actionLoading === plan._id}
