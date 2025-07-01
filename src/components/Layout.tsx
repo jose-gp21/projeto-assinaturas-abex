@@ -14,15 +14,15 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab }) => {
       <Navbar activeTab={activeTab} />
       
       {/* Main Content with animated entrance */}
-      <main className="flex-grow relative">
+      <main className="flex-grow relative z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-800/20 to-transparent pointer-events-none" />
         <div className="relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700 text-white">
           {children}
         </div>
       </main>
       
-      {/* Modern Footer */}
-      <footer className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
+      {/* Modern Footer - z-index baixo para não interferir em modais */}
+      <footer className="relative z-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
         {/* Decorative background elements */}
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-transparent to-blue-600/10" />
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-400/50 to-transparent" />
