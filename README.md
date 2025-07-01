@@ -118,6 +118,6 @@ For questions, collaborations, or development opportunities, feel free to get in
 
 * **José Gabriel:** [github.com/jose-gp21](https://github.com/jose-gp21)
 * **Email:** `gabrielpaludo@unochapeco.edu.br`
-* **LinkedIn:** [Your LinkedIn Profile](https://www.linkedin.com/in/seu-perfil-linkedin)
+* **LinkedIn:** [José Gabriel](https://www.linkedin.com/in/jos%C3%A9-gabriel-paludo-131906267/)
 
 ---
