@@ -50,7 +50,6 @@ This project was developed using a robust technology stack aligned with current 
     * [**Mongoose**](https://mongoosejs.com/) - ODM (Object Data Modeling) for simplified interaction with MongoDB.
 * **Authentication:**
     * **Google OAuth 2.0** - Direct integration for a modern and secure login system.
-    * *(If you used `next-auth`, you can add: "[**NextAuth.js**](https://next-auth.js.org/) - A library for secure and flexible authentication.")*
 * **Deployment & Hosting:**
     * [**Vercel**](https://vercel.com/) - Continuous deployment platform, optimized for Next.js, ensuring agility and scalability.
 
