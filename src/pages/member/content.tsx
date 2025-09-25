@@ -179,7 +179,7 @@ function MyContentPage() {
             new Date(b.publishDate).getTime() -
             new Date(a.publishDate).getTime()
           );
-      }
+      } 
     });
 
     setFilteredContents(filtered);
