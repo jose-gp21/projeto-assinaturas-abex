@@ -1,49 +1,50 @@
-// src/lib/models/Subscription.ts
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
-export interface ISubscription extends mongoose.Document {
-  type: string;           // Ex: 'Monthly', 'Annual' 
-  startDate: Date;
-  endDate: Date;
-  status: string;         // Ex: 'Active', 'Canceled', 'Suspended' 
-  trialPeriod: boolean;
-  memberId: mongoose.Schema.Types.ObjectId; // Reference to the Member ID
-  planId: mongoose.Schema.Types.ObjectId;   // Reference to the Plan ID
+export interface ISubscription extends Document {
+  userId: mongoose.Types.ObjectId;
+  planId: mongoose.Types.ObjectId;
+  status: "pending" | "active" | "inactive" | "cancelled" | "expired";
+  startDate?: Date;
+  endDate?: Date;
+  autoRenew: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-const SubscriptionSchema = new mongoose.Schema<ISubscription>({
-  type: {
-    type: String,
-    enum: ['Monthly', 'Annual'], // According to your class diagram
-    required: [true, 'Please specify the subscription type.'],
+const SubscriptionSchema = new Schema<ISubscription>(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    planId: {
+      type: Schema.Types.ObjectId,
+      ref: "Plan",
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "active", "inactive", "cancelled", "expired"],
+      default: "pending", // ✅ pendente até o pagamento ser aprovado
+    },
+    startDate: {
+      type: Date,
+      required: false,
+    },
+    endDate: {
+      type: Date,
+      required: false,
+    },
+    autoRenew: {
+      type: Boolean,
+      default: true,
+    },
   },
-  startDate: {
-    type: Date,
-    required: [true, 'Please provide the subscription start date.'],
-  },
-  endDate: {
-    type: Date,
-    required: [true, 'Please provide the subscription end date.'],
-  },
-  status: {
-    type: String,
-    enum: ['Active', 'Canceled', 'Suspended'], // According to your class diagram
-    default: 'Active',
-  },
-  trialPeriod: {
-    type: Boolean,
-    default: false,
-  },
-  memberId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // References the 'User' model
-    required: [true, 'Member ID is required for the subscription.'],
-  },
-  planId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Plan', // References the 'Plan' model
-    required: [true, 'Plan ID is required for the subscription.'],
-  },
-}, { timestamps: true }); // Automatically adds createdAt and updatedAt
+  {
+    timestamps: true,
+  }
+);
 
-export default mongoose.models.Subscription || mongoose.model<ISubscription>('Subscription', SubscriptionSchema);
+export default mongoose.models.Subscription ||
+  mongoose.model<ISubscription>("Subscription", SubscriptionSchema);

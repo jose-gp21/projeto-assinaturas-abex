@@ -1,51 +1,53 @@
-// src/lib/models/User.ts
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
-// Define an interface for typing (optional, but recommended with TypeScript)
-export interface IUser extends mongoose.Document {
-  name: string;
+export interface IUser extends Document {
+  name?: string;
   email: string;
-  password: string;
-  subscriptionStatus: string; // Ex: 'Active', 'Inactive', 'Pending'
-  registrationDate: Date;
-  lastAccess: Date;
+  emailVerified?: Date;
+  image?: string;
+  subscriptionStatus?: "active" | "inactive" | "cancelled" | "expired";
+  role: "admin" | "member";
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-// Define the Mongoose Schema
-const UserSchema = new mongoose.Schema<IUser>({
-  name: {
-    type: String,
-    required: [true, 'Please provide a name.'],
-    maxlength: [60, 'Name cannot exceed 60 characters.'],
+const UserSchema = new Schema<IUser>(
+  {
+    name: {
+      type: String,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    emailVerified: {
+      type: Date,
+    },
+    image: {
+      type: String,
+    },
+    subscriptionStatus: {
+      type: String,
+      enum: ["active", "inactive", "cancelled", "expired"],
+      default: "inactive", // ✅ padronizado em minúsculas
+    },
+    role: {
+      type: String,
+      enum: ["admin", "member"],
+      default: "member",
+    },
   },
-  email: {
-    type: String,
-    required: [true, 'Please provide an email.'],
-    unique: true, // Ensures emails are unique
-    match: [/.+@.+\..+/, 'Please provide a valid email.'],
-  },
-  password: {
-    type: String,
-    required: [true, 'Please provide a password.'],
-    minlength: [6, 'Password must be at least 6 characters long.'],
-    // In a real project, you should NOT store the password in plain text.
-    // It should be hashed (e.g., with bcrypt) before being saved.
-    // For now, we can leave it like this, but remember this for production.
-  },
-  subscriptionStatus: {
-    type: String,
-    enum: ['Active', 'Canceled', 'Suspended', 'Pending', 'Inactive'], // Enum of possible statuses
-    default: 'Inactive',
-  },
-  registrationDate: {
-    type: Date,
-    default: Date.now, // Automatically set creation date
-  },
-  lastAccess: {
-    type: Date,
-    default: Date.now, // Updated on login
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
-// Check if the model has already been compiled to avoid recompilation during hot-reload
-export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+// Índices para performance e consultas
+UserSchema.index({ email: 1 });
+UserSchema.index({ subscriptionStatus: 1 });
+
+export default mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
