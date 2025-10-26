@@ -3,8 +3,8 @@ import NextAuth, { type AuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
 import { MongoClient } from 'mongodb';
-import User from '../../lib/models/User';
 import { connectMongoose } from '@/lib/mongodb';
+import User from '@/lib/models/User';
 
 await connectMongoose(); 
 // Garante que a URI do MongoDB esteja definida
