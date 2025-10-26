@@ -3,7 +3,7 @@ import NextAuth, { type AuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
 import { MongoClient } from 'mongodb';
-import User from '../../../lib/models/User'; // Importe o modelo User aqui para usar no callback JWT
+import User from '../../lib/models/User';
 import { connectMongoose } from '@/lib/mongodb';
 
 await connectMongoose(); 

@@ -1,200 +1,227 @@
 // src/services/subscriptionService.ts
-import Subscription, { ISubscription } from '@/lib/models/Subscription'; // Importe o modelo e a interface
-import Plan from '@/lib/models/Plan'; // Também precisaremos do modelo Plan para popular
-import User from '@/lib/models/User'; // E do modelo User para atualizar o status da assinatura
-import { connectMongoose } from '@/lib/mongodb'; // Sua função de conexão com o MongoDB
+import Subscription from "@/lib/models/Subscription";
+import Plan from "@/lib/models/Plan";
+import User from "@/lib/models/User";
+import { connectMongoose } from "@/lib/mongodb";
 
-// Função para buscar a assinatura ativa de um membro
-export async function getMemberSubscription(memberId: string) {
-  if (!memberId) {
-    throw new Error('Member ID is required to fetch subscription.');
+/**
+ * Obtém a assinatura ativa de um usuário.
+ */
+async function getUserActiveSubscription(userId: string) {
+  if (!userId) {
+    throw new Error("User ID is required to fetch subscription.");
   }
 
-  await connectMongoose(); // Garante a conexão com o banco de dados
+  await connectMongoose();
 
   try {
-    // Busca a assinatura mais recente do membro, populando os detalhes do plano
-    // Assumimos que o campo de referência no Subscription é 'planId'
-    const subscription = await Subscription.findOne({ memberId: memberId })
-                                           .sort({ startDate: -1 }) // Pega a mais recente se houver múltiplas
-                                           .populate('planId'); // Popula os detalhes do plano
+    const subscription = await Subscription.findOne({
+      userId,
+      status: "active",
+    })
+      .sort({ startDate: -1 })
+      .populate("planId");
 
     return subscription;
   } catch (error) {
-    console.error('Error fetching member subscription in service:', error);
-    throw new Error('Internal error while fetching member subscription.');
+    console.error("❌ Error fetching user subscription:", error);
+    throw new Error("Internal error while fetching user subscription.");
   }
 }
 
-// Função para criar uma nova assinatura
-// Data esperada: { planId: string, billing: 'monthly' | 'annual', memberId: string }
-export async function createSubscription(data: { planId: string; billing: 'monthly' | 'annual'; memberId: string; trialPeriod?: boolean }) {
-  await connectMongoose();
+/**
+ * Cria uma nova assinatura manualmente (ex: onboarding ou testes).
+ */
+async function createSubscription(data: { planId: string; userId: string }) {
+  const { planId, userId } = data;
 
-  const { planId, billing, memberId } = data;
-
-  if (!planId || !billing || !memberId) {
-    throw new Error('Plan ID, billing type, and member ID are required to create a subscription.');
+  if (!planId || !userId) {
+    throw new Error("Plan ID and User ID are required to create a subscription.");
   }
+
+  await connectMongoose();
 
   try {
     const plan = await Plan.findById(planId);
-    if (!plan) {
-      throw new Error('Plan not found.');
-    }
+    if (!plan) throw new Error("Plan not found.");
 
-    // Calcular datas de início e fim
     const startDate = new Date();
-    let endDate = new Date(startDate);
-    let amount = 0;
+    const endDate = new Date();
+    endDate.setMonth(startDate.getMonth() + 1); // padrão: 1 mês de duração
 
-    if (billing === 'monthly') {
-      endDate.setMonth(endDate.getMonth() + 1);
-      amount = plan.monthlyPrice || 0;
-    } else if (billing === 'annual') {
-      endDate.setFullYear(endDate.getFullYear() + 1);
-      amount = plan.annualPrice || 0;
-    } else {
-        throw new Error('Invalid billing type provided.');
-    }
+    // Cancela outras assinaturas ativas
+    await Subscription.updateMany(
+      { userId, status: "active" },
+      { status: "cancelled" }
+    );
 
-    // Verificar se já existe uma assinatura ativa para este membro
-    const existingActiveSubscription = await Subscription.findOne({
-      memberId: memberId,
-      status: 'Active'
-    });
-
-    if (existingActiveSubscription) {
-      throw new Error('Member already has an active subscription.');
-    }
-
+    // Cria nova assinatura
     const newSubscription = await Subscription.create({
-      type: billing,
+      userId,
+      planId,
       startDate,
       endDate,
-      status: 'Active',
-      trialPeriod: data.trialPeriod ?? (plan.trialDays ? plan.trialDays > 0 : false), // Usa trialDays do plano se disponível
-      memberId,
-      planId,
-      amount, // Adiciona o valor da transação
-      // Outros campos como 'nextBillingDate', 'cancellationDate', 'expirationDate' podem ser calculados ou definidos depois
+      status: "active",
     });
 
-    // Atualizar o status de assinatura do usuário
-    await User.findByIdAndUpdate(memberId, { subscriptionStatus: 'Active' });
+    // Atualiza o status do usuário
+    await User.findByIdAndUpdate(userId, {
+      subscriptionStatus: "active",
+      updatedAt: new Date(),
+    });
+
+    console.log("🎉 Subscription created:", {
+      subscriptionId: newSubscription._id,
+      userId,
+      planId,
+    });
 
     return newSubscription;
   } catch (error: any) {
-    if (error.code === 11000) { // Exemplo de erro de duplicidade se aplicável
-        throw new Error('A subscription already exists for this member and plan.');
-    }
-    console.error('Error creating subscription in service:', error);
-    throw new Error('Internal error while creating subscription: ' + error.message);
+    console.error("❌ Error creating subscription:", error);
+    throw new Error("Internal error while creating subscription: " + error.message);
   }
 }
 
-// Função para cancelar uma assinatura
-export async function cancelSubscription(memberId: string) {
-  if (!memberId) {
-    throw new Error('Member ID is required to cancel subscription.');
+/**
+ * Cancela a assinatura ativa de um usuário.
+ */
+async function cancelSubscription(userId: string) {
+  if (!userId) {
+    throw new Error("User ID is required to cancel subscription.");
   }
 
   await connectMongoose();
 
   try {
-    // Encontrar a assinatura ativa do membro
     const activeSubscription = await Subscription.findOne({
-      memberId: memberId,
-      status: 'Active',
+      userId,
+      status: "active",
     });
 
     if (!activeSubscription) {
-      throw new Error('No active subscription found for this member.');
+      throw new Error("No active subscription found for this user.");
     }
 
-    // Atualizar o status da assinatura para 'Canceled' e definir a data de cancelamento
-    const canceledSubscription = await Subscription.findByIdAndUpdate(
+    const cancelledSubscription = await Subscription.findByIdAndUpdate(
       activeSubscription._id,
-      {
-        status: 'Canceled',
-        cancellationDate: new Date(),
-        expirationDate: activeSubscription.endDate // A expiração pode permanecer a data original de término do período pago
-      },
+      { status: "cancelled" },
       { new: true }
     );
 
-    // Opcional: Atualizar o status de assinatura do usuário para 'Canceled' ou 'Inactive'
-    await User.findByIdAndUpdate(memberId, { subscriptionStatus: 'Canceled' });
+    await User.findByIdAndUpdate(userId, {
+      subscriptionStatus: "cancelled",
+      updatedAt: new Date(),
+    });
 
+    console.log("🚫 Subscription cancelled:", {
+      subscriptionId: cancelledSubscription?._id,
+      userId,
+    });
 
-    return canceledSubscription;
+    return cancelledSubscription;
   } catch (error) {
-    console.error('Error canceling subscription in service:', error);
-    throw new Error('Internal error while canceling subscription.');
+    console.error("❌ Error cancelling subscription:", error);
+    throw new Error("Internal error while cancelling subscription.");
   }
 }
 
-// Função para renovar uma assinatura (exemplo simplificado)
-export async function renewSubscription(memberId: string) {
-  if (!memberId) {
-    throw new Error('Member ID is required to renew subscription.');
-  }
-
+/**
+ * Atualiza assinaturas expiradas automaticamente.
+ */
+async function checkExpiredSubscriptions() {
   await connectMongoose();
 
   try {
-    // Encontrar a assinatura expirada/cancelada mais recente do membro
-    const oldSubscription = await Subscription.findOne({
-      memberId: memberId,
-      status: { $in: ['Expired', 'Canceled'] } // Pode ser 'Expired' ou 'Canceled'
-    }).sort({ endDate: -1 }); // Pega a assinatura mais recente que expirou/foi cancelada
+    const now = new Date();
 
-    if (!oldSubscription) {
-      throw new Error('No expired or canceled subscription found to renew for this member.');
-    }
-
-    // Criar uma nova assinatura com base no plano da assinatura antiga
-    const plan = await Plan.findById(oldSubscription.planId);
-    if (!plan) {
-        throw new Error('Associated plan not found for renewal.');
-    }
-
-    const startDate = new Date();
-    let endDate = new Date(startDate);
-    let amount = 0;
-    let type: 'Monthly' | 'Annual' = 'Monthly'; // Assume monthly by default or from old subscription
-
-    if (oldSubscription.type === 'Annual' && plan.annualPrice) {
-      endDate.setFullYear(endDate.getFullYear() + 1);
-      amount = plan.annualPrice;
-      type = 'Annual';
-    } else if (plan.monthlyPrice) {
-      endDate.setMonth(endDate.getMonth() + 1);
-      amount = plan.monthlyPrice;
-      type = 'Monthly';
-    } else {
-        throw new Error('Cannot determine billing type for renewal.');
-    }
-
-
-    const newSubscription = await Subscription.create({
-      type,
-      startDate,
-      endDate,
-      status: 'Active',
-      trialPeriod: false, // Renovação não deve ser período de teste
-      memberId,
-      planId: oldSubscription.planId,
-      amount,
+    const expiredSubscriptions = await Subscription.find({
+      status: "active",
+      endDate: { $lt: now },
     });
 
-    // Opcional: Atualizar o status de assinatura do usuário para 'Active'
-    await User.findByIdAndUpdate(memberId, { subscriptionStatus: 'Active' });
+    if (expiredSubscriptions.length > 0) {
+      await Subscription.updateMany(
+        { status: "active", endDate: { $lt: now } },
+        { status: "expired" }
+      );
 
-    return newSubscription;
+      const userIds = expiredSubscriptions.map((s) => s.userId);
+      await User.updateMany(
+        { _id: { $in: userIds } },
+        { subscriptionStatus: "expired", updatedAt: new Date() }
+      );
 
+      console.log(`⏰ Updated ${expiredSubscriptions.length} expired subscriptions`);
+    }
+
+    return expiredSubscriptions.length;
   } catch (error) {
-    console.error('Error renewing subscription in service:', error);
-    throw new Error('Internal error while renewing subscription.');
+    console.error("❌ Error checking expired subscriptions:", error);
+    throw new Error("Internal error while checking expired subscriptions.");
   }
 }
+
+/**
+ * Ativa ou renova uma assinatura (usado pelo PaymentService após pagamento aprovado).
+ */
+async function activateOrRenewSubscription(userId: string, planId: string) {
+  await connectMongoose();
+
+  try {
+    const plan = await Plan.findById(planId);
+    if (!plan) throw new Error("Plan not found for renewal.");
+
+    const now = new Date();
+
+    // Verifica se já existe uma assinatura ativa
+    let existing = await Subscription.findOne({ userId, planId, status: "active" });
+
+    if (existing) {
+      // Renova assinatura existente
+      existing.endDate = new Date(now.setMonth(now.getMonth() + 1));
+      await existing.save();
+
+      console.log(`🔁 Subscription renewed for user ${userId}`);
+    } else {
+      // Cria nova assinatura
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setMonth(startDate.getMonth() + 1);
+
+      existing = await Subscription.create({
+        userId,
+        planId,
+        startDate,
+        endDate,
+        status: "active",
+      });
+
+      console.log(`🟢 New subscription activated for user ${userId}`);
+    }
+
+    // Atualiza o status do usuário
+    await User.findByIdAndUpdate(userId, {
+      subscriptionStatus: "active",
+      updatedAt: new Date(),
+    });
+
+    return existing;
+  } catch (error: any) {
+    console.error("❌ Error activating or renewing subscription:", error.message);
+    throw new Error("Internal error while activating/renewing subscription.");
+  }
+}
+
+/**
+ * 🔄 Exporta o serviço unificado compatível com PaymentService
+ */
+export const SubscriptionService = {
+  getUserActiveSubscription,
+  createSubscription,
+  cancelSubscription,
+  checkExpiredSubscriptions,
+  activateOrRenewSubscription,
+};
+
+export default SubscriptionService;

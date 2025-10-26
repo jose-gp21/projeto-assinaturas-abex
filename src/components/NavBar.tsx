@@ -1,5 +1,5 @@
 // src/components/Navbar.tsx
-// FINAL VERSION - WITH LOGIN LOADER
+// FINAL VERSION - WITH TRANSLATION DROPDOWN
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -15,8 +15,10 @@ import {
   Home,
   FileText,
   Shield,
-  ChevronDown
+  ChevronDown,
+  Globe
 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface NavbarProps {
   activeTab?: string;
@@ -25,8 +27,11 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { language, setLanguage, t } = useLanguage();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isLangOpen, setIsLangOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isLoginLoading, setIsLoginLoading] = useState(false);
 
@@ -73,19 +78,14 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
   const handleLoginClick = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsLoginLoading(true);
-    setIsOpen(false); // Fechar menu mobile se estiver aberto
-    
-    // Navegar para página de login
+    setIsOpen(false);
     router.push('/auth/signin').finally(() => {
-      // Reset loader após navegação completar
       setTimeout(() => setIsLoginLoading(false), 500);
     });
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -94,23 +94,21 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
     const handleClickOutside = () => {
       setIsOpen(false);
       setIsProfileOpen(false);
+      setIsLangOpen(false);
     };
-    if (isOpen || isProfileOpen) {
+    if (isOpen || isProfileOpen || isLangOpen) {
       document.addEventListener('click', handleClickOutside);
       return () => document.removeEventListener('click', handleClickOutside);
     }
-  }, [isOpen, isProfileOpen]);
+  }, [isOpen, isProfileOpen, isLangOpen]);
 
-  // Reset login loading when status changes
   useEffect(() => {
     if (status === 'authenticated' || status === 'unauthenticated') {
       setIsLoginLoading(false);
     }
   }, [status]);
 
-  const handleSignOut = () => {
-    signOut({ callbackUrl: '/' });
-  };
+  const handleSignOut = () => signOut({ callbackUrl: '/' });
 
   const UserAvatar = ({ size = 'w-8 h-8', showBorder = true }) => {
     const userImage = session?.user?.image;
@@ -158,7 +156,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
             Loading...
           </>
         ) : (
-          'Sign In'
+          t('signIn')
         )}
       </button>
     );
@@ -190,57 +188,86 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-6">
-            <Link 
-              href="/"
-              className={getLinkClasses('home', '/')}
-            >
+            <Link href="/" className={getLinkClasses('home', '/')}>
               <Home className="w-4 h-4" />
-              Home
+              {t('home')}
             </Link>
 
             {status === 'authenticated' && (
               <>
                 {session.user?.role === 'admin' && (
                   <div className="flex items-center space-x-4">
-                    <Link 
-                      href="/admin/dashboard"
-                      className={getLinkClasses('admin-dashboard', '/admin/dashboard')}
-                    >
+                    <Link href="/admin/dashboard" className={getLinkClasses('admin-dashboard', '/admin/dashboard')}>
                       <Shield className="w-4 h-4" />
-                      Dashboard
+                      {t('dashboard')}
                     </Link>
-                    <Link 
-                      href="/admin/plans"
-                      className={getLinkClasses('admin-plans', '/admin/plans')}
-                    >
+                    <Link href="/admin/plans" className={getLinkClasses('admin-plans', '/admin/plans')}>
                       <Settings className="w-4 h-4" />
-                      Plans
+                      {t('plans')}
                     </Link>
-                    <Link 
-                      href="/admin/content"
-                      className={getLinkClasses('admin-content', '/admin/content')}
-                    >
+                    <Link href="/admin/content" className={getLinkClasses('admin-content', '/admin/content')}>
                       <FileText className="w-4 h-4" />
-                      Content
+                      {t('content')}
                     </Link>
                   </div>
                 )}
 
-                <Link 
-                  href="/member/plans"
-                  className={getLinkClasses('member-plans', '/member/plans')}
-                >
+                <Link href="/member/plans" className={getLinkClasses('member-plans', '/member/plans')}>
                   <Crown className="w-4 h-4" />
-                  My Plans
+                  {t('plans')}
                 </Link>
 
-                <Link 
-                  href="/member/content"
-                  className={getLinkClasses('member-content', '/member/content')}
-                >
+                <Link href="/member/content" className={getLinkClasses('member-content', '/member/content')}>
                   <FileText className="w-4 h-4" />
-                  Exclusive Content
+                  {t('content')}
                 </Link>
+
+                {/* Settings Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsLangOpen(!isLangOpen);
+                    }}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 ${
+                      scrolled 
+                        ? 'text-slate-300 hover:bg-purple-900/20' 
+                        : 'text-white hover:bg-white/10'
+                    }`}
+                  >
+                    <Globe className="w-4 h-4" />
+                    {t('settings')}
+                  </button>
+
+                  {isLangOpen && (
+                    <div className="absolute right-0 mt-2 w-40 bg-slate-800 rounded-lg shadow-2xl border border-slate-700 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                      <button
+                        onClick={() => setLanguage('pt')}
+                        className={`w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-purple-900/20 ${
+                          language === 'pt' ? 'text-purple-400' : 'text-slate-300'
+                        }`}
+                      >
+                        🇧🇷 Português
+                      </button>
+                      <button
+                        onClick={() => setLanguage('en')}
+                        className={`w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-purple-900/20 ${
+                          language === 'en' ? 'text-purple-400' : 'text-slate-300'
+                        }`}
+                      >
+                        🇺🇸 English
+                      </button>
+                      <button
+                        onClick={() => setLanguage('es')}
+                        className={`w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-purple-900/20 ${
+                          language === 'es' ? 'text-purple-400' : 'text-slate-300'
+                        }`}
+                      >
+                        🇪🇸 Español
+                      </button>
+                    </div>
+                  )}
+                </div>
 
                 {/* User Profile Dropdown */}
                 <div className="relative">
@@ -278,7 +305,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                         </div>
                         {session.user?.role === 'admin' && (
                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                            Administrator
+                            {t('admin')}
                           </span>
                         )}
                       </div>
@@ -288,7 +315,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                         className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-red-900/20 hover:text-red-300 transition-colors duration-200"
                       >
                         <LogOut className="w-4 h-4" />
-                        Sign Out
+                        {t('signOut')}
                       </button>
                     </div>
                   )}
@@ -314,105 +341,6 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
-
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="lg:hidden py-4 border-t border-slate-700/50 animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="space-y-2">
-              <Link 
-                href="/"
-                className={getMobileLinkClasses('home', '/')}
-                onClick={() => setIsOpen(false)}
-              >
-                <Home className="w-5 h-5" />
-                Home
-              </Link>
-
-              {status === 'authenticated' ? (
-                <>
-                  {session.user?.role === 'admin' && (
-                    <>
-                      <Link 
-                        href="/admin/dashboard"
-                        className={getMobileLinkClasses('admin-dashboard', '/admin/dashboard')}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <Shield className="w-5 h-5" />
-                        Dashboard
-                      </Link>
-                      <Link 
-                        href="/admin/plans"
-                        className={getMobileLinkClasses('admin-plans', '/admin/plans')}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <Settings className="w-5 h-5" />
-                        Manage Plans
-                      </Link>
-                      <Link 
-                        href="/admin/content"
-                        className={getMobileLinkClasses('admin-content', '/admin/content')}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <FileText className="w-5 h-5" />
-                        Manage Content
-                      </Link>
-                    </>
-                  )}
-
-                  <Link 
-                    href="/member/plans"
-                    className={getMobileLinkClasses('member-plans', '/member/plans')}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <Crown className="w-5 h-5" />
-                    My Plans
-                  </Link>
-
-                  <Link 
-                    href="/member/content"
-                    className={getMobileLinkClasses('member-content', '/member/content')}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <FileText className="w-5 h-5" />
-                    Exclusive Content
-                  </Link>
-
-                  {/* User info mobile */}
-                  <div className={`px-4 py-3 rounded-lg ${
-                    scrolled ? 'bg-purple-900/20' : 'bg-white/10'
-                  }`}>
-                    <div className="flex items-center gap-3 mb-2">
-                      <UserAvatar size="w-10 h-10" showBorder={false} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white">
-                          {session.user?.name || session.user?.email}
-                        </p>
-                        <p className="text-xs text-slate-400 truncate">
-                          {session.user?.email}
-                        </p>
-                      </div>
-                    </div>
-                    {session.user?.role === 'admin' && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                        Administrator
-                      </span>
-                    )}
-                  </div>
-
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-900/20 hover:text-red-300 transition-colors duration-200"
-                  >
-                    <LogOut className="w-5 h-5" />
-                    Sign Out
-                  </button>
-                </>
-              ) : (
-                <LoginButton isMobile={true} />
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </nav>
   );

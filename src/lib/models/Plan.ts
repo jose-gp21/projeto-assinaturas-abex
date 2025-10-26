@@ -1,54 +1,62 @@
-// src/lib/models/Plan.ts
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
-export interface IPlan extends mongoose.Document {
+export interface IPlan extends Document {
+  _id: mongoose.Types.ObjectId;
   name: string;
-  monthlyValue?: number; // Alterado de monthlyPrice para monthlyValue
-  annualValue?: number;  // Alterado de annualPrice para annualValue
-  description: string;
-  benefits: string[];
+  description?: string;
+  price: number; // ✅ compatível com PaymentService
+  monthlyPrice?: number;
+  annualPrice?: number;
+  features: string[];
   trialDays?: number;
-  popular?: boolean;     // Adicionado campo popular
-  active?: boolean;      // Adicionado campo active
+  isActive: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-const PlanSchema = new mongoose.Schema<IPlan>({
-  name: {
-    type: String,
-    required: [true, 'Please provide the plan name.'],
-    unique: true,
+const PlanSchema = new Schema<IPlan>(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      required: false,
+    },
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0, // ✅ usado como fallback no PaymentService
+    },
+    monthlyPrice: {
+      type: Number,
+      min: 0,
+    },
+    annualPrice: {
+      type: Number,
+      min: 0,
+    },
+    features: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    trialDays: {
+      type: Number,
+      default: 0,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
-  monthlyValue: {  // Alterado de monthlyPrice para monthlyValue
-    type: Number,
-    min: 0,
-  },
-  annualValue: {   // Alterado de annualPrice para annualValue
-    type: Number,
-    min: 0,
-  },
-  description: {
-    type: String,
-    required: [true, 'Please provide a description for the plan.'],
-  },
-  benefits: {
-    type: [String],
-    default: [],
-  },
-  trialDays: {
-    type: Number,
-    min: 0,
-    default: 0,
-  },
-  popular: {       // Adicionado campo popular
-    type: Boolean,
-    default: false,
-  },
-  active: {        // Adicionado campo active
-    type: Boolean,
-    default: true,
-  },
-}, {
-  timestamps: true, // Adiciona createdAt e updatedAt automaticamente
-});
+  {
+    timestamps: true,
+  }
+);
 
-export default mongoose.models.Plan || mongoose.model<IPlan>('Plan', PlanSchema);
+export default mongoose.models.Plan || mongoose.model<IPlan>("Plan", PlanSchema);
