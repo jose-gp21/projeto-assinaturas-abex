@@ -109,11 +109,106 @@ Make sure you have the following tools installed:
 The application will be accessible at `http://localhost:3000`.
 
 ---
+```bash
+Structure:
 
+├── eslint.config.mjs
+├── next.config.ts
+├── next-env.d.ts
+├── package.json
+├── package-lock.json
+├── postcss.config.mjs
+├── public
+│   ├── favicon.png
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── next.svg
+│   ├── vercel.svg
+│   └── window.svg
+├── README.md
+├── scripts
+│   └── seed.js
+├── src
+│   ├── assets
+│   │   ├── docs
+│   │   │   └── image.png
+│   │   └── image
+│   │       └── google-logo.png
+│   ├── components
+│   │   ├── Layout.tsx
+│   │   ├── NavBar.tsx
+│   │   ├── payment
+│   │   │   ├── index.tsx
+│   │   │   ├── PayButton.tsx
+│   │   │   ├── PaymentHystory.tsx
+│   │   │   ├── PaymentModal.tsx
+│   │   │   └── PlanCard.tsx
+│   │   └── withAuth.tsx
+│   ├── context
+│   │   └── LanguageContext.tsx
+│   ├── lib
+│   │   ├── authUtils.ts
+│   │   ├── models
+│   │   │   ├── Admin.ts
+│   │   │   ├── Content.ts
+│   │   │   ├── index.ts
+│   │   │   ├── Payment.ts
+│   │   │   ├── Plan.ts
+│   │   │   ├── Subscription.ts
+│   │   │   └── User.ts
+│   │   └── mongodb.ts
+│   ├── locales
+│   │   ├── en.json
+│   │   ├── es.json
+│   │   └── pt.json
+│   ├── pages
+│   │   ├── admin
+│   │   │   ├── content.tsx
+│   │   │   ├── dashboard.tsx
+│   │   │   └── plans.tsx
+│   │   ├── api
+│   │   │   ├── admin
+│   │   │   │   ├── content.ts
+│   │   │   │   ├── dashboard.ts
+│   │   │   │   ├── plans.ts
+│   │   │   │   └── reports.ts
+│   │   │   ├── auth
+│   │   │   │   └── [...nextauth].ts
+│   │   │   ├── member
+│   │   │   │   ├── cancelSubscription.ts
+│   │   │   │   ├── content.ts
+│   │   │   │   ├── favorite.ts
+│   │   │   │   ├── payment-history.ts
+│   │   │   │   ├── payment.ts
+│   │   │   │   ├── plans.ts
+│   │   │   │   ├── renewSubscription.ts
+│   │   │   │   ├── subscribe.ts
+│   │   │   │   ├── subscription.ts
+│   │   │   │   └── viewContent.ts
+│   │   │   ├── test.db.ts
+│   │   │   └── webhooks
+│   │   │       └── mercadopago.ts
+│   │   ├── _app.tsx
+│   │   ├── auth
+│   │   │   └── signin.tsx
+│   │   ├── _document.tsx
+│   │   ├── index.tsx
+│   │   └── member
+│   │       ├── content.tsx
+│   │       └── plans.tsx
+│   ├── services
+│   │   ├── contentService.ts
+│   │   ├── memberContentService.ts
+│   │   ├── paymentService.ts
+│   │   ├── planService.ts
+│   │   ├── reportService.ts
+│   │   └── subscriptionService.ts
+│   └── styles
+│       └── globals.css
+├── tsconfig.json
+└── vercel.json
+```
 
-## 📧 Contact
-
-For questions, collaborations, or development opportunities, feel free to get in touch:
 
 * **José Gabriel:** [github.com/jose-gp21](https://github.com/jose-gp21)
 * **Email:** `gabrielpaludo@unochapeco.edu.br`
