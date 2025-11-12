@@ -44,10 +44,12 @@ import {
   Twitter
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function HomePage() {
   const { data: session } = useSession();
   const router = useRouter();
+  const { t } = useLanguage(); // 🔥 Hook de tradução
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -62,35 +64,35 @@ export default function HomePage() {
   }, []);
 
   const stats = [
-    { number: "10,000+", label: "Active Members", icon: Users },
-    { number: "98%", label: "Customer Satisfaction", icon: Star },
-    { number: "500+", label: "Exclusive Content", icon: FileText },
-    { number: "24/7", label: "Premium Support", icon: Shield }
+    { number: "10,000+", label: t('home.stats.activeMembers'), icon: Users },
+    { number: "98%", label: t('home.stats.satisfaction'), icon: Star },
+    { number: "500+", label: t('home.stats.exclusiveContent'), icon: FileText },
+    { number: "24/7", label: t('home.stats.support'), icon: Shield }
   ];
 
   const features = [
     {
       icon: Crown,
-      title: "Exclusive Content",
-      description: "Access premium materials and unique experiences designed specifically for our members",
+      title: t('home.features.exclusive.title'),
+      description: t('home.features.exclusive.description'),
       color: "from-purple-500 to-pink-500"
     },
     {
       icon: Shield,
-      title: "Total Security",
-      description: "Your data protected with cutting-edge encryption and advanced security protocols",
+      title: t('home.features.security.title'),
+      description: t('home.features.security.description'),
       color: "from-blue-500 to-cyan-500"
     },
     {
       icon: Users,
-      title: "VIP Community",
-      description: "Connect with exclusive members and build valuable professional networks",
+      title: t('home.features.community.title'),
+      description: t('home.features.community.description'),
       color: "from-green-500 to-emerald-500"
     },
     {
       icon: Zap,
-      title: "Instant Access",
-      description: "Immediate access to all content and features as soon as you join",
+      title: t('home.features.instant.title'),
+      description: t('home.features.instant.description'),
       color: "from-orange-500 to-red-500"
     }
   ];
@@ -98,85 +100,84 @@ export default function HomePage() {
   const contentTypes = [
     { 
       icon: FileText, 
-      title: "Premium Articles", 
-      description: "In-depth content and exclusive insights from industry experts", 
+      title: t('home.contentTypes.articles.title'), 
+      description: t('home.contentTypes.articles.description'), 
       color: "from-purple-500 to-pink-500" 
     },
     { 
       icon: Video, 
-      title: "Exclusive Videos", 
-      description: "High-quality video content and masterclasses", 
+      title: t('home.contentTypes.videos.title'), 
+      description: t('home.contentTypes.videos.description'), 
       color: "from-blue-500 to-cyan-500" 
     },
     { 
       icon: Calendar, 
-      title: "VIP Events", 
-      description: "Exclusive events and networking opportunities", 
+      title: t('home.contentTypes.events.title'), 
+      description: t('home.contentTypes.events.description'), 
       color: "from-green-500 to-emerald-500" 
     },
     { 
-      icon: Headphones, 
-      title: "Podcasts", 
-      description: "Educational podcasts and expert interviews", 
+      icon: Headphones,title: t('home.contentTypes.podcasts.title'), 
+      description: t('home.contentTypes.podcasts.description'), 
       color: "from-orange-500 to-red-500" 
     },
     { 
       icon: BookOpen, 
-      title: "Advanced Courses", 
-      description: "Comprehensive learning paths and certifications", 
+      title: t('home.contentTypes.courses.title'), 
+      description: t('home.contentTypes.courses.description'), 
       color: "from-indigo-500 to-purple-500" 
     },
     { 
       icon: Monitor, 
-      title: "Webinars", 
-      description: "Live sessions and interactive workshops", 
+      title: t('home.contentTypes.webinars.title'), 
+      description: t('home.contentTypes.webinars.description'), 
       color: "from-teal-500 to-blue-500" 
     }
   ];
 
   const plans = [
     {
-      name: "Basic",
+      name: t('home.plans.basic.name'),
       price: { monthly: "29", annually: "299" },
       originalPrice: { monthly: "39", annually: "399" },
-      description: "Perfect to get started with exclusive content",
+      description: t('home.plans.basic.description'),
       features: [
-        "Access to basic content",
-        "Community participation",
-        "Email support",
-        "Mobile app access"
+        t('home.plans.basic.features.content'),
+        t('home.plans.basic.features.community'),
+        t('home.plans.basic.features.support'),
+        t('home.plans.basic.features.mobile')
       ],
       popular: false,
       color: "from-slate-600 to-slate-700"
     },
     {
-      name: "Premium",
+      name: t('home.plans.premium.name'),
       price: { monthly: "79", annually: "799" },
       originalPrice: { monthly: "99", annually: "999" },
-      description: "Complete access to all premium features",
+      description: t('home.plans.premium.description'),
       features: [
-        "Access to all content",
-        "Priority support",
-        "Exclusive events",
-        "Advanced courses",
-        "Downloadable resources",
-        "1-on-1 mentoring"
+        t('home.plans.premium.features.allContent'),
+        t('home.plans.premium.features.priority'),
+        t('home.plans.premium.features.events'),
+        t('home.plans.premium.features.courses'),
+        t('home.plans.premium.features.downloads'),
+        t('home.plans.premium.features.mentoring')
       ],
       popular: true,
       color: "from-purple-600 to-blue-600"
     },
     {
-      name: "VIP",
+      name: t('home.plans.vip.name'),
       price: { monthly: "149", annually: "1499" },
       originalPrice: { monthly: "199", annually: "1999" },
-      description: "The ultimate experience with all benefits",
+      description: t('home.plans.vip.description'),
       features: [
-        "Everything from Premium",
-        "VIP community access",
-        "Personal consultation",
-        "Custom content requests",
-        "Direct expert access",
-        "Certification programs"
+        t('home.plans.vip.features.everything'),
+        t('home.plans.vip.features.vipCommunity'),
+        t('home.plans.vip.features.consultation'),
+        t('home.plans.vip.features.custom'),
+        t('home.plans.vip.features.directAccess'),
+        t('home.plans.vip.features.certification')
       ],
       popular: false,
       color: "from-yellow-500 to-orange-500"
@@ -185,23 +186,23 @@ export default function HomePage() {
 
   const testimonials = [
     {
-      name: "Maria Silva",
-      role: "Marketing Director",
-      content: "The exclusive content transformed how I approach my business strategies. Incredible value!",
+      name: t('home.testimonials.testimonial1.name'),
+      role: t('home.testimonials.testimonial1.role'),
+      content: t('home.testimonials.testimonial1.content'),
       rating: 5,
       image: "MS"
     },
     {
-      name: "John Smith",
-      role: "Entrepreneur",
-      content: "The VIP community opened doors I never imagined. The networking alone is worth the investment.",
+      name: t('home.testimonials.testimonial2.name'),
+      role: t('home.testimonials.testimonial2.role'),
+      content: t('home.testimonials.testimonial2.content'),
       rating: 5,
       image: "JS"
     },
     {
-      name: "Ana Costa",
-      role: "Business Consultant",
-      content: "Professional content with practical applicability. I recommend it to all my clients.",
+      name: t('home.testimonials.testimonial3.name'),
+      role: t('home.testimonials.testimonial3.role'),
+      content: t('home.testimonials.testimonial3.content'),
       rating: 5,
       image: "AC"
     }
@@ -209,23 +210,23 @@ export default function HomePage() {
 
   const dashboardFeatures = [
     { 
-      title: "Advanced Analytics", 
-      description: "Complete insights into your content performance and member engagement", 
+      title: t('home.dashboard.analytics.title'), 
+      description: t('home.dashboard.analytics.description'), 
       icon: BarChart3 
     },
     { 
-      title: "Member Management", 
-      description: "Easily manage subscriptions, access levels, and member communications", 
+      title: t('home.dashboard.members.title'), 
+      description: t('home.dashboard.members.description'), 
       icon: Users 
     },
     { 
-      title: "Content Creation", 
-      description: "Intuitive tools to create, edit, and publish exclusive content", 
+      title: t('home.dashboard.creation.title'), 
+      description: t('home.dashboard.creation.description'), 
       icon: Settings 
     },
     { 
-      title: "Revenue Optimization", 
-      description: "Tools to maximize revenue and optimize your monetization strategy", 
+      title: t('home.dashboard.revenue.title'), 
+      description: t('home.dashboard.revenue.description'), 
       icon: TrendingUp 
     }
   ];
@@ -256,22 +257,22 @@ export default function HomePage() {
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full border border-purple-500/30">
                     <Sparkles className="w-4 h-4 text-purple-400" />
                     <span className="text-purple-300 text-sm font-medium">
-                      #1 Platform for Exclusive Content
+                      {t('home.hero.badge')}
                     </span>
                   </div>
                   
                   <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
                     <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-                      Create Your
+                      {t('home.hero.title1')}
                     </span>
                     <br />
                     <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                      Exclusive Club
+                      {t('home.hero.title2')}
                     </span>
                   </h1>
                   
                   <p className="text-xl text-slate-300 leading-relaxed max-w-2xl">
-                    The complete platform to create, manage, and monetize exclusive content for your members
+                    {t('home.hero.subtitle')}
                   </p>
                 </div>
 
@@ -279,18 +280,18 @@ export default function HomePage() {
                   {session ? (
                     <a href="/member/content" className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/25">
                       <Crown className="w-5 h-5" />
-                      Access Content
+                      {t('home.hero.accessContent')}
                     </a>
                   ) : (
                     <a href="/auth/signin" className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/25">
                       <Crown className="w-5 h-5" />
-                      Get Started
+                      {t('home.hero.getStarted')}
                     </a>
                   )}
                   
                   <button className="inline-flex items-center justify-center gap-2 bg-slate-800/50 backdrop-blur-sm border border-slate-700 hover:bg-slate-700/50 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105">
                     <Play className="w-5 h-5" />
-                    Watch Demo
+                    {t('home.hero.watchDemo')}
                   </button>
                 </div>
 
@@ -305,14 +306,14 @@ export default function HomePage() {
                       ))}
                     </div>
                     <span className="text-slate-400 text-sm ml-2">
-                      10,000+ active members
+                      10,000+ {t('home.hero.activeMembers')}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
                     {[1,2,3,4,5].map(i => (
                       <Star key={i} className="w-4 h-4 fill-current text-yellow-400" />
                     ))}
-                    <span className="text-slate-400 text-sm ml-2">4.9/5</span>
+                    <span className="text-slate-400 text-sm ml-2">{t('home.hero.rating')}</span>
                   </div>
                 </div>
               </div>
@@ -336,10 +337,10 @@ export default function HomePage() {
                           <Video className="w-6 h-6 text-purple-400" />
                           <div>
                             <p className="text-white font-medium">
-                              Exclusive Masterclass
+                              {t('home.contentTypes.videos.title')}
                             </p>
                             <p className="text-slate-400 text-sm">
-                              Advanced business strategies
+                              {t('home.contentTypes.courses.title')}
                             </p>
                           </div>
                         </div>
@@ -350,10 +351,10 @@ export default function HomePage() {
                           <FileText className="w-6 h-6 text-green-400" />
                           <div>
                             <p className="text-white font-medium">
-                              Market Report 2024
+                              {t('home.contentTypes.articles.title')}
                             </p>
                             <p className="text-slate-400 text-sm">
-                              Exclusive insights and data
+                              {t('home.contentTypes.articles.description')}
                             </p>
                           </div>
                         </div>
@@ -364,10 +365,10 @@ export default function HomePage() {
                           <Users className="w-6 h-6 text-orange-400" />
                           <div>
                             <p className="text-white font-medium">
-                              VIP Community
+                              {t('home.features.community.title')}
                             </p>
                             <p className="text-slate-400 text-sm">
-                              Elite networking opportunities
+                              {t('home.contentTypes.events.description')}
                             </p>
                           </div>
                         </div>
@@ -402,13 +403,13 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Why Choose {' '}
+                {t('home.features.title')}{' '}
                 <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                   Abex Clubs
                 </span>
               </h2>
               <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-                Discover the features that make our platform the best choice for creating and managing exclusive content
+                {t('home.features.subtitle')}
               </p>
             </div>
 
@@ -433,13 +434,13 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Diverse Types of {' '}
+                {t('home.contentTypes.title')}{' '}
                 <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                  Exclusive Content
+                  {t('home.contentTypes.title2')}
                 </span>
               </h2>
               <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-                Create and share various types of premium content to engage and educate your members
+                {t('home.contentTypes.subtitle')}
               </p>
             </div>
 
@@ -464,18 +465,18 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Choose Your {' '}
+                {t('home.plans.title')}{' '}
                 <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                  Perfect Plan
+                  {t('home.plans.title2')}
                 </span>
               </h2>
               <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-                Flexible plans designed to meet your needs and budget
+                {t('home.plans.subtitle')}
               </p>
               
               <div className="flex items-center justify-center gap-4 mt-8">
                 <span className={`text-slate-400 ${activePlanPeriod === 'monthly' ? 'text-white font-semibold' : ''}`}>
-                  Monthly
+                  {t('home.plans.monthly')}
                 </span>
                 <button
                   className="relative w-14 h-8 bg-slate-700 rounded-full border border-slate-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
@@ -486,10 +487,10 @@ export default function HomePage() {
                   }`}></span>
                 </button>
                 <span className={`text-slate-400 ${activePlanPeriod === 'annually' ? 'text-white font-semibold' : ''}`}>
-                  Annually
+                  {t('home.plans.annually')}
                 </span>
                 <div className="px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full text-white text-sm font-medium">
-                  Save 20%
+                  {t('home.plans.save')}
                 </div>
               </div>
             </div>
@@ -499,7 +500,7 @@ export default function HomePage() {
                 <div key={index} className={`relative group ${plan.popular ? 'scale-105' : ''}`}>
                   {plan.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full text-white text-sm font-bold shadow-md">
-                      Most Popular
+                      {t('home.plans.mostPopular')}
                     </div>
                   )}
                   
@@ -541,7 +542,7 @@ export default function HomePage() {
                         ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-purple-500/25'
                         : 'bg-slate-700 hover:bg-slate-600 text-white'
                     }`}>
-                      {session ? 'Upgrade Now' : 'Get Started'}
+                      {session ? t('home.plans.upgradeNow') : t('home.plans.getStarted')}
                     </a>
                   </div>
                 </div>
@@ -557,13 +558,13 @@ export default function HomePage() {
               <div className="space-y-8">
                 <div>
                   <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                    Powerful {' '}
+                    {t('home.dashboard.title')}{' '}
                     <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                      Admin Dashboard
+                      {t('home.dashboard.title2')}
                     </span>
                   </h2>
                   <p className="text-xl text-slate-400 leading-relaxed max-w-2xl">
-                    Complete control over your exclusive club with advanced analytics and management tools
+                    {t('home.dashboard.subtitle')}
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -591,7 +592,7 @@ export default function HomePage() {
                     <div className="w-11/12 h-5/6 bg-slate-900 rounded-lg shadow-inner p-4 flex flex-col gap-2 relative">
                         <div className="absolute top-4 right-4 flex items-center gap-2 text-slate-400 text-xs">
                             <Settings className="w-3 h-3" />
-                            <span>Settings</span>
+                            <span>{t('navbar.settings')}</span>
                         </div>
                         <div className="h-6 bg-slate-800 rounded mb-4"></div>
                         <div className="grid grid-cols-3 gap-2">
@@ -618,13 +619,13 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Easy Content {' '}
+                {t('home.contentManagement.title')}{' '}
                 <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                  Management
+                  {t('home.contentManagement.title2')}
                 </span>
               </h2>
               <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-                Create, organize, and publish your exclusive content with our intuitive management system
+                {t('home.contentManagement.subtitle')}
               </p>
             </div>
             <div className="relative p-6 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-3xl shadow-2xl animate-fade-in">
@@ -636,76 +637,76 @@ export default function HomePage() {
                   </div>
                   <div className="flex items-center gap-2 bg-slate-700 rounded-md px-3 py-2">
                     <Search className="w-4 h-4 text-slate-400" />
-                    <input type="text" placeholder="Search content..." className="bg-transparent text-slate-300 outline-none w-40" />
+                    <input type="text" placeholder={t('home.contentManagement.searchPlaceholder')} className="bg-transparent text-slate-300 outline-none w-40" />
                   </div>
                 </div>
                 <div className="flex-grow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="bg-slate-800 rounded-xl p-4 flex flex-col justify-between border border-slate-700/50 hover:border-purple-500/50 transition-colors duration-300">
                     <div>
                       <h4 className="text-lg font-semibold text-white mb-2">
-                        Market Analysis 2024
+                        {t('home.contentTypes.articles.title')} 2024
                       </h4>
                       <p className="text-slate-400 text-sm mb-3 truncate">
-                        Complete report on current market trends and opportunities
+                        {t('home.contentTypes.articles.description')}
                       </p>
                       <div className="flex items-center gap-2 text-slate-500 text-xs">
                         <FileText className="w-3 h-3" />
-                        <span>Published</span>
+                        <span>{t('home.contentManagement.published')}</span>
                         <div className="w-2 h-2 rounded-full bg-green-500 ml-auto"></div>
                       </div>
                     </div>
                     <div className="flex justify-end gap-2 mt-4">
                       <button className="text-blue-400 hover:text-blue-500 text-sm">
-                        Edit
+                        {t('home.contentManagement.edit')}
                       </button>
                       <button className="text-red-400 hover:text-red-500 text-sm">
-                        Delete
+                        {t('home.contentManagement.delete')}
                       </button>
                     </div>
                   </div>
                   <div className="bg-slate-800 rounded-xl p-4 flex flex-col justify-between border border-slate-700/50 hover:border-purple-500/50 transition-colors duration-300">
                     <div>
                       <h4 className="text-lg font-semibold text-white mb-2">
-                        Leadership Masterclass
+                        {t('home.contentTypes.courses.title')}
                       </h4>
                       <p className="text-slate-400 text-sm mb-3 truncate">
-                        Exclusive video series on leadership skills development
+                        {t('home.contentTypes.courses.description')}
                       </p>
                       <div className="flex items-center gap-2 text-slate-500 text-xs">
                         <Video className="w-3 h-3" />
-                        <span>Draft</span>
+                        <span>{t('home.contentManagement.draft')}</span>
                         <div className="w-2 h-2 rounded-full bg-yellow-500 ml-auto"></div>
                       </div>
                     </div>
                     <div className="flex justify-end gap-2 mt-4">
                       <button className="text-blue-400 hover:text-blue-500 text-sm">
-                        Edit
+                        {t('home.contentManagement.edit')}
                       </button>
                       <button className="text-red-400 hover:text-red-500 text-sm">
-                        Delete
+                        {t('home.contentManagement.delete')}
                       </button>
                     </div>
                   </div>
                   <div className="bg-slate-800 rounded-xl p-4 flex flex-col justify-between border border-slate-700/50 hover:border-purple-500/50 transition-colors duration-300">
                     <div>
                       <h4 className="text-lg font-semibold text-white mb-2">
-                        Weekly Business Podcast
+                        {t('home.contentTypes.podcasts.title')}
                       </h4>
                       <p className="text-slate-400 text-sm mb-3 truncate">
-                        Expert interviews and industry insights
+                        {t('home.contentTypes.podcasts.description')}
                       </p>
                       <div className="flex items-center gap-2 text-slate-500 text-xs">
                         <Headphones className="w-3 h-3" />
-                        <span>Scheduled</span>
+                        <span>{t('home.contentManagement.scheduled')}</span>
                         <div className="w-2 h-2 rounded-full bg-orange-500 ml-auto"></div>
                       </div>
                     </div>
                     <div className="flex justify-end gap-2 mt-4">
                       <button className="text-blue-400 hover:text-blue-500 text-sm">
-                        Edit
+                        {t('home.contentManagement.edit')}
                       </button>
                       <button className="text-red-400 hover:text-red-500 text-sm">
-                        Delete
+                        {t('home.contentManagement.delete')}
                       </button>
                     </div>
                   </div>
@@ -713,7 +714,7 @@ export default function HomePage() {
                 <div className="mt-6 flex justify-center">
                   <button className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105">
                     <Edit className="w-5 h-5" />
-                    Add New Content
+                    {t('home.contentManagement.addNew')}
                   </button>
                 </div>
               </div>
@@ -733,19 +734,19 @@ export default function HomePage() {
                     <div className="flex-grow p-4 space-y-4">
                         <div className="bg-slate-700 rounded-md p-3 flex items-center justify-between">
                             <span className="text-white font-medium">
-                              Advanced Business Strategies
+                              {t('home.contentTypes.courses.title')}
                             </span>
                             <Play className="w-5 h-5 text-purple-400" />
                         </div>
                         <div className="bg-slate-700 rounded-md p-3 flex items-center justify-between">
                             <span className="text-white font-medium">
-                              Exclusive Market Report
+                              {t('home.contentTypes.articles.title')}
                             </span>
                             <Lock className="w-5 h-5 text-red-400" />
                         </div>
                         <div className="bg-slate-700 rounded-md p-3 flex items-center justify-between">
                             <span className="text-white font-medium">
-                              VIP Member Webinar
+                              {t('home.contentTypes.webinars.title')}
                             </span>
                             <Play className="w-5 h-5 text-purple-400" />
                         </div>
@@ -761,13 +762,13 @@ export default function HomePage() {
               <div className="space-y-8">
                 <div>
                   <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                    Exceptional {' '}
+                    {t('home.memberExperience.title')}{' '}
                     <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                      Member Experience
+                      {t('home.memberExperience.title2')}
                     </span>
                   </h2>
                   <p className="text-xl text-slate-400 leading-relaxed max-w-2xl">
-                    Your members will enjoy a premium, intuitive experience designed to maximize engagement and satisfaction
+                    {t('home.memberExperience.subtitle')}
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -777,10 +778,10 @@ export default function HomePage() {
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-white">
-                        Multi-device Access
+                        {t('home.memberExperience.multiDevice.title')}
                       </h3>
                       <p className="text-slate-400 text-sm">
-                        Access from any device, anywhere, anytime
+                        {t('home.memberExperience.multiDevice.description')}
                       </p>
                     </div>
                   </div>
@@ -790,10 +791,10 @@ export default function HomePage() {
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-white">
-                        Restricted Content
+                        {t('home.memberExperience.restricted.title')}
                       </h3>
                       <p className="text-slate-400 text-sm">
-                        Exclusive content based on membership levels
+                        {t('home.memberExperience.restricted.description')}
                       </p>
                     </div>
                   </div>
@@ -803,10 +804,10 @@ export default function HomePage() {
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-white">
-                        Clear Interface
+                        {t('home.memberExperience.interface.title')}
                       </h3>
                       <p className="text-slate-400 text-sm">
-                        Intuitive and easy-to-navigate design
+                        {t('home.memberExperience.interface.description')}
                       </p>
                     </div>
                   </div>
@@ -821,13 +822,13 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                What Our {' '}
+                {t('home.testimonials.title')}{' '}
                 <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                  Members Say
+                  {t('home.testimonials.title2')}
                 </span>
               </h2>
               <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-                Discover how our platform has transformed businesses and careers around the world
+                {t('home.testimonials.subtitle')}
               </p>
             </div>
 
@@ -877,7 +878,7 @@ export default function HomePage() {
                 <span className="text-2xl font-bold text-white">Abex Clubs</span>
               </div>
               <p className="text-slate-400 leading-relaxed">
-                The complete platform for creating and managing exclusive membership clubs
+                {t('home.footer.description')}
               </p>
               <div className="flex space-x-4 mt-6">
                 <a href="#" className="text-slate-400 hover:text-white transition-colors">
@@ -897,47 +898,47 @@ export default function HomePage() {
 
             <div>
               <h3 className="text-lg font-semibold text-white mb-6">
-                Navigation
+                {t('home.footer.navigation')}
               </h3>
               <ul className="space-y-3">
                 <li><a href="#features" className="hover:text-white transition-colors">
-                  Features
+                  {t('navbar.content')}
                 </a></li>
                 <li><a href="#content" className="hover:text-white transition-colors">
-                  Content
+                  {t('navbar.content')}
                 </a></li>
                 <li><a href="#plans" className="hover:text-white transition-colors">
-                  Plans
+                  {t('navbar.plans')}
                 </a></li>
                 <li><a href="#testimonials" className="hover:text-white transition-colors">
-                  Testimonials
+                  {t('home.testimonials.title2')}
                 </a></li>
               </ul>
             </div>
 
             <div>
               <h3 className="text-lg font-semibold text-white mb-6">
-                Support
+                {t('home.footer.support')}
               </h3>
               <ul className="space-y-3">
                 <li><a href="#" className="hover:text-white transition-colors">
-                  Help Center
+                  {t('home.footer.helpCenter')}
                 </a></li>
                 <li><a href="#" className="hover:text-white transition-colors">
-                  FAQs
+                  {t('home.footer.faqs')}
                 </a></li>
                 <li><a href="#" className="hover:text-white transition-colors">
-                  Contact
+                  {t('home.footer.contact')}
                 </a></li>
                 <li><a href="#" className="hover:text-white transition-colors">
-                  Terms of Service
+                  {t('home.footer.terms')}
                 </a></li>
               </ul>
             </div>
 
             <div>
               <h3 className="text-lg font-semibold text-white mb-6">
-                Contact
+                {t('home.footer.contact')}
               </h3>
               <address className="not-italic space-y-3">
                 <p className="flex items-center gap-3">
@@ -957,7 +958,7 @@ export default function HomePage() {
           </div>
 
           <div className="border-t border-slate-700/50 mt-12 pt-8 text-center text-slate-500 text-sm">
-            &copy; {new Date().getFullYear()} Abex Clubs. All rights reserved.
+            &copy; {new Date().getFullYear()} Abex Clubs. {t('home.footer.rights')}
           </div>
         </footer>
       </div>

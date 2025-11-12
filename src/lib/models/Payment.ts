@@ -4,7 +4,7 @@ export interface IPayment extends Document {
   userId: mongoose.Types.ObjectId;
   planId: mongoose.Types.ObjectId;
   subscriptionId?: mongoose.Types.ObjectId;
-  mpPaymentId: string; // ✅ compatível com PaymentService
+  mpPaymentId: string;
   preferenceId?: string;
   amount: number;
   currency?: string;
@@ -30,12 +30,12 @@ const PaymentSchema = new Schema<IPayment>(
     subscriptionId: {
       type: Schema.Types.ObjectId,
       ref: "Subscription",
-      required: false, // ✅ assinatura pode ser criada depois
+      required: false, // assinatura pode ser criada depois
     },
     mpPaymentId: {
       type: String,
       required: true,
-      unique: true, // ✅ id único do pagamento do Mercado Pago
+      unique: true, // id único do pagamento do Mercado Pago
     },
     preferenceId: {
       type: String,

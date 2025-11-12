@@ -1,0 +1,212 @@
+{
+  "navbar": {
+    "signIn": "Entrar",
+    "home": "Início",
+    "dashboard": "Painel",
+    "plans": "Planos",
+    "content": "Conteúdo",
+    "settings": "Configurações",
+    "admin": "Administrador",
+    "signOut": "Sair"
+  },
+  "loading": "Carregando...",
+  "user": "Usuário",
+  "language": {
+    "portuguese": "🇧🇷 Português",
+    "english": "🇺🇸 Inglês",
+    "spanish": "🇪🇸 Espanhol"
+  },
+  "home": {
+    "hero": {
+      "badge": "#1 Plataforma de Conteúdo Exclusivo",
+      "title1": "Crie Seu",
+      "title2": "Clube Exclusivo",
+      "subtitle": "A plataforma completa para criar, gerenciar e monetizar conteúdo exclusivo para seus membros",
+      "getStarted": "Começar Agora",
+      "accessContent": "Acessar Conteúdo",
+      "watchDemo": "Ver Demonstração",
+      "activeMembers": "membros ativos",
+      "rating": "4.9/5"
+    },
+    "stats": {
+      "activeMembers": "Membros Ativos",
+      "satisfaction": "Satisfação dos Clientes",
+      "exclusiveContent": "Conteúdo Exclusivo",
+      "support": "Suporte Premium"
+    },
+    "features": {
+      "title": "Por Que Escolher",
+      "subtitle": "Descubra os recursos que tornam nossa plataforma a melhor escolha para criar e gerenciar conteúdo exclusivo",
+      "exclusive": {
+        "title": "Conteúdo Exclusivo",
+        "description": "Acesse materiais premium e experiências únicas projetadas especificamente para nossos membros"
+      },
+      "security": {
+        "title": "Segurança Total",
+        "description": "Seus dados protegidos com criptografia de ponta e protocolos de segurança avançados"
+      },
+      "community": {
+        "title": "Comunidade VIP",
+        "description": "Conecte-se com membros exclusivos e construa redes profissionais valiosas"
+      },
+      "instant": {
+        "title": "Acesso Instantâneo",
+        "description": "Acesso imediato a todo o conteúdo e recursos assim que você se juntar"
+      }
+    },
+    "contentTypes": {
+      "title": "Diversos Tipos de",
+      "title2": "Conteúdo Exclusivo",
+      "subtitle": "Crie e compartilhe vários tipos de conteúdo premium para engajar e educar seus membros",
+      "articles": {
+        "title": "Artigos Premium",
+        "description": "Conteúdo aprofundado e insights exclusivos de especialistas do setor"
+      },
+      "videos": {
+        "title": "Vídeos Exclusivos",
+        "description": "Conteúdo de vídeo de alta qualidade e masterclasses"
+      },
+      "events": {
+        "title": "Eventos VIP",
+        "description": "Eventos exclusivos e oportunidades de networking"
+      },
+      "podcasts": {
+        "title": "Podcasts",
+        "description": "Podcasts educacionais e entrevistas com especialistas"
+      },
+      "courses": {
+        "title": "Cursos Avançados",
+        "description": "Trilhas de aprendizado abrangentes e certificações"
+      },
+      "webinars": {
+        "title": "Webinars",
+        "description": "Sessões ao vivo e workshops interativos"
+      }
+    },
+    "plans": {
+      "title": "Escolha Seu",
+      "title2": "Plano Perfeito",
+      "subtitle": "Planos flexíveis projetados para atender suas necessidades e orçamento",
+      "monthly": "Mensal",
+      "annually": "Anual",
+      "save": "Economize 20%",
+      "mostPopular": "Mais Popular",
+      "getStarted": "Começar Agora",
+      "upgradeNow": "Fazer Upgrade",
+      "basic": {
+        "name": "Básico",
+        "description": "Perfeito para começar com conteúdo exclusivo",
+        "features": {
+          "content": "Acesso a conteúdo básico",
+          "community": "Participação na comunidade",
+          "support": "Suporte por email",
+          "mobile": "Acesso ao app mobile"
+        }
+      },
+      "premium": {
+        "name": "Premium",
+        "description": "Acesso completo a todos os recursos premium",
+        "features": {
+          "allContent": "Acesso a todo o conteúdo",
+          "priority": "Suporte prioritário",
+          "events": "Eventos exclusivos",
+          "courses": "Cursos avançados",
+          "downloads": "Recursos para download",
+          "mentoring": "Mentoria 1-a-1"
+        }
+      },
+      "vip": {
+        "name": "VIP",
+        "description": "A experiência definitiva com todos os benefícios",
+        "features": {
+          "everything": "Tudo do Premium",
+          "vipCommunity": "Acesso à comunidade VIP",
+          "consultation": "Consultoria pessoal",
+          "custom": "Solicitações de conteúdo personalizado",
+          "directAccess": "Acesso direto a especialistas",
+          "certification": "Programas de certificação"
+        }
+      }
+    },
+    "dashboard": {
+      "title": "Poderoso",
+      "title2": "Painel Administrativo",
+      "subtitle": "Controle completo sobre seu clube exclusivo com análises avançadas e ferramentas de gerenciamento",
+      "analytics": {
+        "title": "Análises Avançadas",
+        "description": "Insights completos sobre o desempenho do seu conteúdo e engajamento dos membros"
+      },
+      "members": {
+        "title": "Gestão de Membros",
+        "description": "Gerencie facilmente assinaturas, níveis de acesso e comunicações com membros"
+      },
+      "creation": {
+        "title": "Criação de Conteúdo",
+        "description": "Ferramentas intuitivas para criar, editar e publicar conteúdo exclusivo"
+      },
+      "revenue": {
+        "title": "Otimização de Receita",
+        "description": "Ferramentas para maximizar a receita e otimizar sua estratégia de monetização"
+      }
+    },
+    "contentManagement": {
+      "title": "Gerenciamento Fácil",
+      "title2": "de Conteúdo",
+      "subtitle": "Crie, organize e publique seu conteúdo exclusivo com nosso sistema intuitivo de gerenciamento",
+      "searchPlaceholder": "Buscar conteúdo...",
+      "published": "Publicado",
+      "draft": "Rascunho",
+      "scheduled": "Agendado",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "addNew": "Adicionar Novo Conteúdo"
+    },
+    "memberExperience": {
+      "title": "Experiência Excepcional",
+      "title2": "para Membros",
+      "subtitle": "Seus membros desfrutarão de uma experiência premium e intuitiva projetada para maximizar o engajamento e a satisfação",
+      "multiDevice": {
+        "title": "Acesso Multi-dispositivo",
+        "description": "Acesse de qualquer dispositivo, em qualquer lugar, a qualquer momento"
+      },
+      "restricted": {
+        "title": "Conteúdo Restrito",
+        "description": "Conteúdo exclusivo baseado em níveis de associação"
+      },
+      "interface": {
+        "title": "Interface Clara",
+        "description": "Design intuitivo e fácil de navegar"
+      }
+    },
+    "testimonials": {
+      "title": "O Que Nossos",
+      "title2": "Membros Dizem",
+      "subtitle": "Descubra como nossa plataforma transformou negócios e carreiras ao redor do mundo",
+      "testimonial1": {
+        "name": "Maria Silva",
+        "role": "Diretora de Marketing",
+        "content": "O conteúdo exclusivo transformou como abordo minhas estratégias de negócios. Valor incrível!"
+      },
+      "testimonial2": {
+        "name": "João Santos",
+        "role": "Empreendedor",
+        "content": "A comunidade VIP abriu portas que nunca imaginei. O networking por si só vale o investimento."
+      },
+      "testimonial3": {
+        "name": "Ana Costa",
+        "role": "Consultora de Negócios",
+        "content": "Conteúdo profissional com aplicabilidade prática. Recomendo para todos os meus clientes."
+      }
+    },
+    "footer": {
+      "description": "A plataforma completa para criar e gerenciar clubes de membros exclusivos",
+      "navigation": "Navegação",
+      "support": "Suporte",
+      "helpCenter": "Central de Ajuda",
+      "faqs": "Perguntas Frequentes",
+      "contact": "Contato",
+      "terms": "Termos de Serviço",
+      "rights": "Todos os direitos reservados"
+    }
+  }
+}
