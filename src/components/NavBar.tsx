@@ -240,7 +240,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                 language === 'pt' ? 'text-purple-400 bg-purple-900/10' : 'text-slate-300'
               }`}
             >
-              🇧🇷 {t('language.portuguese')}
+               {t('language.portuguese')}
             </button>
             <button 
               onClick={() => {
@@ -251,7 +251,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                 language === 'en' ? 'text-purple-400 bg-purple-900/10' : 'text-slate-300'
               }`}
             >
-              🇺🇸 {t('language.english')}
+               {t('language.english')}
             </button>
             <button 
               onClick={() => {
@@ -262,7 +262,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                 language === 'es' ? 'text-purple-400 bg-purple-900/10' : 'text-slate-300'
               }`}
             >
-              🇪🇸 {t('language.spanish')}
+               {t('language.spanish')}
             </button>
           </div>
         )}
