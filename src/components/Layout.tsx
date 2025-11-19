@@ -2,6 +2,7 @@
 // Remove 'use client' if using Pages Router
 import React from 'react';
 import Navbar from './NavBar';
+import { useLanguage } from '../context/LanguageContext'; // ✨ ADICIONAR
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -9,6 +10,8 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, activeTab }) => {
+  const { t } = useLanguage(); // ✨ USAR HOOK
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 flex flex-col">
       <Navbar activeTab={activeTab} />
@@ -36,24 +39,24 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab }) => {
                 Abex Clubs
               </h3>
               <p className="text-slate-300 text-sm leading-relaxed">
-                Your exclusive platform for premium content and unique experiences.
+                {t('footer.description')} {/* ✨ TRADUZIR */}
               </p>
             </div>
             
             {/* Quick Links */}
             <div className="text-center">
               <h4 className="font-semibold text-white mb-3">
-                Quick Links
+                {t('footer.quickLinks')} {/* ✨ TRADUZIR */}
               </h4>
               <div className="space-y-2 text-sm">
                 <a href="/about" className="block text-slate-300 hover:text-purple-400 transition-colors duration-200">
-                  About Us
+                  {t('footer.aboutUs')} {/* ✨ TRADUZIR */}
                 </a>
                 <a href="/contact" className="block text-slate-300 hover:text-purple-400 transition-colors duration-200">
-                  Contact
+                  {t('footer.contact')} {/* ✨ TRADUZIR */}
                 </a>
                 <a href="/support" className="block text-slate-300 hover:text-purple-400 transition-colors duration-200">
-                  Support
+                  {t('footer.support')} {/* ✨ TRADUZIR */}
                 </a>
               </div>
             </div>
@@ -61,11 +64,11 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab }) => {
             {/* Contact Info */}
             <div className="text-center md:text-right">
               <h4 className="font-semibold text-white mb-3">
-                Contact
+                {t('footer.contactSection')} {/* ✨ TRADUZIR */}
               </h4>
               <div className="space-y-2 text-sm text-slate-300">
-                <p>contact@abexclubs.com</p>
-                <p>+1 (555) 123-4567</p>
+                <p>{t('footer.email')}</p> {/* ✨ TRADUZIR */}
+                <p>{t('footer.phone')}</p> {/* ✨ TRADUZIR */}
               </div>
             </div>
           </div>
@@ -74,14 +77,15 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab }) => {
           <div className="pt-6 border-t border-slate-700/50">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
               <p className="text-slate-400 text-sm">
-                &copy; {new Date().getFullYear()} Abex Clubs. All rights reserved.
+                {/* ✨ TRADUZIR - mantém o ano dinâmico */}
+                &copy; {new Date().getFullYear()} {t('footer.copyright').replace('© 2025 ', '')}
               </p>
               <div className="flex space-x-6 text-sm">
                 <a href="/privacy" className="text-slate-400 hover:text-purple-400 transition-colors duration-200">
-                  Privacy Policy
+                  {t('footer.privacyPolicy')} {/* ✨ TRADUZIR */}
                 </a>
                 <a href="/terms" className="text-slate-400 hover:text-purple-400 transition-colors duration-200">
-                  Terms of Service
+                  {t('footer.termsOfService')} {/* ✨ TRADUZIR */}
                 </a>
               </div>
             </div>

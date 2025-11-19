@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import withAuth from '@/components/withAuth';
 import { useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 import { 
   Crown, 
   Shield, 
@@ -25,6 +26,7 @@ interface SignInPageProps {
 
 function SignIn({ providers }: SignInPageProps) {
   const router = useRouter();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
@@ -37,21 +39,22 @@ function SignIn({ providers }: SignInPageProps) {
     }
   };
 
+  // ✨ USAR TRADUÇÕES nas features
   const features = [
     {
       icon: <Crown className="w-5 h-5" />,
-      title: "Exclusive Content",
-      description: "Access premium materials and unique experiences"
+      title: t('signin.features.exclusive.title'),
+      description: t('signin.features.exclusive.description')
     },
     {
       icon: <Users className="w-5 h-5" />,
-      title: "VIP Community",
-      description: "Connect with exclusive members of our community"
+      title: t('signin.features.community.title'),
+      description: t('signin.features.community.description')
     },
     {
       icon: <Shield className="w-5 h-5" />,
-      title: "Total Security",
-      description: "Your data protected with cutting-edge encryption"
+      title: t('signin.features.security.title'),
+      description: t('signin.features.security.description')
     }
   ];
 
@@ -79,7 +82,7 @@ function SignIn({ providers }: SignInPageProps) {
                   </h1>
                 </div>
                 <p className="text-xl text-slate-300 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-                  Your exclusive platform for premium content and unique experiences
+                  {t('signin.subtitle')}
                 </p>
               </div>
 
@@ -111,7 +114,7 @@ function SignIn({ providers }: SignInPageProps) {
                   ))}
                 </div>
                 <span className="text-sm">
-                  Over 10,000 active members
+                  {t('signin.stats')}
                 </span>
               </div>
             </div>
@@ -128,13 +131,13 @@ function SignIn({ providers }: SignInPageProps) {
                   <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/20 rounded-full text-purple-300 text-sm font-medium mb-4">
                       <Sparkles className="w-4 h-4" />
-                      Exclusive Access
+                      {t('signin.badge')}
                     </div>
                     <h2 className="text-3xl font-bold text-white mb-3">
-                      Welcome back!
+                      {t('signin.title')}
                     </h2>
                     <p className="text-slate-400">
-                      Sign in to access your exclusive content
+                      {t('signin.description')}
                     </p>
                   </div>
 
@@ -159,8 +162,8 @@ function SignIn({ providers }: SignInPageProps) {
                             )}
                             <span className="text-lg">
                               {isLoading 
-                                ? 'Signing in...' 
-                                : 'Continue with Google'
+                                ? t('signin.signing')
+                                : t('signin.googleButton')
                               }
                             </span>
                             {!isLoading && (
@@ -172,15 +175,15 @@ function SignIn({ providers }: SignInPageProps) {
                           <div className="space-y-3">
                             <div className="flex items-center gap-3 text-slate-300 text-sm">
                               <CheckCircle className="w-4 h-4 text-green-400" />
-                              Secure and fast login
+                              {t('signin.benefits.secure')}
                             </div>
                             <div className="flex items-center gap-3 text-slate-300 text-sm">
                               <CheckCircle className="w-4 h-4 text-green-400" />
-                              Instant access to content
+                              {t('signin.benefits.instant')}
                             </div>
                             <div className="flex items-center gap-3 text-slate-300 text-sm">
                               <CheckCircle className="w-4 h-4 text-green-400" />
-                              Sync across all devices
+                              {t('signin.benefits.sync')}
                             </div>
                           </div>
                         </div>
@@ -193,7 +196,7 @@ function SignIn({ providers }: SignInPageProps) {
                   <div className="my-8 flex items-center">
                     <div className="flex-1 border-t border-slate-600"></div>
                     <span className="px-4 text-slate-500 text-sm">
-                      100% Secure
+                      {t('signin.secureLabel')}
                     </span>
                     <div className="flex-1 border-t border-slate-600"></div>
                   </div>
@@ -201,19 +204,19 @@ function SignIn({ providers }: SignInPageProps) {
                   {/* Security note */}
                   <div className="text-center">
                     <p className="text-xs text-slate-500 leading-relaxed">
-                      By continuing, you agree to our{' '}
+                      {t('signin.terms')}{' '}
                       <Link 
                         href="/terms" 
                         className="text-purple-400 hover:text-purple-300 underline"
                       >
-                        Terms of Service
+                        {t('signin.termsLink')}
                       </Link>{' '}
-                      and{' '}
+                      {t('signin.and')}{' '} 
                       <Link 
                         href="/privacy" 
                         className="text-purple-400 hover:text-purple-300 underline"
                       >
-                        Privacy Policy
+                        {t('signin.privacyLink')}
                       </Link>
                     </p>
                   </div>
@@ -223,9 +226,9 @@ function SignIn({ providers }: SignInPageProps) {
               {/* Additional CTA */}
               <div className="mt-6 text-center">
                 <p className="text-slate-400 text-sm">
-                  New here?{' '}
+                  {t('signin.newUser')}{' '} 
                   <span className="text-purple-400 font-medium">
-                    Google sign-in automatically creates your account!
+                    {t('signin.autoCreate')} 
                   </span>
                 </p>
               </div>

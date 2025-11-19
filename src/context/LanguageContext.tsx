@@ -22,22 +22,46 @@ const LanguageContext = createContext<LanguageContextType>({
 });
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<string>('pt');
+  const [language, setLanguageState] = useState<string>('pt');
+  const [mounted, setMounted] = useState(false);
 
-  // 🔄 Carrega idioma salvo no navegador
+  // 🔧 CORREÇÃO: Detectar idioma apenas no cliente
   useEffect(() => {
-    const savedLang = localStorage.getItem('language');
-    if (savedLang && translations[savedLang]) {
-      setLanguage(savedLang);
+    setMounted(true);
+    
+    // Detectar idioma salvo ou do navegador
+    let detectedLang = 'pt';
+    
+    if (typeof window !== 'undefined') {
+      // 1. Tentar pegar do localStorage
+      const savedLang = localStorage.getItem('language');
+      if (savedLang && translations[savedLang]) {
+        detectedLang = savedLang;
+      } else {
+        // 2. Detectar do navegador
+        const browserLang = navigator.language.toLowerCase();
+        if (browserLang.startsWith('en')) detectedLang = 'en';
+        else if (browserLang.startsWith('es')) detectedLang = 'es';
+        else detectedLang = 'pt';
+      }
     }
+    
+    setLanguageState(detectedLang);
   }, []);
 
-  // 💾 Salva idioma quando for alterado
-  useEffect(() => {
-    localStorage.setItem('language', language);
-  }, [language]);
+  // 🔧 CORREÇÃO: Função setLanguage que salva persistentemente
+  const setLanguage = (lang: string) => {
+    if (!translations[lang]) return;
+    
+    setLanguageState(lang);
+    
+    // Salvar no localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('language', lang);
+    }
+  };
 
-  // 🔍 Função de tradução
+  // 📝 Função de tradução
   const t = (key: string): string => {
     const keys = key.split('.');
     let result: any = translations[language];
@@ -45,8 +69,13 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       result = result?.[k];
       if (result === undefined) return key;
     }
-    return result;
+    return result || key;
   };
+
+  // 🔧 CORREÇÃO: Não renderizar até montar no cliente (evita flash)
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>

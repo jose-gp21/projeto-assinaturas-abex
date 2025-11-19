@@ -16,6 +16,54 @@
     "english": "🇺🇸 Inglês",
     "spanish": "🇪🇸 Espanhol"
   },
+  "signin": {
+    "badge": "Acesso Exclusivo",
+    "title": "Bem-vindo de volta!",
+    "subtitle": "Sua plataforma exclusiva para conteúdo premium e experiências únicas",
+    "description": "Faça login para acessar seu conteúdo exclusivo",
+    "googleButton": "Continuar com Google",
+    "signing": "Entrando...",
+    "secureLabel": "100% Seguro",
+    "newUser": "Novo aqui?",
+    "autoCreate": "O login com Google cria sua conta automaticamente!",
+    "terms": "Ao continuar, você concorda com nossos",
+    "termsLink": "Termos de Serviço",
+    "and": "e",
+    "privacyLink": "Política de Privacidade",
+    "features": {
+      "exclusive": {
+        "title": "Conteúdo Exclusivo",
+        "description": "Acesse materiais premium e experiências únicas"
+      },
+      "community": {
+        "title": "Comunidade VIP",
+        "description": "Conecte-se com membros exclusivos da nossa comunidade"
+      },
+      "security": {
+        "title": "Segurança Total",
+        "description": "Seus dados protegidos com criptografia de ponta"
+      }
+    },
+    "benefits": {
+      "secure": "Login seguro e rápido",
+      "instant": "Acesso instantâneo ao conteúdo",
+      "sync": "Sincronização em todos os dispositivos"
+    },
+    "stats": "Mais de 10.000 membros ativos"
+  },
+  "footer": {
+    "description": "Sua plataforma exclusiva para conteúdo premium e experiências únicas.",
+    "quickLinks": "Links Rápidos",
+    "aboutUs": "Sobre Nós",
+    "contact": "Contato",
+    "support": "Suporte",
+    "contactSection": "Contato",
+    "email": "contato@abexclubs.com",
+    "phone": "+1 (555) 123-4567",
+    "privacyPolicy": "Política de Privacidade",
+    "termsOfService": "Termos de Serviço",
+    "copyright": "Abex Clubs. Todos os direitos reservados."
+  },
   "home": {
     "hero": {
       "badge": "#1 Plataforma de Conteúdo Exclusivo",
@@ -197,16 +245,6 @@
         "role": "Consultora de Negócios",
         "content": "Conteúdo profissional com aplicabilidade prática. Recomendo para todos os meus clientes."
       }
-    },
-    "footer": {
-      "description": "A plataforma completa para criar e gerenciar clubes de membros exclusivos",
-      "navigation": "Navegação",
-      "support": "Suporte",
-      "helpCenter": "Central de Ajuda",
-      "faqs": "Perguntas Frequentes",
-      "contact": "Contato",
-      "terms": "Termos de Serviço",
-      "rights": "Todos os direitos reservados"
     }
   }
 }

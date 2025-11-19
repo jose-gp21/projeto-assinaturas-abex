@@ -16,6 +16,54 @@
     "english": "🇺🇸 Inglés",
     "spanish": "🇪🇸 Español"
   },
+  "signin": {
+    "badge": "Acceso Exclusivo",
+    "title": "¡Bienvenido de nuevo!",
+    "subtitle": "Tu plataforma exclusiva para contenido premium y experiencias únicas",
+    "description": "Inicia sesión para acceder a tu contenido exclusivo",
+    "googleButton": "Continuar con Google",
+    "signing": "Iniciando sesión...",
+    "secureLabel": "100% Seguro",
+    "newUser": "¿Nuevo aquí?",
+    "autoCreate": "¡El inicio de sesión con Google crea tu cuenta automáticamente!",
+    "terms": "Al continuar, aceptas nuestros",
+    "termsLink": "Términos de Servicio",
+    "and": "y",
+    "privacyLink": "Política de Privacidad",
+    "features": {
+      "exclusive": {
+        "title": "Contenido Exclusivo",
+        "description": "Accede a materiales premium y experiencias únicas"
+      },
+      "community": {
+        "title": "Comunidad VIP",
+        "description": "Conéctate con miembros exclusivos de nuestra comunidad"
+      },
+      "security": {
+        "title": "Seguridad Total",
+        "description": "Tus datos protegidos con encriptación de vanguardia"
+      }
+    },
+    "benefits": {
+      "secure": "Inicio de sesión seguro y rápido",
+      "instant": "Acceso instantáneo al contenido",
+      "sync": "Sincronización en todos los dispositivos"
+    },
+    "stats": "Más de 10,000 miembros activos"
+  },
+  "footer": {
+    "description": "Tu plataforma exclusiva para contenido premium y experiencias únicas.",
+    "quickLinks": "Enlaces Rápidos",
+    "aboutUs": "Sobre Nosotros",
+    "contact": "Contacto",
+    "support": "Soporte",
+    "contactSection": "Contacto",
+    "email": "contacto@abexclubs.com",
+    "phone": "+1 (555) 123-4567",
+    "privacyPolicy": "Política de Privacidad",
+    "termsOfService": "Términos de Servicio",
+    "copyright": "© 2025 Abex Clubs. Todos los derechos reservados."
+  },
   "home": {
     "hero": {
       "badge": "#1 Plataforma de Contenido Exclusivo",
@@ -197,16 +245,6 @@
         "role": "Consultora de Negocios",
         "content": "Contenido profesional con aplicabilidad práctica. Lo recomiendo a todos mis clientes."
       }
-    },
-    "footer": {
-      "description": "La plataforma completa para crear y gestionar clubes de miembros exclusivos",
-      "navigation": "Navegación",
-      "support": "Soporte",
-      "helpCenter": "Centro de Ayuda",
-      "faqs": "Preguntas Frecuentes",
-      "contact": "Contacto",
-      "terms": "Términos de Servicio",
-      "rights": "Todos los derechos reservados"
     }
   }
 }
