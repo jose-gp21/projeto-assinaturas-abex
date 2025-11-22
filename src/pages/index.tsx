@@ -31,6 +31,7 @@ import {
   MessageCircle,
   Quote,
   ChevronRight,
+  ChevronLeft,
   Edit,
   Search,
   Filter,
@@ -237,6 +238,35 @@ export default function HomePage() {
     }, 5000);
     return () => clearInterval(interval);
   }, [testimonials.length]);
+
+  const nextTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+  };
+
+  const prevTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  };
+
+  useEffect(() => {
+    const handleKeydown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target) {
+        const tag = target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || target.isContentEditable) return;
+      }
+
+      if (e.key === 'ArrowRight') {
+        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+      } else if (e.key === 'ArrowLeft') {
+        setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
+  }, [testimonials.length]);
+
+  
 
   return (
     <Layout activeTab="home" >
@@ -834,30 +864,59 @@ export default function HomePage() {
 
             <div className="relative max-w-4xl mx-auto bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8 shadow-xl">
               <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/5 to-blue-500/5 rounded-2xl -z-10 animate-spin-slow"></div>
-              <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-                <div className="flex-shrink-0 w-24 h-24 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-3xl font-bold text-white shadow-lg">
-                  {testimonials[currentTestimonial].image}
-                </div>
-                <div className="text-center md:text-left">
-                  <Quote className="w-10 h-10 text-purple-400 mb-4 mx-auto md:mx-0" />
-                  <p className="text-xl text-slate-300 italic mb-4">
-                    "{testimonials[currentTestimonial].content}"
-                  </p>
-                  <div className="flex items-center justify-center md:justify-start gap-1 mb-2">
-                    {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-current text-yellow-400" />
+
+              <div className="relative">
+                <div className="overflow-hidden">
+                  <div
+                    className="flex transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${currentTestimonial * 100}%)` }}
+                  >
+                    {testimonials.map((item, idx) => (
+                      <div key={idx} className="flex-none w-full flex flex-col md:flex-row items-center md:items-start gap-8">
+                        <div className="flex-shrink-0 w-24 h-24 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-3xl font-bold text-white shadow-lg">
+                          {item.image}
+                        </div>
+                        <div className="text-center md:text-left">
+                          <Quote className="w-10 h-10 text-purple-400 mb-4 mx-auto md:mx-0" />
+                          <p className="text-xl text-slate-300 italic mb-4">
+                            "{item.content}"
+                          </p>
+                          <div className="flex items-center justify-center md:justify-start gap-1 mb-2">
+                            {[...Array(item.rating)].map((_, i) => (
+                              <Star key={i} className="w-5 h-5 fill-current text-yellow-400" />
+                            ))}
+                          </div>
+                          <p className="text-white font-semibold">{item.name}</p>
+                          <p className="text-slate-400 text-sm">{item.role}</p>
+                        </div>
+                      </div>
                     ))}
                   </div>
-                  <p className="text-white font-semibold">{testimonials[currentTestimonial].name}</p>
-                  <p className="text-slate-400 text-sm">{testimonials[currentTestimonial].role}</p>
                 </div>
+
+                <button
+                  onClick={prevTestimonial}
+                  aria-label="Anterior"
+                  className="hidden md:flex items-center justify-center absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-full text-white"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+
+                <button
+                  onClick={nextTestimonial}
+                  aria-label="Próximo"
+                  className="hidden md:flex items-center justify-center absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-full text-white"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
               </div>
+
               <div className="flex justify-center mt-8 space-x-3">
                 {testimonials.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentTestimonial(index)}
-                    className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+                    className={`w-3 h-3 rounded-full transition-transform duration-300 ${
                       index === currentTestimonial ? 'bg-purple-500 scale-125' : 'bg-slate-700 hover:bg-slate-600'
                     }`}
                   ></button>
