@@ -1,4 +1,6 @@
 // src/pages/index.tsx
+import { PaymentModal } from '@/components/payment';
+import { IPlan } from '@/lib/models/Plan';
 import Layout from '@/components/Layout';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
@@ -51,6 +53,41 @@ export default function HomePage() {
   const { data: session } = useSession();
   const router = useRouter();
   const { t } = useLanguage(); // 🔥 Hook de tradução
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+const [availablePlans, setAvailablePlans] = useState<IPlan[]>([]);
+const [loadingPlans, setLoadingPlans] = useState(false);
+
+// Buscar planos do banco
+useEffect(() => {
+  const fetchPlans = async () => {
+    try {
+      setLoadingPlans(true);
+      const response = await fetch('/api/member/plans');
+      const data = await response.json();
+      setAvailablePlans(data);
+    } catch (error) {
+      console.error('Erro ao buscar planos:', error);
+    } finally {
+      setLoadingPlans(false);
+    }
+  };
+
+  fetchPlans();
+}, []);
+
+const handleOpenPaymentModal = () => {
+  setIsPaymentModalOpen(true);
+};
+
+const handleClosePaymentModal = () => {
+  setIsPaymentModalOpen(false);
+};
+
+const handlePaymentSuccess = () => {
+  setIsPaymentModalOpen(false);
+  router.push('/member/content');
+};
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -567,13 +604,16 @@ export default function HomePage() {
                       ))}
                     </div>
 
-                    <a href="/member/plans" className={`block w-full py-4 px-6 rounded-xl text-center font-semibold transition-all duration-300 group-hover:scale-105 ${
-                      plan.popular 
-                        ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-purple-500/25'
-                        : 'bg-slate-700 hover:bg-slate-600 text-white'
-                    }`}>
-                      {session ? t('home.plans.upgradeNow') : t('home.plans.getStarted')}
-                    </a>
+                    <button
+  onClick={handleOpenPaymentModal}
+  className={`block w-full py-4 px-6 rounded-xl text-center font-semibold transition-all duration-300 group-hover:scale-105 ${
+    plan.popular 
+      ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-purple-500/25'
+      : 'bg-slate-700 hover:bg-slate-600 text-white'
+  }`}
+>
+  {session ? t('home.plans.upgradeNow') : t('home.plans.getStarted')}
+</button>
                   </div>
                 </div>
               ))}
@@ -1021,6 +1061,13 @@ export default function HomePage() {
           </div>
         </footer>
       </div>
+      {/* Payment Modal */}
+<PaymentModal
+  isOpen={isPaymentModalOpen}
+  onClose={handleClosePaymentModal}
+  plans={availablePlans}
+  onPaymentSuccess={handlePaymentSuccess}
+/>
     </Layout>
   );
 }
