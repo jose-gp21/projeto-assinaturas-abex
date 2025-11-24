@@ -6,6 +6,8 @@ import { IPlan } from "@/lib/models/Plan";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import Layout from "@/components/Layout";
+import { connectMongoose } from "@/lib/mongodb";
+import Plan from "@/lib/models/Plan";
 
 interface PlansPageProps {
   plans: IPlan[];
@@ -170,25 +172,33 @@ export async function getServerSideProps(context: any) {
   }
 
   try {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    // Buscar direto do MongoDB (mais confiável no SSR)
+    await connectMongoose();
+    
+    const plansFromDb = await Plan.find({ isActive: true })
+      .sort({ monthlyPrice: 1 })
+      .lean()
+      .exec();
+    
+    // Serializar corretamente para o Next.js
+    const serializedPlans = JSON.parse(JSON.stringify(plansFromDb));
 
-    const req = await fetch(`${baseUrl}/api/member/plans`, {
-      headers: {
-        Cookie: context.req.headers.cookie || "",
-      },
-    });
-
-    const data = await req.json();
+    console.log('✅ SSR - Planos carregados:', serializedPlans.length);
 
     return {
       props: {
-        plans: data?.data || [],
-        currentPlanId: (session.user as any)?.currentPlanId || null,
+        plans: serializedPlans,
+        currentPlanId: null,
       },
     };
-  } catch (err) {
-    console.error("SSR ERROR (plans.tsx):", err);
-    return { props: { plans: [], currentPlanId: null } };
+  } catch (err: any) {
+    console.error("❌ SSR ERROR:", err.message);
+    
+    return { 
+      props: { 
+        plans: [], 
+        currentPlanId: null 
+      } 
+    };
   }
 }
