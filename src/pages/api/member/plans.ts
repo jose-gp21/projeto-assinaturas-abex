@@ -1,13 +1,9 @@
-// src/pages/api/member/plans.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { connectMongoose } from "@/lib/mongodb";
 import Plan from "@/lib/models/Plan";
 import { authOptions } from "../auth/[...nextauth]";
 
-/**
- * Lista todos os planos disponíveis para o usuário autenticado.
- */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   res.setHeader("Content-Type", "application/json");
 
@@ -29,19 +25,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     await connectMongoose();
 
-    // 🔎 Buscar todos os planos ativos
     const plans = await Plan.find({ isActive: true }).sort({ price: 1 });
-
-    if (!plans.length) {
-      return res.status(404).json({
-        success: false,
-        message: "Nenhum plano ativo encontrado.",
-      });
-    }
 
     return res.status(200).json({
       success: true,
-      message: "Planos disponíveis obtidos com sucesso.",
       data: plans,
     });
   } catch (error: any) {
