@@ -16,6 +16,11 @@
     "english": "🇺🇸 Inglés",
     "spanish": "🇪🇸 Español"
   },
+  "currency": {
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro"
+  },
   "signin": {
     "badge": "Acceso Exclusivo",
     "title": "¡Bienvenido de nuevo!",

@@ -4,6 +4,7 @@ import { IPlan } from '@/lib/models/Plan';
 import Layout from '@/components/Layout';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { formatPrice } from '@/lib/currencyUtils';
 import { 
   Crown, 
   Shield, 
@@ -91,7 +92,7 @@ const handlePaymentSuccess = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [activePlanPeriod, setActivePlanPeriod] = useState<'monthly' | 'annually'>('monthly');
+  const [activePlanPeriod, setActivePlanPeriod] = useState<'monthly' | 'annual'>('monthly');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -176,8 +177,8 @@ const handlePaymentSuccess = () => {
   const plans = [
     {
       name: t('home.plans.basic.name'),
-      price: { monthly: "29", annually: "299" },
-      originalPrice: { monthly: "39", annually: "399" },
+      price: { monthly: "29", annual: "299" },
+      originalPrice: { monthly: "39", annual: "399" },
       description: t('home.plans.basic.description'),
       features: [
         t('home.plans.basic.features.content'),
@@ -190,8 +191,8 @@ const handlePaymentSuccess = () => {
     },
     {
       name: t('home.plans.premium.name'),
-      price: { monthly: "79", annually: "799" },
-      originalPrice: { monthly: "99", annually: "999" },
+      price: { monthly: "79", annual: "799" },
+      originalPrice: { monthly: "99", annual: "999" },
       description: t('home.plans.premium.description'),
       features: [
         t('home.plans.premium.features.allContent'),
@@ -206,8 +207,8 @@ const handlePaymentSuccess = () => {
     },
     {
       name: t('home.plans.vip.name'),
-      price: { monthly: "149", annually: "1499" },
-      originalPrice: { monthly: "199", annually: "1999" },
+      price: { monthly: "149", annual: "1499" },
+      originalPrice: { monthly: "199", annual: "1999" },
       description: t('home.plans.vip.description'),
       features: [
         t('home.plans.vip.features.everything'),
@@ -547,13 +548,13 @@ const handlePaymentSuccess = () => {
                 </span>
                 <button
                   className="relative w-14 h-8 bg-slate-700 rounded-full border border-slate-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
-                  onClick={() => setActivePlanPeriod(activePlanPeriod === 'monthly' ? 'annually' : 'monthly')}
+                  onClick={() => setActivePlanPeriod(activePlanPeriod === 'monthly' ? 'annual' : 'monthly')}
                 >
                   <span className={`absolute left-1 top-1 w-6 h-6 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full shadow-md transform transition-transform duration-300 ${
-                    activePlanPeriod === 'annually' ? 'translate-x-6' : ''
+                    activePlanPeriod === 'annual' ? 'translate-x-6' : ''
                   }`}></span>
                 </button>
-                <span className={`text-slate-400 ${activePlanPeriod === 'annually' ? 'text-white font-semibold' : ''}`}>
+                <span className={`text-slate-400 ${activePlanPeriod === 'annual' ? 'text-white font-semibold' : ''}`}>
                   {t('home.plans.annually')}
                 </span>
                 <div className="px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full text-white text-sm font-medium">
@@ -576,21 +577,19 @@ const handlePaymentSuccess = () => {
                       <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
                       <p className="text-slate-400 mb-6">{plan.description}</p>
                       
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-center gap-2">
+                      <div className="flex items-center justify-center gap-2">
                           <span className="text-3xl font-bold text-slate-400 line-through">
-                            ${plan.originalPrice[activePlanPeriod]}
+                            {formatPrice(plan.originalPrice[activePlanPeriod], language as 'pt' | 'en' | 'es')}
                           </span>
                         </div>
                         <div className="flex items-center justify-center gap-1">
                           <span className="text-4xl font-bold text-white">
-                            ${plan.price[activePlanPeriod]}
+                            {formatPrice(plan.price[activePlanPeriod], language as 'pt' | 'en' | 'es')}
                           </span>
                           <span className="text-slate-400">
                             /{activePlanPeriod === 'monthly' ? 'mo' : 'yr'}
                           </span>
                         </div>
-                      </div>
                     </div>
 
                     <div className="space-y-4 mb-8 flex-grow">

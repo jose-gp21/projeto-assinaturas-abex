@@ -110,22 +110,54 @@ async function main() {
       subscriptionStatus: "Inactive",
     });
 
-    const planTiny = await Plan.create({
-      name: "Plano Minimo (R$0.01)",
-      description: "Plano de teste com valor mínimo (sandbox).",
-      price: 0.01,
-      monthlyPrice: 0.01,
-      features: ["Acesso mínimo para testes"],
+    const planBasic = await Plan.create({
+      name: "Plano Básico",
+      description: "Perfeito para começar com conteúdo exclusivo",
+      price: 29,
+      monthlyPrice: 29,
+      annualPrice: 299,
+      features: [
+        "Acesso a conteúdo básico",
+        "Participação na comunidade",
+        "Suporte por email",
+        "Acesso ao app mobile"
+      ],
       trialDays: 0,
       isActive: true,
     });
 
-    const planSmall = await Plan.create({
-      name: "Plano Pequeno (R$1.00)",
-      description: "Plano de teste com R$1.00 (fallback caso 0.01 seja rejeitado).",
-      price: 1.0,
-      monthlyPrice: 1.0,
-      features: ["Acesso básico"],
+    const planPremium = await Plan.create({
+      name: "Plano Premium",
+      description: "Acesso completo a todos os recursos premium",
+      price: 79,
+      monthlyPrice: 79,
+      annualPrice: 799,
+      features: [
+        "Acesso a todo o conteúdo",
+        "Suporte prioritário",
+        "Eventos exclusivos",
+        "Cursos avançados",
+        "Recursos para download",
+        "Mentoria 1-a-1"
+      ],
+      trialDays: 0,
+      isActive: true,
+    });
+
+    const planVIP = await Plan.create({
+      name: "Plano VIP",
+      description: "A experiência definitiva com todos os benefícios",
+      price: 149,
+      monthlyPrice: 149,
+      annualPrice: 1499,
+      features: [
+        "Tudo do Premium",
+        "Acesso à comunidade VIP",
+        "Consultoria pessoal",
+        "Solicitações de conteúdo personalizado",
+        "Acesso direto a especialistas",
+        "Programas de certificação"
+      ],
       trialDays: 0,
       isActive: true,
     });
@@ -143,30 +175,30 @@ async function main() {
       title: "Conteúdo Restrito - Teste",
       description: "Conteúdo exclusivo para assinantes.",
       restricted: true,
-      planId: planTiny._id,
+      planId: planPremium._id,
       views: 0,
       thumbnailUrl: "",
     });
 
-    // assinatura sample
+    // assinatura sample com plano premium
     const now = new Date();
     const oneMonth = new Date(now);
     oneMonth.setMonth(oneMonth.getMonth() + 1);
 
     const subscription1 = await Subscription.create({
       userId: user1._id,
-      planId: planSmall._id,
+      planId: planPremium._id,
       startDate: now,
       endDate: oneMonth,
       status: "active",
     });
 
-    // pagamentos de teste — garantimos mercadoPagoId únicos para não colidir com índice unique existente
+    // pagamentos de teste — com valores reais dos planos
     const payment1 = await Payment.create({
       userId: user1._id,
-      planId: planSmall._id,
+      planId: planPremium._id,
       mercadoPagoId: "TEST-MP-APPROVED-001",
-      amount: 1.0,
+      amount: 79.0,
       status: "approved",
       paidAt: new Date(),
       createdAt: new Date(),
@@ -177,9 +209,9 @@ async function main() {
 
     const payment2 = await Payment.create({
       userId: user2._id,
-      planId: planTiny._id,
+      planId: planBasic._id,
       mercadoPagoId: "TEST-MP-PENDING-002",
-      amount: 0.01,
+      amount: 29.0,
       status: "pending",
       createdAt: new Date(),
       ownerId: admin._id,
@@ -195,8 +227,9 @@ async function main() {
         { id: user2._id, email: user2.email }
       ],
       plans: [
-        { id: planTiny._id, name: planTiny.name, price: planTiny.price },
-        { id: planSmall._id, name: planSmall.name, price: planSmall.price }
+        { id: planBasic._id, name: planBasic.name, price: planBasic.price, monthly: planBasic.monthlyPrice, annual: planBasic.annualPrice },
+        { id: planPremium._id, name: planPremium.name, price: planPremium.price, monthly: planPremium.monthlyPrice, annual: planPremium.annualPrice },
+        { id: planVIP._id, name: planVIP.name, price: planVIP.price, monthly: planVIP.monthlyPrice, annual: planVIP.annualPrice }
       ],
       contents: [
         { id: publicContent._id, title: publicContent.title },

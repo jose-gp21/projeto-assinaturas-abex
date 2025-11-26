@@ -333,6 +333,13 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                 </>
               )}
 
+              {status === 'unauthenticated' && (
+                <a href="/#plans" className={getLinkClasses('plans')}>
+                  <Crown className="w-4 h-4" />
+                  {t('navbar.plans')}
+                </a>
+              )}
+
               {/* 🌍 Seletor de idiomas - sempre visível */}
               <LanguageSelector />
 
@@ -475,6 +482,17 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                     {t('navbar.content')}
                   </Link>
                 </>
+              )}
+
+              {status === 'unauthenticated' && (
+                <a 
+                  href="/#plans" 
+                  className={getMobileLinkClasses('plans')}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Crown className="w-5 h-5" />
+                  {t('navbar.plans')}
+                </a>
               )}
             </div>
 

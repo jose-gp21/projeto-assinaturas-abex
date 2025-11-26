@@ -16,6 +16,11 @@
     "english": "🇺🇸 English",
     "spanish": "🇪🇸 Spanish"
   },
+  "currency": {
+    "code": "USD",
+    "symbol": "$",
+    "name": "Dollar"
+  },
   "signin": {
     "badge": "Exclusive Access",
     "title": "Welcome back!",
