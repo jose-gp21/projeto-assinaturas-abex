@@ -174,7 +174,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               <div className="flex items-center gap-4">
                 <div className="text-right">
                   <p className="text-2xl font-bold text-gray-900">
-                    {formatPrice(billing === 'annual' ? selectedPlan.annualPrice! : selectedPlan.monthlyPrice!, language as 'pt' | 'en' | 'es')}
+                    {formatPrice(billing === 'annual' ? selectedPlan.annualPrice! : selectedPlan.monthlyPrice!, language)}
                   </p>
                   <p className="text-sm text-gray-500">
                     /{billing === 'annual' ? 'ano' : 'mês'}

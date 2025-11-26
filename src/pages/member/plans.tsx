@@ -2,6 +2,7 @@
 // src/pages/member/plans.tsx
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useLanguage } from '@/context/LanguageContext';
 import { useRouter } from 'next/router';
 import withAuth from '@/components/withAuth';
 import Layout from '@/components/Layout';
@@ -54,6 +55,7 @@ interface Subscription {
 }
 
 function MyPlansPage() {
+  const { language } = useLanguage();
   const { data: session, status } = useSession();
   const router = useRouter();
   const [plans, setPlans] = useState<Plan[]>([]);
