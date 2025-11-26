@@ -2,6 +2,7 @@
 import Layout from '@/components/Layout';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { formatPrice } from '@/lib/currencyUtils';
 import { 
   Crown, 
   Shield, 
@@ -31,6 +32,7 @@ import {
   MessageCircle,
   Quote,
   ChevronRight,
+  ChevronLeft,
   Edit,
   Search,
   Filter,
@@ -53,7 +55,7 @@ export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [activePlanPeriod, setActivePlanPeriod] = useState<'monthly' | 'annually'>('monthly');
+  const [activePlanPeriod, setActivePlanPeriod] = useState<'monthly' | 'annual'>('monthly');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -138,8 +140,8 @@ export default function HomePage() {
   const plans = [
     {
       name: t('home.plans.basic.name'),
-      price: { monthly: "29", annually: "299" },
-      originalPrice: { monthly: "39", annually: "399" },
+      price: { monthly: "29", annual: "299" },
+      originalPrice: { monthly: "39", annual: "399" },
       description: t('home.plans.basic.description'),
       features: [
         t('home.plans.basic.features.content'),
@@ -152,8 +154,8 @@ export default function HomePage() {
     },
     {
       name: t('home.plans.premium.name'),
-      price: { monthly: "79", annually: "799" },
-      originalPrice: { monthly: "99", annually: "999" },
+      price: { monthly: "79", annual: "799" },
+      originalPrice: { monthly: "99", annual: "999" },
       description: t('home.plans.premium.description'),
       features: [
         t('home.plans.premium.features.allContent'),
@@ -168,8 +170,8 @@ export default function HomePage() {
     },
     {
       name: t('home.plans.vip.name'),
-      price: { monthly: "149", annually: "1499" },
-      originalPrice: { monthly: "199", annually: "1999" },
+      price: { monthly: "149", annual: "1499" },
+      originalPrice: { monthly: "199", annual: "1999" },
       description: t('home.plans.vip.description'),
       features: [
         t('home.plans.vip.features.everything'),
@@ -237,6 +239,35 @@ export default function HomePage() {
     }, 5000);
     return () => clearInterval(interval);
   }, [testimonials.length]);
+
+  const nextTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+  };
+
+  const prevTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  };
+
+  useEffect(() => {
+    const handleKeydown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target) {
+        const tag = target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || target.isContentEditable) return;
+      }
+
+      if (e.key === 'ArrowRight') {
+        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+      } else if (e.key === 'ArrowLeft') {
+        setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
+  }, [testimonials.length]);
+
+  
 
   return (
     <Layout activeTab="home" >
@@ -480,13 +511,13 @@ export default function HomePage() {
                 </span>
                 <button
                   className="relative w-14 h-8 bg-slate-700 rounded-full border border-slate-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
-                  onClick={() => setActivePlanPeriod(activePlanPeriod === 'monthly' ? 'annually' : 'monthly')}
+                  onClick={() => setActivePlanPeriod(activePlanPeriod === 'monthly' ? 'annual' : 'monthly')}
                 >
                   <span className={`absolute left-1 top-1 w-6 h-6 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full shadow-md transform transition-transform duration-300 ${
-                    activePlanPeriod === 'annually' ? 'translate-x-6' : ''
+                    activePlanPeriod === 'annual' ? 'translate-x-6' : ''
                   }`}></span>
                 </button>
-                <span className={`text-slate-400 ${activePlanPeriod === 'annually' ? 'text-white font-semibold' : ''}`}>
+                <span className={`text-slate-400 ${activePlanPeriod === 'annual' ? 'text-white font-semibold' : ''}`}>
                   {t('home.plans.annually')}
                 </span>
                 <div className="px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full text-white text-sm font-medium">
@@ -509,21 +540,19 @@ export default function HomePage() {
                       <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
                       <p className="text-slate-400 mb-6">{plan.description}</p>
                       
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-center gap-2">
+                      <div className="flex items-center justify-center gap-2">
                           <span className="text-3xl font-bold text-slate-400 line-through">
-                            ${plan.originalPrice[activePlanPeriod]}
+                            {formatPrice(plan.originalPrice[activePlanPeriod], language as 'pt' | 'en' | 'es')}
                           </span>
                         </div>
                         <div className="flex items-center justify-center gap-1">
                           <span className="text-4xl font-bold text-white">
-                            ${plan.price[activePlanPeriod]}
+                            {formatPrice(plan.price[activePlanPeriod], language as 'pt' | 'en' | 'es')}
                           </span>
                           <span className="text-slate-400">
                             /{activePlanPeriod === 'monthly' ? 'mo' : 'yr'}
                           </span>
                         </div>
-                      </div>
                     </div>
 
                     <div className="space-y-4 mb-8 flex-grow">
@@ -834,30 +863,59 @@ export default function HomePage() {
 
             <div className="relative max-w-4xl mx-auto bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8 shadow-xl">
               <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/5 to-blue-500/5 rounded-2xl -z-10 animate-spin-slow"></div>
-              <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-                <div className="flex-shrink-0 w-24 h-24 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-3xl font-bold text-white shadow-lg">
-                  {testimonials[currentTestimonial].image}
-                </div>
-                <div className="text-center md:text-left">
-                  <Quote className="w-10 h-10 text-purple-400 mb-4 mx-auto md:mx-0" />
-                  <p className="text-xl text-slate-300 italic mb-4">
-                    "{testimonials[currentTestimonial].content}"
-                  </p>
-                  <div className="flex items-center justify-center md:justify-start gap-1 mb-2">
-                    {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-current text-yellow-400" />
+
+              <div className="relative">
+                <div className="overflow-hidden">
+                  <div
+                    className="flex transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${currentTestimonial * 100}%)` }}
+                  >
+                    {testimonials.map((item, idx) => (
+                      <div key={idx} className="flex-none w-full flex flex-col md:flex-row items-center md:items-start gap-8">
+                        <div className="flex-shrink-0 w-24 h-24 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-3xl font-bold text-white shadow-lg">
+                          {item.image}
+                        </div>
+                        <div className="text-center md:text-left">
+                          <Quote className="w-10 h-10 text-purple-400 mb-4 mx-auto md:mx-0" />
+                          <p className="text-xl text-slate-300 italic mb-4">
+                            "{item.content}"
+                          </p>
+                          <div className="flex items-center justify-center md:justify-start gap-1 mb-2">
+                            {[...Array(item.rating)].map((_, i) => (
+                              <Star key={i} className="w-5 h-5 fill-current text-yellow-400" />
+                            ))}
+                          </div>
+                          <p className="text-white font-semibold">{item.name}</p>
+                          <p className="text-slate-400 text-sm">{item.role}</p>
+                        </div>
+                      </div>
                     ))}
                   </div>
-                  <p className="text-white font-semibold">{testimonials[currentTestimonial].name}</p>
-                  <p className="text-slate-400 text-sm">{testimonials[currentTestimonial].role}</p>
                 </div>
+
+                <button
+                  onClick={prevTestimonial}
+                  aria-label="Anterior"
+                  className="hidden md:flex items-center justify-center absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-full text-white"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+
+                <button
+                  onClick={nextTestimonial}
+                  aria-label="Próximo"
+                  className="hidden md:flex items-center justify-center absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-full text-white"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
               </div>
+
               <div className="flex justify-center mt-8 space-x-3">
                 {testimonials.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentTestimonial(index)}
-                    className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+                    className={`w-3 h-3 rounded-full transition-transform duration-300 ${
                       index === currentTestimonial ? 'bg-purple-500 scale-125' : 'bg-slate-700 hover:bg-slate-600'
                     }`}
                   ></button>

@@ -32,7 +32,9 @@ interface Plan {
   monthlyPrice?: number;
   annualPrice?: number; 
   description: string;
-  benefits: string[];
+  // some APIs use `features`, others `benefits` — accept both
+  features?: string[];
+  benefits?: string[];
   trialDays?: number;
   popular?: boolean;
   active?: boolean;
@@ -113,7 +115,7 @@ function MyPlansPage() {
   setError(null);
 
   try {
-    const res = await fetch('/api/member/plans', {
+    const res = await fetch('/api/member/subscribe', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
@@ -311,7 +313,7 @@ function MyPlansPage() {
       <div className="mb-6">
         <h4 className="text-sm font-medium text-slate-300 mb-3">Features included</h4>
         <div className="space-y-2">
-          {plan.benefits.map((benefit, index) => (
+          {(plan.features || plan.benefits || []).map((benefit, index) => (
             <div key={index} className="flex items-start gap-2 text-sm text-slate-400">
               <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
               <span>{benefit}</span>

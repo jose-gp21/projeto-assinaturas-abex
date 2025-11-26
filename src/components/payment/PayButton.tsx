@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
+import { formatPrice } from '@/lib/currencyUtils';
 
 interface PayButtonProps {
   planId: string;
@@ -24,6 +26,7 @@ const PayButton: React.FC<PayButtonProps> = ({
   disabled = false
 }) => {
   const [loading, setLoading] = useState(false);
+  const { language } = useLanguage();
 
   const handlePayment = async () => {
     if (disabled || loading) return;
@@ -72,13 +75,6 @@ const PayButton: React.FC<PayButtonProps> = ({
     }
   };
 
-  const formatPrice = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
-
   return (
     <button
       onClick={handlePayment}
@@ -112,7 +108,7 @@ const PayButton: React.FC<PayButtonProps> = ({
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
-            Pagar {formatPrice(price)}
+            Pagar {formatPrice(price, language as 'pt' | 'en' | 'es')}
             <span className="ml-1 text-xs opacity-80">
               /{billing === 'annual' ? 'ano' : 'mês'}
             </span>

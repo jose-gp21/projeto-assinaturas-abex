@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IPlan } from '@/lib/models/Plan';
+import { useLanguage } from '@/context/LanguageContext';
+import { formatPrice } from '@/lib/currencyUtils';
 import PlanCard from './PlanCard';
 import PayButton from './PayButton';
 
@@ -22,6 +24,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { language } = useLanguage();
 
   // Reset state when modal opens
   useEffect(() => {
@@ -171,10 +174,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               <div className="flex items-center gap-4">
                 <div className="text-right">
                   <p className="text-2xl font-bold text-gray-900">
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
-                    }).format(billing === 'annual' ? selectedPlan.annualPrice! : selectedPlan.monthlyPrice!)}
+                    {formatPrice(billing === 'annual' ? selectedPlan.annualPrice! : selectedPlan.monthlyPrice!, language as 'pt' | 'en' | 'es')}
                   </p>
                   <p className="text-sm text-gray-500">
                     /{billing === 'annual' ? 'ano' : 'mês'}

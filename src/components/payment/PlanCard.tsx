@@ -1,5 +1,7 @@
 import React from 'react';
 import { IPlan } from '@/lib/models/Plan';
+import { useLanguage } from '@/context/LanguageContext';
+import { formatPrice } from '@/lib/currencyUtils';
 
 interface PlanCardProps {
   plan: IPlan;
@@ -18,19 +20,13 @@ const PlanCard: React.FC<PlanCardProps> = ({
   loading = false,
   currentPlanId 
 }) => {
+  const { language } = useLanguage();
   const price = billing === 'annual' ? plan.annualPrice : plan.monthlyPrice;
   const isCurrentPlan = currentPlanId === plan._id.toString();
 
   if (!price) {
     return null; // Don't render if no price for selected billing
   }
-
-  const formatPrice = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
 
   const getMonthlyEquivalent = () => {
     if (billing === 'annual' && plan.annualPrice) {
@@ -82,7 +78,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
       <div className="text-center mb-6">
         <div className="flex items-baseline justify-center">
           <span className="text-4xl font-bold text-gray-900">
-            {formatPrice(price)}
+            {formatPrice(price, language as 'pt' | 'en' | 'es')}
           </span>
           <span className="text-gray-500 ml-1">
             /{billing === 'annual' ? 'ano' : 'mês'}
@@ -92,11 +88,11 @@ const PlanCard: React.FC<PlanCardProps> = ({
         {billing === 'annual' && (
           <div className="mt-2">
             <p className="text-sm text-gray-500">
-              {formatPrice(getMonthlyEquivalent())}/mês
+              {formatPrice(getMonthlyEquivalent(), language as 'pt' | 'en' | 'es')}/mês
             </p>
             {getSavings() > 0 && (
               <p className="text-sm text-green-600 font-semibold">
-                Economize {formatPrice(getSavings())} por ano
+                Economize {formatPrice(getSavings(), language as 'pt' | 'en' | 'es')} por ano
               </p>
             )}
           </div>

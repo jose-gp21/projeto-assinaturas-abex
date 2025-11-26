@@ -16,6 +16,11 @@
     "english": "🇺🇸 Inglês",
     "spanish": "🇪🇸 Espanhol"
   },
+  "currency": {
+    "code": "BRL",
+    "symbol": "R$",
+    "name": "Real"
+  },
   "signin": {
     "badge": "Acesso Exclusivo",
     "title": "Bem-vindo de volta!",
