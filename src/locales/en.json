@@ -16,6 +16,40 @@
     "english": "🇺🇸 English",
     "spanish": "🇪🇸 Spanish"
   },
+  "plans": {
+    "title": "Choose Your",
+    "titleHighlight": "Perfect Plan",
+    "subtitle": "Flexible plans designed to meet your needs and budget",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "save": "Save 20%",
+    "noPlans": "No plans available",
+    "contactSupport": "Contact support for more information",
+    "mostPopular": "Most Popular",
+    "getStarted": "Get Started",
+    "upgradeNow": "Upgrade Now",
+    "features": {
+      "secure": {
+        "title": "Secure Payment",
+        "description": "Your data protected with cutting-edge encryption"
+      },
+      "guarantee": {
+        "title": "30-Day Guarantee",
+        "description": "Satisfaction guaranteed or your money back"
+      },
+      "support": {
+        "title": "24/7 Support",
+        "description": "Customer service always available for you"
+      }
+    }
+  },
+  "planCard": {
+    "perMonth": "/month",
+    "perYear": "/year",
+    "freeDays": "days free",
+    "currentPlan": "Current Plan",
+    "selectPlan": "Select Plan"
+  },
   "signin": {
     "badge": "Exclusive Access",
     "title": "Welcome back!",
@@ -62,7 +96,12 @@
     "phone": "+1 (555) 123-4567",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
-    "copyright": "© 2025 Abex Clubs. All rights reserved."
+    "copyright": "© 2025 Abex Clubs. All rights reserved.",
+    "navigation": "Navigation",
+    "helpCenter": "Help Center",
+    "faqs": "FAQs",
+    "terms": "Terms & Conditions",
+    "rights": "All rights reserved."
   },
   "home": {
     "hero": {
