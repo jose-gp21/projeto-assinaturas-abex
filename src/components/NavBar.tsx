@@ -1,5 +1,5 @@
 // src/components/Navbar.tsx
-// VERSÃO FINAL - EM PORTUGUÊS COM SUPORTE MULTI-IDIOMA
+// VERSÃO FINAL - COM LINK DE PAGAMENTOS
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -16,7 +16,8 @@ import {
   FileText,
   Shield,
   ChevronDown,
-  Globe
+  Globe,
+  DollarSign // ✨ NOVO ÍCONE
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -149,7 +150,6 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
     );
   };
 
-  // 🌍 Componente de seletor de idiomas (reutilizável)
   const LanguageSelector = ({ isMobile = false }) => {
     const getLanguageLabel = () => {
       switch (language) {
@@ -282,7 +282,6 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 lg:h-20">
             
-            {/* Logo */}
             <Link 
               href="/" 
               className={`text-2xl lg:text-3xl font-bold transition-all duration-300 hover:scale-105 flex items-center gap-2 ${
@@ -310,6 +309,13 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                         <Shield className="w-4 h-4" />
                         {t('navbar.dashboard')}
                       </Link>
+                      
+                      {/* ✨ NOVO LINK - Pagamentos */}
+                      <Link href="/admin/payments" className={getLinkClasses('admin-payments', '/admin/payments')}>
+                        <DollarSign className="w-4 h-4" />
+                        Pagamentos
+                      </Link>
+                      
                       <Link href="/admin/plans" className={getLinkClasses('admin-plans', '/admin/plans')}>
                         <Settings className="w-4 h-4" />
                         {t('navbar.plans')}
@@ -333,11 +339,9 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                 </>
               )}
 
-              {/* 🌍 Seletor de idiomas - sempre visível */}
               <LanguageSelector />
 
               {status === 'authenticated' ? (
-                /* Perfil do usuário */
                 <div className="relative">
                   <button
                     onClick={(e) => {
@@ -389,12 +393,10 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                   )}
                 </div>
               ) : (
-                /* Botão de Login */
                 <LoginButton />
               )}
             </div>
 
-            {/* Menu mobile */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -412,7 +414,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
         </div>
       </nav>
 
-      {/* 📱 Menu Mobile Overlay */}
+      {/* 📱 Menu Mobile */}
       {isOpen && (
         <div className="lg:hidden fixed inset-0 z-40 bg-slate-900/95 backdrop-blur-md">
           <div className="h-full overflow-y-auto pt-20 pb-6 px-4">
@@ -438,6 +440,17 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                         <Shield className="w-5 h-5" />
                         {t('navbar.dashboard')}
                       </Link>
+                      
+                      {/* ✨ NOVO LINK MOBILE - Pagamentos */}
+                      <Link 
+                        href="/admin/payments" 
+                        className={getMobileLinkClasses('admin-payments', '/admin/payments')}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <DollarSign className="w-5 h-5" />
+                        Pagamentos
+                      </Link>
+                      
                       <Link 
                         href="/admin/plans" 
                         className={getMobileLinkClasses('admin-plans', '/admin/plans')}
@@ -478,13 +491,11 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
               )}
             </div>
 
-            {/* 🌍 Seletor de idiomas mobile */}
             <div className="mt-6 pt-6 border-t border-slate-700">
               <LanguageSelector isMobile />
             </div>
 
             {status === 'authenticated' ? (
-              /* Perfil mobile */
               <div className="mt-6 pt-6 border-t border-slate-700">
                 <div className="flex items-center gap-3 px-4 py-3 bg-slate-800/50 rounded-lg mb-4">
                   <UserAvatar size="w-12 h-12" />
@@ -516,7 +527,6 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                 </button>
               </div>
             ) : (
-              /* Login button mobile */
               <div className="mt-6 pt-6 border-t border-slate-700">
                 <LoginButton isMobile />
               </div>
