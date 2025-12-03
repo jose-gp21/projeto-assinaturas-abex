@@ -265,25 +265,50 @@
         "description": "Intuitive and easy-to-navigate design"
       }
     },
-    "testimonials": {
-      "title": "What Our",
-      "title2": "Members Say",
-      "subtitle": "Discover how our platform has transformed businesses and careers around the world",
-      "testimonial1": {
-        "name": "Maria Silva",
-        "role": "Marketing Director",
-        "content": "The exclusive content transformed how I approach my business strategies. Incredible value!"
-      },
-      "testimonial2": {
-        "name": "John Smith",
-        "role": "Entrepreneur",
-        "content": "The VIP community opened doors I never imagined. The networking alone is worth the investment."
-      },
-      "testimonial3": {
-        "name": "Ana Costa",
-        "role": "Business Consultant",
-        "content": "Professional content with practical applicability. I recommend it to all my clients."
-      }
+"testimonials": {
+  "title": "What Our",
+  "title2": "Members Say",
+  "subtitle": "Discover how our platform has transformed businesses and careers around the world",
+  "testimonial1": {
+    "name": "Maria Silva",
+    "role": "Marketing Director",
+    "content": "The exclusive content transformed how I approach my business strategies. Incredible value!"
+  },
+  "testimonial2": {
+    "name": "John Smith",
+    "role": "Entrepreneur",
+    "content": "The VIP community opened doors I never imagined. The networking alone is worth the investment."
+  },
+  "testimonial3": {
+    "name": "Ana Costa",
+    "role": "Business Consultant",
+    "content": "Professional content with practical applicability. I recommend it to all my clients."
+  },
+  "testimonial4": {
+    "name": "Robert Ferguson",
+    "role": "Digital Entrepreneur",
+    "content": "The content quality is exceptional. I've implemented several strategies I learned and I'm already seeing concrete results in my business."
+  },
+  "testimonial5": {
+    "name": "Laura Collins",
+    "role": "Marketing Consultant",
+    "content": "The networking here is incredible! I've met amazing professionals and formed valuable partnerships. Worth every penny invested."
+  },
+  "testimonial6": {
+    "name": "Peter Morgan",
+    "role": "Freelance Designer",
+    "content": "Excellent platform with lots of relevant content. The courses are well-structured and support is always quick."
+  }
+},
+    "footer": {
+      "description": "The complete platform for creating and managing exclusive membership clubs",
+      "navigation": "Navigation",
+      "support": "Support",
+      "helpCenter": "Help Center",
+      "faqs": "FAQs",
+      "contact": "Contact",
+      "terms": "Terms of Service",
+      "rights": "All rights reserved"
     }
   }
 }
