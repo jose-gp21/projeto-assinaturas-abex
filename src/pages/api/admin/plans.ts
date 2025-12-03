@@ -1,168 +1,117 @@
-// src/api/admin/plans.ts
-import type { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]";
-import { connectMongoose } from "@/lib/mongodb";
-import { PlanService } from "@/services/planService";
+// src/pages/api/admin/plans.ts
+import { NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]';
+import { connectMongoose } from '@/lib/mongodb';
+import Plan from '@/lib/models/Plan';
 
-/**
- * Rota administrativa para CRUD de planos.
- * Métodos suportados: GET, POST, PUT, DELETE
- */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  res.setHeader("Content-Type", "application/json");
-
   try {
     const session = await getServerSession(req, res, authOptions);
 
-    // ✅ Apenas administradores podem acessar
-    if (!session?.user || session.user.role !== "admin") {
-      return res.status(403).json({
-        success: false,
-        message: "Acesso negado. Permissões de administrador necessárias.",
+    if (!session) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    // @ts-ignore
+    if (session.user?.role !== 'admin') {
+      return res.status(403).json({ error: 'Forbidden - Admin access required' });
+    }
+
+    await connectMongoose();
+
+    // GET - Listar todos os planos
+    if (req.method === 'GET') {
+      const plans = await Plan.find({}).lean().exec();
+      return res.status(200).json(plans);
+    }
+
+    // POST - Criar novo plano
+    if (req.method === 'POST') {
+      const { name, description, monthlyPrice, annualPrice, features, trialDays, isActive } = req.body;
+
+      // Validações
+      if (!name || !description) {
+        return res.status(400).json({ error: 'Nome e descrição são obrigatórios' });
+      }
+
+      if (!monthlyPrice || monthlyPrice < 0) {
+        return res.status(400).json({ error: 'Preço mensal inválido' });
+      }
+
+      if (!annualPrice || annualPrice < 0) {
+        return res.status(400).json({ error: 'Preço anual inválido' });
+      }
+
+      if (!Array.isArray(features) || features.length === 0) {
+        return res.status(400).json({ error: 'Adicione pelo menos uma feature' });
+      }
+
+      // Criar novo plano
+      const newPlan = new Plan({
+        name,
+        description,
+        monthlyPrice: parseFloat(monthlyPrice),
+        annualPrice: parseFloat(annualPrice),
+        features,
+        trialDays: parseInt(trialDays) || 0,
+        isActive: isActive !== undefined ? isActive : true,
+      });
+
+      await newPlan.save();
+
+      return res.status(201).json({
+        message: 'Plano criado com sucesso',
+        plan: newPlan,
       });
     }
 
-    // ✅ Garante conexão ativa com o banco
-    await connectMongoose();
+    // PUT - Atualizar plano
+    if (req.method === 'PUT') {
+      const { id, ...updateData } = req.body;
 
-    switch (req.method) {
-      /**
-       * 📘 GET — Listar todos os planos
-       */
-      case "GET": {
-        try {
-          const plans = await PlanService.getPlans();
-          return res.status(200).json({
-            success: true,
-            message: "Planos obtidos com sucesso.",
-            data: plans,
-          });
-        } catch (error: any) {
-          console.error("❌ Erro ao listar planos:", error.message);
-          return res.status(500).json({
-            success: false,
-            message: "Erro interno ao listar planos.",
-            error: error.message,
-          });
-        }
+      if (!id) {
+        return res.status(400).json({ error: 'ID do plano é obrigatório' });
       }
 
-      /**
-       * 🟢 POST — Criar novo plano
-       */
-      case "POST": {
-        try {
-          const body = req.body;
-          const newPlan = await PlanService.createNewPlan(body);
+      const updatedPlan = await Plan.findByIdAndUpdate(
+        id,
+        { $set: updateData },
+        { new: true, runValidators: true }
+      );
 
-          return res.status(201).json({
-            success: true,
-            message: "Plano criado com sucesso!",
-            data: newPlan,
-          });
-        } catch (error: any) {
-          console.error("❌ Erro ao criar plano:", error.message);
-          if (error.message.includes("required")) {
-            return res.status(400).json({ success: false, message: error.message });
-          }
-          if (error.message.includes("already exists")) {
-            return res.status(409).json({ success: false, message: error.message });
-          }
-          return res.status(500).json({
-            success: false,
-            message: "Erro interno ao criar plano.",
-            error: error.message,
-          });
-        }
+      if (!updatedPlan) {
+        return res.status(404).json({ error: 'Plano não encontrado' });
       }
 
-      /**
-       * 🟡 PUT — Atualizar plano existente
-       */
-      case "PUT": {
-        try {
-          const { id, ...updateData } = req.body;
-
-          if (!id) {
-            return res.status(400).json({
-              success: false,
-              message: "O ID do plano é obrigatório para atualização.",
-            });
-          }
-
-          const updatedPlan = await PlanService.updateExistingPlan(id, updateData);
-
-          return res.status(200).json({
-            success: true,
-            message: "Plano atualizado com sucesso!",
-            data: updatedPlan,
-          });
-        } catch (error: any) {
-          console.error("❌ Erro ao atualizar plano:", error.message);
-          if (error.message.includes("not found")) {
-            return res.status(404).json({ success: false, message: error.message });
-          }
-          if (error.message.includes("already exists")) {
-            return res.status(409).json({ success: false, message: error.message });
-          }
-          return res.status(500).json({
-            success: false,
-            message: "Erro interno ao atualizar plano.",
-            error: error.message,
-          });
-        }
-      }
-
-      /**
-       * 🔴 DELETE — Excluir plano
-       */
-      case "DELETE": {
-        try {
-          const { id } = req.query;
-
-          if (!id || typeof id !== "string") {
-            return res.status(400).json({
-              success: false,
-              message: "O ID do plano é obrigatório para exclusão.",
-            });
-          }
-
-          const deletedPlan = await PlanService.deleteExistingPlan(id);
-
-          return res.status(200).json({
-            success: true,
-            message: "Plano excluído com sucesso.",
-            data: deletedPlan,
-          });
-        } catch (error: any) {
-          console.error("❌ Erro ao excluir plano:", error.message);
-          if (error.message.includes("not found")) {
-            return res.status(404).json({ success: false, message: error.message });
-          }
-          return res.status(500).json({
-            success: false,
-            message: "Erro interno ao excluir plano.",
-            error: error.message,
-          });
-        }
-      }
-
-      /**
-       * 🚫 MÉTODO INVÁLIDO
-       */
-      default:
-        return res.status(405).json({
-          success: false,
-          message: "Método não permitido.",
-        });
+      return res.status(200).json({
+        message: 'Plano atualizado com sucesso',
+        plan: updatedPlan,
+      });
     }
-  } catch (error: any) {
-    console.error("❌ Erro global em /api/admin/plans:", error.message);
-    return res.status(500).json({
-      success: false,
-      message: "Erro interno do servidor.",
-      error: error.message,
-    });
+
+    // DELETE - Deletar plano
+    if (req.method === 'DELETE') {
+      const { id } = req.query;
+
+      if (!id) {
+        return res.status(400).json({ error: 'ID do plano é obrigatório' });
+      }
+
+      const deletedPlan = await Plan.findByIdAndDelete(id);
+
+      if (!deletedPlan) {
+        return res.status(404).json({ error: 'Plano não encontrado' });
+      }
+
+      return res.status(200).json({
+        message: 'Plano deletado com sucesso',
+      });
+    }
+
+    return res.status(405).json({ error: 'Method not allowed' });
+  } catch (error) {
+    console.error('Error in plans API:', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }

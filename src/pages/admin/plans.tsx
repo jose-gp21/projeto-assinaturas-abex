@@ -1,617 +1,593 @@
-'use client'
 // src/pages/admin/plans.tsx
+import { GetServerSideProps } from 'next';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../api/auth/[...nextauth]';
 import Layout from '@/components/Layout';
-import withAuth from '@/components/withAuth';
-import { useState, useEffect } from 'react';
-import { 
-  Crown, 
-  Plus, 
-  Edit3, 
-  Trash2, 
-  DollarSign, 
-  Calendar, 
-  CheckCircle, 
-  X,
-  Save,
-  AlertCircle,
-  Zap,
-  Users,
-  Star,
-  Clock,
-  Gift,
-  Sparkles,
-  Target,
-  TrendingUp,
-  Eye,
-  EyeOff
-} from 'lucide-react';
+import { Crown, Edit, Trash2, Plus, DollarSign, Users, X, Check } from 'lucide-react';
+import { useState } from 'react';
+import { connectMongoose } from '@/lib/mongodb';
+import Plan from '@/lib/models/Plan';
 
-interface Plan {
+interface PlanType {
   _id: string;
   name: string;
-  monthlyValue?: number;
-  annualValue?: number;
   description: string;
-  benefits: string[];
-  trialDays?: number;
-  popular?: boolean;
-  active?: boolean;
+  monthlyPrice: number;
+  annualPrice: number;
+  features: string[];
+  isActive: boolean;
+  trialDays: number;
 }
 
-function ManagePlansPage() {
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [showForm, setShowForm] = useState(false);
-  const [formLoading, setFormLoading] = useState(false);
-  const [form, setForm] = useState<Partial<Plan>>({
+interface AdminPlansPageProps {
+  plans: PlanType[];
+}
+
+export default function AdminPlansPage({ plans = [] }: AdminPlansPageProps) {
+  const [plansList, setPlansList] = useState<PlanType[]>(plans);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingPlanId, setEditingPlanId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  
+  // Form state
+  const [formData, setFormData] = useState({
     name: '',
     description: '',
-    benefits: [],
-    monthlyValue: undefined,
-    annualValue: undefined,
-    trialDays: undefined,
-    popular: false,
-    active: true,
+    monthlyPrice: '',
+    annualPrice: '',
+    trialDays: '0',
+    isActive: true,
   });
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentPlanId, setCurrentPlanId] = useState<string | null>(null);
+  
+  const [features, setFeatures] = useState<string[]>(['']);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  useEffect(() => {
-    fetchPlans();
-  }, []);
+  const handleAddFeature = () => {
+    setFeatures([...features, '']);
+  };
 
-  const fetchPlans = async () => {
+  const handleRemoveFeature = (index: number) => {
+    setFeatures(features.filter((_, i) => i !== index));
+  };
+
+  const handleFeatureChange = (index: number, value: string) => {
+    const newFeatures = [...features];
+    newFeatures[index] = value;
+    setFeatures(newFeatures);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      description: '',
+      monthlyPrice: '',
+      annualPrice: '',
+      trialDays: '0',
+      isActive: true,
+    });
+    setFeatures(['']);
+    setError('');
+    setSuccess('');
+    setIsEditMode(false);
+    setEditingPlanId(null);
+  };
+
+  const handleOpenCreateModal = () => {
+    resetForm();
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (plan: PlanType) => {
+    setFormData({
+      name: plan.name,
+      description: plan.description,
+      monthlyPrice: plan.monthlyPrice.toString(),
+      annualPrice: plan.annualPrice.toString(),
+      trialDays: plan.trialDays.toString(),
+      isActive: plan.isActive,
+    });
+    setFeatures(plan.features.length > 0 ? plan.features : ['']);
+    setIsEditMode(true);
+    setEditingPlanId(plan._id);
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
     try {
-      const res = await fetch('/api/admin/plans');
-      const data = await res.json();
-      if (data.success) {
-        setPlans(data.data);
-      } else {
-        setError(data.message);
+      // Validações
+      if (!formData.name || !formData.description) {
+        setError('Nome e descrição são obrigatórios');
+        setLoading(false);
+        return;
       }
-    } catch (err: any) {
-      setError(err.message || 'Error loading plans');
+
+      const filteredFeatures = features.filter(f => f.trim() !== '');
+      if (filteredFeatures.length === 0) {
+        setError('Adicione pelo menos uma feature');
+        setLoading(false);
+        return;
+      }
+
+      const payload = {
+        name: formData.name,
+        description: formData.description,
+        monthlyPrice: parseFloat(formData.monthlyPrice),
+        annualPrice: parseFloat(formData.annualPrice),
+        trialDays: parseInt(formData.trialDays),
+        features: filteredFeatures,
+        isActive: formData.isActive,
+      };
+
+      if (isEditMode && editingPlanId) {
+        // Atualizar plano existente
+        const response = await fetch('/api/admin/plans', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: editingPlanId,
+            ...payload,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.error || 'Erro ao atualizar plano');
+          setLoading(false);
+          return;
+        }
+
+        setSuccess('Plano atualizado com sucesso!');
+        
+        // Atualizar lista de planos
+        setPlansList(plansList.map(p => p._id === editingPlanId ? data.plan : p));
+      } else {
+        // Criar novo plano
+        const response = await fetch('/api/admin/plans', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.error || 'Erro ao criar plano');
+          setLoading(false);
+          return;
+        }
+
+        setSuccess('Plano criado com sucesso!');
+        
+        // Adicionar à lista de planos
+        setPlansList([...plansList, data.plan]);
+      }
+
+      // Fechar modal após sucesso
+      setTimeout(() => {
+        setIsModalOpen(false);
+        resetForm();
+      }, 1500);
+    } catch (error) {
+      console.error('Error saving plan:', error);
+      setError('Erro ao salvar plano');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    
-    if (type === 'checkbox') {
-      const checked = (e.target as HTMLInputElement).checked;
-      setForm({ ...form, [name]: checked });
-    } else {
-      const newValue = type === 'number' ? (value === '' ? undefined : parseFloat(value)) : value;
-      setForm({ ...form, [name]: newValue });
-    }
-  };
-
-  const handleBenefitsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setForm({ ...form, benefits: e.target.value.split(',').map(b => b.trim()).filter(b => b) });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setFormLoading(true);
-
-    const method = isEditing ? 'PUT' : 'POST';
-    const url = '/api/admin/plans';
-    const body = isEditing ? { ...form, id: currentPlanId } : form;
+  const handleDelete = async (planId: string) => {
+    if (!confirm('Tem certeza que deseja deletar este plano?')) return;
 
     try {
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (data.success) {
-        resetForm();
-        fetchPlans();
-        setShowForm(false);
-      } else {
-        setError(data.message);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Error saving plan');
-    } finally {
-      setFormLoading(false);
-    }
-  };
-
-  const resetForm = () => {
-    setForm({
-      name: '',
-      description: '',
-      benefits: [],
-      monthlyValue: undefined,
-      annualValue: undefined,
-      trialDays: undefined,
-      popular: false,
-      active: true,
-    });
-    setIsEditing(false);
-    setCurrentPlanId(null);
-    setError(null);
-  };
-
-  const handleEdit = (plan: Plan) => {
-    setForm({
-      name: plan.name,
-      monthlyValue: plan.monthlyValue,
-      annualValue: plan.annualValue,
-      description: plan.description,
-      benefits: plan.benefits,
-      trialDays: plan.trialDays,
-      popular: plan.popular || false,
-      active: plan.active !== false,
-    });
-    setIsEditing(true);
-    setCurrentPlanId(plan._id);
-    setShowForm(true);
-  };
-
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
-
-    try {
-      const res = await fetch(`/api/admin/plans?id=${id}`, {
+      const response = await fetch(`/api/admin/plans?id=${planId}`, {
         method: 'DELETE',
       });
-      const data = await res.json();
-      if (data.success) {
-        fetchPlans();
-      } else {
-        setError(data.message);
+
+      if (!response.ok) {
+        alert('Erro ao deletar plano');
+        return;
       }
-    } catch (err: any) {
-      setError(err.message || 'Error deleting plan');
+
+      setPlansList(plansList.filter(p => p._id !== planId));
+    } catch (error) {
+      console.error('Error deleting plan:', error);
+      alert('Erro ao deletar plano');
     }
   };
-
-  const togglePlanStatus = async (id: string, active: boolean) => {
-    try {
-      const res = await fetch('/api/admin/plans', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id, active: !active }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        fetchPlans();
-      } else {
-        setError(data.message);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Error updating plan status');
-    }
-  };
-
-  const PlanCard = ({ plan }: { plan: Plan }) => (
-    <div className={`relative bg-slate-800/50 backdrop-blur-sm border ${
-      plan.popular ? 'border-purple-500/50 shadow-purple-500/20' : 'border-slate-700/50'
-    } rounded-2xl p-6 hover:bg-slate-800/70 transition-all duration-300 hover:scale-[1.02] group`}>
-      
-      {/* Popular Badge */}
-      {plan.popular && (
-        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-          <div className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-            <Star className="w-3 h-3 fill-current" />
-            Popular
-          </div>
-        </div>
-      )}
-
-      {/* Status Badge */}
-      <div className="absolute top-4 right-4">
-        <button
-          onClick={() => togglePlanStatus(plan._id, plan.active !== false)}
-          className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${
-            plan.active !== false 
-              ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
-              : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-          }`}
-        >
-          {plan.active !== false ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-          {plan.active !== false ? 'Active' : 'Inactive'}
-        </button>
-      </div>
-
-      {/* Plan Icon */}
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
-        plan.popular 
-          ? 'bg-gradient-to-r from-purple-500 to-blue-500' 
-          : 'bg-gradient-to-r from-slate-600 to-slate-700'
-      }`}>
-        <Crown className="w-6 h-6 text-white" />
-      </div>
-
-      {/* Plan Details */}
-      <div className="mb-6">
-        <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
-        <p className="text-slate-400 text-sm line-clamp-2">{plan.description}</p>
-      </div>
-
-      {/* Pricing */}
-      <div className="mb-6">
-        {plan.monthlyValue && (
-          <div className="flex items-baseline gap-2 mb-2">
-            <span className="text-2xl font-bold text-white">
-              ${plan.monthlyValue.toFixed(2)}
-            </span>
-            <span className="text-slate-400 text-sm">/month</span>
-          </div>
-        )}
-        {plan.annualValue && (
-          <div className="flex items-baseline gap-2">
-            <span className="text-lg font-semibold text-purple-400">
-              ${plan.annualValue.toFixed(2)}
-            </span>
-            <span className="text-slate-400 text-sm">/year</span>
-            {plan.monthlyValue && (
-              <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">
-                {Math.round((1 - (plan.annualValue / (plan.monthlyValue * 12))) * 100)}% off
-              </span>
-            )}
-          </div>
-        )}
-        {plan.trialDays && (
-          <div className="flex items-center gap-1 mt-2 text-blue-400 text-sm">
-            <Gift className="w-4 h-4" />
-            {plan.trialDays} days free
-          </div>
-        )}
-      </div>
-
-      {/* Benefits */}
-      <div className="mb-6">
-        <h4 className="text-sm font-medium text-slate-300 mb-3">Benefits included</h4>
-        <div className="space-y-2">
-          {plan.benefits.slice(0, 3).map((benefit, index) => (
-            <div key={index} className="flex items-center gap-2 text-sm text-slate-400">
-              <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-              <span className="line-clamp-1">{benefit}</span>
-            </div>
-          ))}
-          {plan.benefits.length > 3 && (
-            <div className="text-xs text-slate-500">
-              +{plan.benefits.length - 3} additional benefits
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="flex gap-2 pt-4 border-t border-slate-700">
-        <button
-          onClick={() => handleEdit(plan)}
-          className="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-        >
-          <Edit3 className="w-4 h-4" />
-          Edit
-        </button>
-        <button
-          onClick={() => handleDelete(plan._id, plan.name)}
-          className="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
-      </div>
-    </div>
-  );
-
-  if (loading) {
-    return (
-      <Layout activeTab='admin-plans'>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-slate-300 text-lg">Loading plans...</p>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
 
   return (
     <Layout activeTab="admin-plans">
-      <div className="container mx-auto p-4 lg:p-6 max-w-7xl space-y-8">
-        
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
-              Manage Plans
-            </h1>
-            <p className="text-slate-400">Create and manage subscription plans for your platform</p>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
           
-          <button
-            onClick={() => {
-              resetForm();
-              setShowForm(true);
-            }}
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2 shadow-lg"
-          >
-            <Plus className="w-5 h-5" />
-            New Plan
-          </button>
-        </div>
-
-        {/* Error Alert */}
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-400" />
-            <p className="text-red-400">{error}</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">
+                Gerenciar Planos
+              </h1>
+              <p className="text-slate-400">
+                Crie e edite os planos de assinatura da plataforma
+              </p>
+            </div>
             <button 
-              onClick={() => setError(null)}
-              className="ml-auto text-red-400 hover:text-red-300"
+              onClick={handleOpenCreateModal}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-all duration-200 hover:scale-105"
             >
-              <X className="w-4 h-4" />
+              <Plus className="w-4 h-4" />
+              Novo Plano
             </button>
           </div>
-        )}
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                <Target className="w-6 h-6 text-white" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                  <Crown className="w-6 h-6 text-white" />
+                </div>
               </div>
-              <div>
-                <p className="text-2xl font-bold text-white">{plans.length}</p>
-                <p className="text-slate-400 text-sm">Total Plans</p>
-              </div>
+              <p className="text-slate-400 text-sm mb-1">Total de Planos</p>
+              <p className="text-2xl font-bold text-white">{plansList.length}</p>
             </div>
-          </div>
-          
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
-                <Eye className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-white">
-                  {plans.filter(p => p.active !== false).length}
-                </p>
-                <p className="text-slate-400 text-sm">Active Plans</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <Star className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-white">
-                  {plans.filter(p => p.popular).length}
-                </p>
-                <p className="text-slate-400 text-sm">Popular Plans</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Plans Grid */}
-        <div>
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-            <Crown className="w-6 h-6 text-purple-400" />
-            Registered Plans ({plans.length})
-          </h2>
-          
-          {plans.length === 0 ? (
-            <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-12 text-center">
+            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                  <DollarSign className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <p className="text-slate-400 text-sm mb-1">Planos Ativos</p>
+              <p className="text-2xl font-bold text-white">
+                {plansList.filter(p => p.isActive).length}
+              </p>
+            </div>
+
+            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                  <Users className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <p className="text-slate-400 text-sm mb-1">Assinantes</p>
+              <p className="text-2xl font-bold text-white">0</p>
+            </div>
+          </div>
+
+          {plansList.length === 0 ? (
+            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-12 text-center">
               <Crown className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-400 mb-2">No plans registered</h3>
-              <p className="text-slate-500 mb-6">Start by creating your first subscription plan</p>
-              <button
-                onClick={() => {
-                  resetForm();
-                  setShowForm(true);
-                }}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2 mx-auto"
+              <h3 className="text-xl font-bold text-white mb-2">
+                Nenhum plano cadastrado
+              </h3>
+              <p className="text-slate-400 mb-6">
+                Comece criando seu primeiro plano de assinatura
+              </p>
+              <button 
+                onClick={handleOpenCreateModal}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg font-semibold transition-all duration-200 hover:scale-105"
               >
                 <Plus className="w-5 h-5" />
-                Create First Plan
+                Criar Primeiro Plano
               </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {plans.map((plan) => (
-                <PlanCard key={plan._id} plan={plan} />
+              {plansList.map((plan) => (
+                <div
+                  key={plan._id}
+                  className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 hover:bg-slate-800/70 transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => handleOpenEditModal(plan)}
+                        className="p-2 text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors"
+                        title="Editar plano"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(plan._id)}
+                        className="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
+                        title="Deletar plano"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <p className="text-slate-400 text-sm mb-4">{plan.description}</p>
+
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 text-sm">Mensal</span>
+                      <span className="text-white font-bold">
+                        R$ {plan.monthlyPrice?.toFixed(2) || '0.00'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 text-sm">Anual</span>
+                      <span className="text-white font-bold">
+                        R$ {plan.annualPrice?.toFixed(2) || '0.00'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-700">
+                    <p className="text-slate-400 text-xs mb-2">Features:</p>
+                    <div className="space-y-1">
+                      {(plan.features || []).slice(0, 3).map((feature, index) => (
+                        <p key={index} className="text-slate-300 text-sm">
+                          • {feature}
+                        </p>
+                      ))}
+                      {(plan.features || []).length > 3 && (
+                        <p className="text-slate-500 text-sm">
+                          +{plan.features.length - 3} mais
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-slate-700 flex items-center justify-between">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        plan.isActive
+                          ? 'bg-green-500/20 text-green-400'
+                          : 'bg-red-500/20 text-red-400'
+                      }`}
+                    >
+                      {plan.isActive ? 'Ativo' : 'Inativo'}
+                    </span>
+                    {plan.trialDays > 0 && (
+                      <span className="text-xs text-slate-400">
+                        {plan.trialDays} dias grátis
+                      </span>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           )}
         </div>
+      </div>
 
-        {/* Form Modal */}
-        {showForm && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                  {isEditing ? <Edit3 className="w-6 h-6 text-blue-400" /> : <Plus className="w-6 h-6 text-purple-400" />}
-                  {isEditing ? 'Edit Plan' : 'Create New Plan'}
-                </h2>
-                <button
-                  onClick={() => setShowForm(false)}
-                  className="text-slate-400 hover:text-white transition-colors"
-                >
-                  <X className="w-6 h-6" />
-                </button>
+      {/* Modal de Criar/Editar Plano */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-white">
+                {isEditMode ? 'Editar Plano' : 'Criar Novo Plano'}
+              </h3>
+              <button 
+                onClick={() => {
+                  setIsModalOpen(false);
+                  resetForm();
+                }}
+                className="text-slate-400 hover:text-white"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {error && (
+              <div className="mb-4 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400">
+                {error}
               </div>
+            )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-slate-300 text-sm font-medium mb-2">
-                      Plan Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={form.name || ''}
-                      onChange={handleChange}
-                      className="w-full bg-slate-900/50 border border-slate-600 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      placeholder="e.g., Premium Plan"
-                      required
-                    />
-                  </div>
+            {success && (
+              <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400 flex items-center gap-2">
+                <Check className="w-5 h-5" />
+                {success}
+              </div>
+            )}
 
-                  <div>
-                    <label className="block text-slate-300 text-sm font-medium mb-2">
-                      Monthly Price
-                    </label>
-                    <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input
-                        type="number"
-                        name="monthlyValue"
-                        value={form.monthlyValue ?? ''}
-                        onChange={handleChange}
-                        className="w-full bg-slate-900/50 border border-slate-600 text-white pl-12 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="0.00"
-                        step="0.01"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-300 text-sm font-medium mb-2">
-                      Annual Price
-                    </label>
-                    <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input
-                        type="number"
-                        name="annualValue"
-                        value={form.annualValue ?? ''}
-                        onChange={handleChange}
-                        className="w-full bg-slate-900/50 border border-slate-600 text-white pl-12 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="0.00"
-                        step="0.01"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-300 text-sm font-medium mb-2">
-                      Free Trial Days
-                    </label>
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input
-                        type="number"
-                        name="trialDays"
-                        value={form.trialDays ?? ''}
-                        onChange={handleChange}
-                        className="w-full bg-slate-900/50 border border-slate-600 text-white pl-12 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="0"
-                        min="0"
-                      />
-                    </div>
-                  </div>
-                </div>
-
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-slate-300 text-sm font-medium mb-2">
-                    Description *
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Nome do Plano *
                   </label>
-                  <textarea
-                    name="description"
-                    value={form.description || ''}
-                    onChange={handleChange}
-                    rows={3}
-                    className="w-full bg-slate-900/50 border border-slate-600 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="Describe what this plan offers..."
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    className="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Ex: Premium"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 text-sm font-medium mb-2">
-                    Benefits
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Dias de Trial
                   </label>
-                  <textarea
-                    name="benefits"
-                    value={form.benefits?.join(', ') || ''}
-                    onChange={handleBenefitsChange}
-                    rows={3}
-                    className="w-full bg-slate-900/50 border border-slate-600 text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="Access to premium content, Priority support, Exclusive webinars"
+                  <input
+                    type="number"
+                    value={formData.trialDays}
+                    onChange={(e) => setFormData({...formData, trialDays: e.target.value})}
+                    className="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    min="0"
                   />
-                  <p className="text-slate-500 text-xs mt-1">Separate benefits with commas</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Descrição *
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  className="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  rows={3}
+                  placeholder="Descreva o plano..."
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Preço Mensal (R$) *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.monthlyPrice}
+                    onChange={(e) => setFormData({...formData, monthlyPrice: e.target.value})}
+                    className="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="29.00"
+                    required
+                  />
                 </div>
 
-                <div className="flex gap-6">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      name="popular"
-                      checked={form.popular || false}
-                      onChange={handleChange}
-                      className="w-5 h-5 rounded border-2 border-slate-600 text-purple-500 focus:ring-purple-500 focus:ring-2"
-                    />
-                    <span className="text-slate-300 flex items-center gap-2">
-                      <Star className="w-4 h-4" />
-                      Mark as popular
-                    </span>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Preço Anual (R$) *
                   </label>
-
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      name="active"
-                      checked={form.active !== false}
-                      onChange={handleChange}
-                      className="w-5 h-5 rounded border-2 border-slate-600 text-green-500 focus:ring-green-500 focus:ring-2"
-                    />
-                    <span className="text-slate-300 flex items-center gap-2">
-                      <Eye className="w-4 h-4" />
-                      Active plan
-                    </span>
-                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.annualPrice}
+                    onChange={(e) => setFormData({...formData, annualPrice: e.target.value})}
+                    className="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="299.00"
+                    required
+                  />
                 </div>
+              </div>
 
-                <div className="flex gap-4 pt-6 border-t border-slate-700">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Features *
+                </label>
+                <div className="space-y-2">
+                  {features.map((feature, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={feature}
+                        onChange={(e) => handleFeatureChange(index, e.target.value)}
+                        className="flex-1 px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="Ex: Acesso a todo conteúdo"
+                      />
+                      {features.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFeature(index)}
+                          className="px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
                   <button
                     type="button"
-                    onClick={() => setShowForm(false)}
-                    className="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-xl font-medium transition-colors"
+                    onClick={handleAddFeature}
+                    className="text-purple-400 hover:text-purple-300 text-sm font-medium"
                   >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={formLoading}
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2"
-                  >
-                    {formLoading ? (
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <Save className="w-5 h-5" />
-                    )}
-                    {formLoading ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Plan'}
+                    + Adicionar Feature
                   </button>
                 </div>
-              </form>
-            </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
+                  className="w-4 h-4 text-purple-600 bg-slate-700 border-slate-600 rounded focus:ring-purple-500"
+                />
+                <label htmlFor="isActive" className="text-sm text-slate-300">
+                  Plano ativo
+                </label>
+              </div>
+
+              <div className="flex gap-4 pt-6">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    resetForm();
+                  }}
+                  className="flex-1 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                  disabled={loading}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={loading}
+                >
+                  {loading ? (isEditMode ? 'Salvando...' : 'Criando...') : (isEditMode ? 'Salvar Alterações' : 'Criar Plano')}
+                </button>
+              </div>
+            </form>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </Layout>
   );
 }
 
-export default withAuth(ManagePlansPage, { requiresAdmin: true });
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  try {
+    const session = await getServerSession(context.req, context.res, authOptions);
+
+    if (!session) {
+      return {
+        redirect: {
+          destination: '/auth/signin',
+          permanent: false,
+        },
+      };
+    }
+
+    // @ts-ignore
+    if (session.user?.role !== 'admin') {
+      return {
+        redirect: {
+          destination: '/member/content',
+          permanent: false,
+        },
+      };
+    }
+
+    await connectMongoose();
+    
+    const plansFromDb = await Plan.find({}).lean().exec();
+    const serializedPlans = JSON.parse(JSON.stringify(plansFromDb));
+
+    return {
+      props: {
+        plans: serializedPlans || [],
+      },
+    };
+  } catch (error) {
+    console.error('Error loading plans:', error);
+    
+    return {
+      props: {
+        plans: [],
+      },
+    };
+  }
+};
