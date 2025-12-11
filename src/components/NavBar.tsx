@@ -381,7 +381,13 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab }) => {
                           </span>
                         )}
                       </div>
-                      
+                      <Link
+      href="/member/settings"
+      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 transition-colors duration-200"
+    >
+      <Settings className="w-4 h-4" />
+      {t('navbar.settings')}
+    </Link>
                       <button
                         onClick={handleSignOut}
                         className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-red-900/20 hover:text-red-300 transition-colors duration-200"

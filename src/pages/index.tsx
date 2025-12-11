@@ -92,6 +92,7 @@ const handlePaymentSuccess = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [activePlanPeriod, setActivePlanPeriod] = useState<'monthly' | 'annually'>('monthly');
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -303,10 +304,47 @@ const handlePaymentSuccess = () => {
     return () => window.removeEventListener('keydown', handleKeydown);
   }, [testimonials.length]);
 
-  
+  useEffect(() => {
+  if (router.query.deleted === 'true') {
+    setShowDeleteSuccess(true);
+    
+    const { deleted, ...rest } = router.query;
+    router.replace({ pathname: '/', query: rest }, undefined, { shallow: true });
+    
+    setTimeout(() => {
+      setShowDeleteSuccess(false);
+    }, 5000);
+  }
+}, [router]);
 
   return (
     <Layout activeTab="home" >
+       {/* Mensagem de Sucesso - Conta Deletada */}
+  {showDeleteSuccess && (
+    <div className="fixed top-20 right-4 z-50 animate-in slide-in-from-top duration-300">
+      <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-4 shadow-2xl backdrop-blur-sm max-w-md">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <Check className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-white font-semibold mb-1">
+              Conta deletada com sucesso
+            </h3>
+            <p className="text-green-200 text-sm">
+              Todos os seus dados foram removidos permanentemente do sistema.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowDeleteSuccess(false)}
+            className="text-green-300 hover:text-white"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 overflow-hidden">
         
         {/* Floating Elements */}
