@@ -258,25 +258,50 @@
         "description": "Design intuitivo e fácil de navegar"
       }
     },
-    "testimonials": {
-      "title": "O Que Nossos",
-      "title2": "Membros Dizem",
-      "subtitle": "Descubra como nossa plataforma transformou negócios e carreiras ao redor do mundo",
-      "testimonial1": {
-        "name": "Maria Silva",
-        "role": "Diretora de Marketing",
-        "content": "O conteúdo exclusivo transformou como abordo minhas estratégias de negócios. Valor incrível!"
-      },
-      "testimonial2": {
-        "name": "João Santos",
-        "role": "Empreendedor",
-        "content": "A comunidade VIP abriu portas que nunca imaginei. O networking por si só vale o investimento."
-      },
-      "testimonial3": {
-        "name": "Ana Costa",
-        "role": "Consultora de Negócios",
-        "content": "Conteúdo profissional com aplicabilidade prática. Recomendo para todos os meus clientes."
-      }
+"testimonials": {
+  "title": "O Que Nossos",
+  "title2": "Membros Dizem",
+  "subtitle": "Descubra como nossa plataforma transformou negócios e carreiras ao redor do mundo",
+  "testimonial1": {
+    "name": "Maria Silva",
+    "role": "Diretora de Marketing",
+    "content": "O conteúdo exclusivo transformou como abordo minhas estratégias de negócios. Valor incrível!"
+  },
+  "testimonial2": {
+    "name": "João Santos",
+    "role": "Empreendedor",
+    "content": "A comunidade VIP abriu portas que nunca imaginei. O networking por si só vale o investimento."
+  },
+  "testimonial3": {
+    "name": "Ana Costa",
+    "role": "Consultora de Negócios",
+    "content": "Conteúdo profissional com aplicabilidade prática. Recomendo para todos os meus clientes."
+  },
+  "testimonial4": {
+    "name": "Roberto Ferreira",
+    "role": "Empreendedor Digital",
+    "content": "A qualidade do conteúdo é excepcional. Consegui implementar várias estratégias que aprendi e já vejo resultados concretos no meu negócio."
+  },
+  "testimonial5": {
+    "name": "Luciana Costa",
+    "role": "Consultora de Marketing",
+    "content": "O networking aqui é incrível! Conheci profissionais incríveis e formamos parcerias valiosas. Vale cada centavo investido."
+  },
+  "testimonial6": {
+    "name": "Pedro Mendes",
+    "role": "Designer Freelancer",
+    "content": "Excelente plataforma com muito conteúdo relevante. Os cursos são bem estruturados e o suporte é sempre rápido."
+  }
+},
+    "footer": {
+      "description": "A plataforma completa para criar e gerenciar clubes de membros exclusivos",
+      "navigation": "Navegação",
+      "support": "Suporte",
+      "helpCenter": "Central de Ajuda",
+      "faqs": "Perguntas Frequentes",
+      "contact": "Contato",
+      "terms": "Termos de Serviço",
+      "rights": "Todos os direitos reservados"
     }
   }
 }
